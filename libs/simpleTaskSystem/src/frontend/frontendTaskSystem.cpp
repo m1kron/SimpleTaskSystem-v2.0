@@ -48,7 +48,7 @@ void FrontendTaskSystem::ReleaseTask( const ITaskHandle* task_handle )
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void FrontendTaskSystem::TryToRunOneTask()
 {
-	bool hasMoreWorkToDo = m_helperInstanceWorker.TryToExecuteSingleTask();
+	bool hasMoreWorkToDo = m_helperInstanceWorker.PerformOneExecutionStep();
 	if( !hasMoreWorkToDo )
 		btl::this_thread::SleepFor( 2 );
 }
@@ -58,11 +58,11 @@ bool FrontendTaskSystem::ConvertMainThreadToWorker()
 {
 	if( m_helperInstanceWorker.ConvertToFiber() )
 	{
-		SYSTEM_LOG( "Converting main thread to worker thread." );
+		SYSTEM_LOG( "Converting main thread to helper worker instance." );
 		return true;
 	}
 
-	SYSTEM_LOG( "Attempt to covnert main thread to worker thread Failed! Calling ConvertMainThreadToWorker from two different threads?" );
+	SYSTEM_LOG( "Attempt to covnert main thread to helper worker instance failed! Calling ConvertMainThreadToWorker from two different threads?" );
 
 	return false;
 }
@@ -71,7 +71,8 @@ bool FrontendTaskSystem::ConvertMainThreadToWorker()
 void FrontendTaskSystem::ConvertWorkerToMainThread()
 {
 	VERIFY_SUCCESS( m_helperInstanceWorker.ConvertToThread() );
-	SYSTEM_LOG( "Converting worker thread back to main thread." );
+	m_helperInstanceWorker.FlushAllPendingAndSuspendedTasks();
+	SYSTEM_LOG( "Converted from helper worker instance back to normal thread again." );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

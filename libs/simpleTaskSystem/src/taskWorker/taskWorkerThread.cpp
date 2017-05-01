@@ -40,8 +40,7 @@ void TaskWorkerThread::MainWorkerThreadLoop()
 		// Do all the tasks:
 		while( !m_shouldFinishWork )
 		{
-			bool hasMoreWork = m_workerInstance.TryToExecuteSingleTask();
-
+			bool hasMoreWork = m_workerInstance.PerformOneExecutionStep();
 			if( !hasMoreWork )
 				break;
 		}

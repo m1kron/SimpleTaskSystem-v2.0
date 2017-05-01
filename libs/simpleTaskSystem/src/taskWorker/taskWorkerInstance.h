@@ -36,9 +36,9 @@ public:
 	// Adds task to pending execution queue. Returns true if success.
 	bool AddTask( Task* task );
 
-	// Tries to execute one task - first from pending queue. If queue is empty, then tries to steal task
+	// Performs one execution step - first checks suspended tasks. Second, tries to execute task from pending queue. If queue is empty, then tries to steal task
 	// from other worker instances. Returns true if there is more work to do, false it there is no work on this worker instance.
-	bool TryToExecuteSingleTask();
+	bool PerformOneExecutionStep();
 
 	// Returns thread id that this instance is working on.
 	btl::THREAD_ID GetThreadID() const;
@@ -46,10 +46,18 @@ public:
 	// Returns this instance id.
 	uint32_t GetInstanceID() const;
 
+	// Flushes all pending and suspened tasks by moving them to other worker instances.
+	void FlushAllPendingAndSuspendedTasks();
+
+private:
+	friend class Dispatcher;
+
+	// Takes ownership of suspended task fiber. Returns true if success.
+	bool TakeOwnershipOfSuspendedTaskFiber( TaskFiber* suspended_task_fiber );
+
 	// Tries to steal a task from this worker instance.
 	Task* TryToStealTaskFromThisInstance();
 
-private:
 	// Setups given fiber.
 	void SetupFiber( TaskFiber* fiber );
 

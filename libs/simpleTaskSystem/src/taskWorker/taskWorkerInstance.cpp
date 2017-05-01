@@ -57,7 +57,7 @@ bool TaskWorkerInstance::ConvertToThread()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-bool TaskWorkerInstance::TryToExecuteSingleTask()
+bool TaskWorkerInstance::PerformOneExecutionStep()
 {
 	WORKER_LOG( "Has %i suspended task fibers and %i pending tasks.", , m_suspendedTaskFibers.GetCurrentSize(), m_pendingTaskQueue.GetCurrentSize() );
 
@@ -262,5 +262,30 @@ bool TaskWorkerInstance::AddTask( Task* task )
 	return m_pendingTaskQueue.PushBack( task );
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+void TaskWorkerInstance::FlushAllPendingAndSuspendedTasks()
+{
+	WORKER_LOG( "Flushing %i suspended task fibers and %i pending tasks to other worker instances.",, m_suspendedTaskFibers.GetCurrentSize(), m_pendingTaskQueue.GetCurrentSize() );
+	// 2. Flush pending tasks:
+	while( TaskFiber* suspended_task_fiber = m_suspendedTaskFibers.PopBack() )
+		VERIFY_SUCCESS( m_context.m_dispatcher->RedispatchSuspendedTaskFiber( suspended_task_fiber ) );
+
+	// 2. Flush pending tasks:
+	while( Task* pending_task = m_pendingTaskQueue.PopBack() )
+		VERIFY_SUCCESS( m_context.m_dispatcher->RedispatchTaskFromHelperWorkerInstance( pending_task ) );
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+bool TaskWorkerInstance::TakeOwnershipOfSuspendedTaskFiber( TaskFiber* suspended_task_fiber )
+{
+	ASSERT( suspended_task_fiber->GetCurrentState() == TaskFiberState::Suspended );
+	if( m_suspendedTaskFibers.PushBack( suspended_task_fiber ) )
+	{
+		WORKER_LOG( "Taken ownership of suspended task fiber with task< %i >", , suspended_task_fiber->GetTask()->GetTaskID() );
+		suspended_task_fiber->Setup( m_thisFiberID, m_context.m_taskSystem );
+		return true;
+	}
+	return false;
+}
 
 NAMESPACE_STS_END

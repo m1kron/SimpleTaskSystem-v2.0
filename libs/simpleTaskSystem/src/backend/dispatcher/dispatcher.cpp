@@ -3,20 +3,21 @@
 #include "..\..\task\task.h"
 #include "..\..\taskWorker\taskWorkerInstance.h"
 #include "..\..\tools\positiveNumberHasher.h"
+#include "..\taskFiber\taskFiber.h"
 
 NAMESPACE_STS_BEGIN
 
 #define DISPATCHER_LOG( ... ) LOG( "[DISPATCHER]: " __VA_ARGS__ );
 
 /////////////////////////////////////////////////////////////////////////////
-uint32_t Dispatcher::Register( TaskWorkerInstance* instance, bool always_converted )
+uint32_t Dispatcher::Register( TaskWorkerInstance* instance, bool primary_instance )
 {
 	m_allRegisteredInstances.push_back( instance );
 
-	if( always_converted )
-		m_alwaysConvertedInstances.push_back( instance );
+	if( primary_instance )
+		m_primaryInstances.push_back( instance );
 	else
-		m_notAlwaysConvertedInstances.push_back( instance );
+		m_helpersInstances.push_back( instance );
 
 	return GetRegisteredInstancesCount() - 1;
 }
@@ -25,8 +26,8 @@ uint32_t Dispatcher::Register( TaskWorkerInstance* instance, bool always_convert
 void Dispatcher::UnregisterAll()
 {
 	m_allRegisteredInstances.clear();
-	m_alwaysConvertedInstances.clear();
-	m_notAlwaysConvertedInstances.clear();
+	m_primaryInstances.clear();
+	m_helpersInstances.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -52,14 +53,53 @@ bool Dispatcher::DispatchTask( Task* task )
 	}
 
 	// 2) Task is not submitted from any of available worker instances, so dispatch task to one of them. 
-	// Try to dispach task equally among all worker threads. In order to do that use a hash of task id:
-	const uint32_t alwaysConvertedSize = (uint32_t)m_alwaysConvertedInstances.size();
-	uint32_t starting_id = CalcHashedNumberClamped( task->GetTaskID(), alwaysConvertedSize );
+	return DispatchTaskToPrimaryInstances( task );
+}
 
-	for( uint32_t i = 0; i < alwaysConvertedSize; ++i )
+/////////////////////////////////////////////////////////////////////////////
+bool Dispatcher::RedispatchTaskFromHelperWorkerInstance( Task* task )
+{
+	DISPATCHER_LOG( "Requested to redispatch task< %i > from helper worker instance.", task->GetTaskID() );
+	ASSERT( task->IsReadyToBeExecuted() );
+	return DispatchTaskToPrimaryInstances( task );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+bool Dispatcher::RedispatchSuspendedTaskFiber( TaskFiber* suspended_task_fiber )
+{
+	const uint32_t taskID = suspended_task_fiber->GetTask()->GetTaskID();
+	DISPATCHER_LOG( "Requested to redispatch suspended task fiber with task< %i > from helper worker instance.", suspended_task_fiber->GetTask()->GetTaskID() );
+
+	// Try to dispach task equally among all primary worker threads. In order to do that use a hash of task id:
+	const uint32_t primarySize = ( uint32_t )m_primaryInstances.size();
+	uint32_t starting_id = CalcHashedNumberClamped( taskID, primarySize );
+
+	for( uint32_t i = 0; i < primarySize; ++i )
 	{
-		uint32_t worker_instance_idx = ( starting_id + i ) % alwaysConvertedSize;
-		TaskWorkerInstance* instance = m_alwaysConvertedInstances[ worker_instance_idx ];
+		uint32_t worker_instance_idx = ( starting_id + i ) % primarySize;
+		TaskWorkerInstance* instance = m_primaryInstances[ worker_instance_idx ];
+		if( instance->TakeOwnershipOfSuspendedTaskFiber( suspended_task_fiber ) )
+		{
+			DISPATCHER_LOG( "Suspended task fiber with task< %i > was added to worker instance %i.", taskID, instance->GetInstanceID() );
+			return true;
+		}
+	}
+
+	DISPATCHER_LOG( "Failed to dispatch suspended task fiber with task< %i >.", taskID );
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+bool Dispatcher::DispatchTaskToPrimaryInstances( Task* task )
+{
+	// Try to dispach task equally among all primary worker threads. In order to do that use a hash of task id:
+	const uint32_t primarySize = ( uint32_t )m_primaryInstances.size();
+	uint32_t starting_id = CalcHashedNumberClamped( task->GetTaskID(), primarySize );
+
+	for( uint32_t i = 0; i < primarySize; ++i )
+	{
+		uint32_t worker_instance_idx = ( starting_id + i ) % primarySize;
+		TaskWorkerInstance* instance = m_primaryInstances[ worker_instance_idx ];
 
 		if( instance->AddTask( task ) )
 		{
@@ -97,12 +137,12 @@ Task* Dispatcher::TryToStealTaskFromOtherWorkerInstances( uint32_t requesting_wo
 TaskWorkerInstance* Dispatcher::FindWorkerInstanceWithThreadID( btl::THREAD_ID thread_id )
 {
 	// 1. Check always converted instances:
-	for( auto instance : m_alwaysConvertedInstances )
+	for( auto instance : m_primaryInstances )
 		if( instance->GetThreadID() == thread_id )
 			return instance;
 
 	// 2. Chcek not alwyas converted instances:
-	for( auto instance : m_alwaysConvertedInstances )
+	for( auto instance : m_helpersInstances )
 		if( instance->IsConvertedToFiber() && instance->GetThreadID() == thread_id )
 			return instance;
 
