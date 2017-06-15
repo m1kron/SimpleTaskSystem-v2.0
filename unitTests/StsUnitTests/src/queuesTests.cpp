@@ -4,14 +4,14 @@
 #include <sts\lowlevel\thread\FunctorThread.h>
 #include <sts\lowlevel\synchro\Mutex.h>
 
-static const int QUEUE_SIZE = 2048;
-static float SOME_VALUE = 12345;
-static float ONE_VALUE = 1;
-static float TWO_VALUE = 2;
-static float THREE_VALUE = 3;
-
 namespace helpers
 {
+	static const int QUEUE_SIZE = 2048;
+	static float SOME_VALUE = 12345;
+	static float ONE_VALUE = 1;
+	static float TWO_VALUE = 2;
+	static float THREE_VALUE = 3;
+
 	//////////////////////////////////////////////////////////////////////////////////
 	template< class TQueue >
 	void QueueAdder( TQueue& queue, unsigned elements_to_push )
@@ -198,77 +198,77 @@ namespace helpers
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_PopBack_Lockbased_SpinLock )
 {
-	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_PopBack_Lockbased_Mutex )
 {
-	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_Lockfree )
 {
-	helpers::TestSingleThreaded< sts::LockFreePtrQueue< float, QUEUE_SIZE >  >();
+	helpers::TestSingleThreaded< sts::LockFreePtrQueue< float, helpers::QUEUE_SIZE >  >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_Lockbased_SpinLock )
 {
-	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_Lockbased_Mutex )
 {
-	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_Lockfree )
 {
-	helpers::TestSingleProducerAndConsumer< sts::LockFreePtrQueue< float, QUEUE_SIZE >  >();
+	helpers::TestSingleProducerAndConsumer< sts::LockFreePtrQueue< float, helpers::QUEUE_SIZE >  >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_Lockbased_SpinLock )
 {
-	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_Lockbased_Mutex )
 {
-	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_PopBack_Lockbased_SpinLock )
 {
-	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_PopBack_Lockbased_Mutex )
 {
-	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, MultipleProducersAndConsumers_Lockfree )
 {
-	helpers::TestMultipleProducersAndConsumers< sts::LockFreePtrQueue< float, QUEUE_SIZE > >();
+	helpers::TestMultipleProducersAndConsumers< sts::LockFreePtrQueue< float, helpers::QUEUE_SIZE > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, MultipleProducersAndConsumers_LockBased_SpinLock )
 {
-	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, MultipleProducersAndConsumers_LockBased_Mutex )
 {
-	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
 }

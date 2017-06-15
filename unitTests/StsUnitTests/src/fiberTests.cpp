@@ -2,52 +2,60 @@
 #include <sts\lowlevel\thread\fiber.h>
 #include <vector>
 
-class TestFiber : public sts::FiberBase
+namespace helpers
 {
-public:
-	TestFiber() 
-		: sts::FiberBase( true )
-		, m_integer( nullptr )
-		, m_base( 1 )
-		, m_nextFiber( nullptr )
-		, m_prevFiber( nullptr )
-		, m_prevID() {}
-
-	~TestFiber() {}
-
-	void FiberFunction() override
+	//////////////////////////////////////////////////////
+	// class used for testing fibers
+	class TestFiber : public sts::FiberBase
 	{
-		if( m_nextFiber )
+	public:
+		TestFiber()
+			: sts::FiberBase( true )
+			, m_integer( nullptr )
+			, m_base( 1 )
+			, m_nextFiber( nullptr )
+			, m_prevFiber( nullptr )
+			, m_prevID()
 		{
-			m_nextFiber->m_prevFiber = this;
-			sts::this_fiber::SwitchToFiber( m_nextFiber->GetFiberID() );
 		}
 
-		*m_integer += m_base*9;
+		~TestFiber() {}
 
-		if( m_prevFiber )
-			sts::this_fiber::SwitchToFiber( m_prevFiber->GetFiberID() );
-		else
-			sts::this_fiber::SwitchToFiber( m_prevID );
-	}
+		void FiberFunction() override
+		{
+			if( m_nextFiber )
+			{
+				m_nextFiber->m_prevFiber = this;
+				sts::this_fiber::SwitchToFiber( m_nextFiber->GetFiberID() );
+			}
 
-	unsigned m_base;
-	unsigned* m_integer;
-	TestFiber* m_nextFiber;
-	TestFiber* m_prevFiber;
-	sts::FIBER_ID m_prevID;
-};
+			*m_integer += m_base * 9;
 
+			if( m_prevFiber )
+				sts::this_fiber::SwitchToFiber( m_prevFiber->GetFiberID() );
+			else
+				sts::this_fiber::SwitchToFiber( m_prevID );
+		}
+
+		unsigned m_base;
+		unsigned* m_integer;
+		TestFiber* m_nextFiber;
+		TestFiber* m_prevFiber;
+		sts::FIBER_ID m_prevID;
+	};
+}
+
+//////////////////////////////////////////////////////////////////////////
 TEST( FiberTests, FiberSwitching )
 {
-	std::vector< TestFiber* > fibers;
+	std::vector< helpers::TestFiber* > fibers;
 	static const unsigned NUM_OF_FIBERS = 5;
 
 	unsigned globalInt = 0;
 	for( unsigned i = 0; i < NUM_OF_FIBERS; ++i )
 	{
-		fibers.push_back( new TestFiber() );
-		TestFiber* fiber = fibers.back();
+		fibers.push_back( new helpers::TestFiber() );
+		helpers::TestFiber* fiber = fibers.back();
 		fiber->m_base = ( unsigned )pow( 10, i );
 		fiber->m_integer = &globalInt;
 
@@ -57,7 +65,7 @@ TEST( FiberTests, FiberSwitching )
 
 	sts::FIBER_ID thisThreadFiberID = sts::this_fiber::ConvertThreadToFiber();
 
-	TestFiber* first = fibers[ 0 ];
+	helpers::TestFiber* first = fibers[ 0 ];
 	first->m_prevID = thisThreadFiberID;
 
 	sts::this_fiber::SwitchToFiber( first->GetFiberID() );

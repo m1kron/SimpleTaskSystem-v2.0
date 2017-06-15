@@ -8,8 +8,11 @@ typedef std::array<int, 8 > TArray8;
 namespace helpers
 {
 	//////////////////////////////////////////////////////////////////////
+	// WARNING! This method has to take iterator and fill it, otherwise 
+	// it will be optimaized by compiler in release( in case that it 
+	// simply returns computed value ) for for-loop.
 	template< class TIter >
-	static void CalculateBigSum( TIter& it ) // WARNING! This method has to take it and fill it, otherwise, it will be optimaized by compiler in release!!!
+	static void CalculateBigSum( TIter& it ) 
 	{
 		static const int IterationNumberBig = 1000000000;
 		static const int IterationNumberSmall = 100000000;
@@ -33,142 +36,108 @@ namespace helpers
 				return false;
 		return true;
 	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	template< class TArray, unsigned NumOfThreads >
+	void TestParallelForUsingThreads()
+	{
+		TArray testArray;
+
+		sts::ParallelForEach( testArray.begin(), testArray.end(),
+			[]( TArray::iterator& it )
+		{
+			helpers::CalculateBigSum( it );
+		}, NumOfThreads );
+
+		ASSERT_TRUE( helpers::ChcekIfEqual( testArray.begin(), testArray.end() ) );
+	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	template< class TArray >
+	void TestParallelForUsingTasks()
+	{
+		TArray testArray;
+		sts::TaskManager manager;
+		manager.Setup();
+
+		sts::ParallelForEachUsingTasks( testArray.begin(), testArray.end(),
+			[]( TArray::iterator& it )
+		{
+			helpers::CalculateBigSum( it );
+		}, manager );
+
+		ASSERT_TRUE( helpers::ChcekIfEqual( testArray.begin(), testArray.end() ) );
+	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	template< class TArray >
+	void TestSerialForLoop()
+	{
+		TArray testArray;
+
+		for( auto it = testArray.begin(); it != testArray.end(); ++it )
+			helpers::CalculateBigSum( it );
+
+		ASSERT_TRUE( helpers::ChcekIfEqual( testArray.begin(), testArray.end() ) );
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST(STSParallelFor, SingleThread_8_Test )
 {
-	TArray8 m_TestArray;
-
-	for( auto it = m_TestArray.begin(); it != m_TestArray.end(); ++it ) 
-		helpers::CalculateBigSum( it );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestSerialForLoop< TArray8 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, MultiThreadUsing2Threads_8_Test )
 {
-	TArray8 m_TestArray;
-
-	sts::ParallelForEach( m_TestArray.begin(), m_TestArray.end(), 
-		[] ( TArray8::iterator& it )
-		{
-			helpers::CalculateBigSum( it );
-		}, 2 );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestParallelForUsingThreads< TArray8, 2 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, MultiThreadUsing4Threads_8_Test )
 {
-	TArray8 m_TestArray;
-
-	sts::ParallelForEach( m_TestArray.begin(), m_TestArray.end(),
-		[]( TArray8::iterator& it )
-		{
-			helpers::CalculateBigSum( it );
-		}, 4 );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestParallelForUsingThreads< TArray8, 4 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, MultiThreadUsing8Threads_8_Test )
 {
-	TArray8 m_TestArray;
-
-	sts::ParallelForEach( m_TestArray.begin(), m_TestArray.end(),
-		[]( TArray8::iterator& it )
-		{
-			helpers::CalculateBigSum( it );
-		}, 8 );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestParallelForUsingThreads< TArray8, 8 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, MultiThreadUsingTasks_8_Test )
 {
-	TArray8 m_TestArray;
-	sts::TaskManager manager;
-	manager.Setup();
-
-	sts::ParallelForEachUsingTasks( m_TestArray.begin(), m_TestArray.end(),
-		[]( TArray8::iterator& it )
-	{
-		helpers::CalculateBigSum( it );
-	}, manager );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestParallelForUsingTasks< TArray8 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, SingleThread_16_Test )
 {
-	TArray16 m_TestArray;
-
-	for( auto it = m_TestArray.begin(); it != m_TestArray.end(); ++it )
-		helpers::CalculateBigSum( it );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestSerialForLoop< TArray16 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, MultiThreadUsing2Threads_16_Test )
 {
-	TArray16 m_TestArray;
-
-	sts::ParallelForEach( m_TestArray.begin(), m_TestArray.end(),
-		[]( TArray16::iterator& it )
-	{
-		helpers::CalculateBigSum( it );
-	}, 2 );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestParallelForUsingThreads< TArray16, 2 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, MultiThreadUsing4Threads_16_Test )
 {
-	TArray16 m_TestArray;
-
-	sts::ParallelForEach( m_TestArray.begin(), m_TestArray.end(),
-		[]( TArray16::iterator& it )
-	{
-		helpers::CalculateBigSum( it );
-	}, 4 );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestParallelForUsingThreads< TArray16, 4 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, MultiThreadUsing8Threads_16_Test )
 {
-	TArray16 m_TestArray;
-
-	sts::ParallelForEach( m_TestArray.begin(), m_TestArray.end(),
-		[]( TArray16::iterator& it )
-	{
-		helpers::CalculateBigSum( it );
-	}, 8 );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestParallelForUsingThreads< TArray16, 8 >();
 }
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSParallelFor, MultiThreadUsingTasks_16_Test )
 {
-	TArray16 m_TestArray;
-	sts::TaskManager manager;
-	manager.Setup();
-
-	sts::ParallelForEachUsingTasks( m_TestArray.begin(), m_TestArray.end(),
-		[]( TArray16::iterator& it )
-	{
-		helpers::CalculateBigSum( it );
-	}, manager );
-
-	ASSERT_TRUE( helpers::ChcekIfEqual( m_TestArray.begin(), m_TestArray.end() ) );
+	helpers::TestParallelForUsingTasks< TArray16 >();
 }

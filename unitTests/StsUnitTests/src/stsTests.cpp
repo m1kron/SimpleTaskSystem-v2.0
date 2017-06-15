@@ -193,6 +193,7 @@ TEST( STSTest, DynamicTaskTreeTest1 )
 
 			// Submit whole batch.
 			bool submitted = context.GetTaskManager().SubmitTaskBatch( batch );
+			ASSERT_TRUE( submitted );
 
 			// Wait until whole batch is done.
 			context.WaitFor( [ &batch ] { return batch.AreAllTaskFinished(); } );
@@ -222,6 +223,7 @@ TEST( STSTest, DynamicTaskTreeTest1 )
 
 		// Submit main task..
 		bool submitted = manager.SubmitTask( root_task_handle );
+		ASSERT_TRUE( submitted );
 
 		// and help processing until main task is done:
 		manager.RunTasksUsingThisThreadUntil( [ &root_task_handle ] { return root_task_handle->IsFinished(); } );
