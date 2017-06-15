@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="buffers">
+      <UniqueIdentifier>{a1eda0cb-c90a-450c-a5e5-4ad90744540e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="compileTimeTools">
+      <UniqueIdentifier>{d361470e-9c20-425c-b80f-ffe9124321f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prints">
+      <UniqueIdentifier>{d3d51f8d-64cd-493d-81c5-edb0ca3199da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="timers">
+      <UniqueIdentifier>{e6f1367b-7df7-4ca4-9988-a48b7e00a262}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{c80e6d60-b7f9-4294-9689-f8117e681ab2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="commonLib\implementation\timers\HighResolutionTimer.cpp">
+      <Filter>timers</Filter>
+    </ClCompile>
+    <ClCompile Include="commonLib\include\commonlib\prints\Prints.cpp">
+      <Filter>prints</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="commonLib\include\commonlib\timers\HighResolutionTimer.h">
+      <Filter>timers</Filter>
+    </ClInclude>
+    <ClInclude Include="commonLib\include\commonlib\timers\TimerMacros.h">
+      <Filter>timers</Filter>
+    </ClInclude>
+    <ClInclude Include="commonLib\include\commonlib\prints\Prints.h">
+      <Filter>prints</Filter>
+    </ClInclude>
+    <ClInclude Include="commonLib\include\commonlib\buffers\ExistingBufferWrapper.h">
+      <Filter>buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="commonLib\include\commonlib\Macros.h" />
+    <ClInclude Include="commonLib\include\commonlib\compile_time_tools\IsPowerOf2.h">
+      <Filter>compileTimeTools</Filter>
+    </ClInclude>
+    <ClInclude Include="commonLib\include\commonlib\tools\Tools.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
