@@ -17,6 +17,7 @@ TaskWorkerThread::TaskWorkerThread( const TaskWorkerContext& context )
 void TaskWorkerThread::ThreadFunction()
 {
 	m_thisWorkerFiberID = sts::this_fiber::ConvertThreadToFiber();
+	ASSERT( m_thisWorkerFiberID != INVALID_FIBER_ID );
 	m_currentFiber = m_context.m_fiberAllocator->AllocateNewTaskFiber();
 	ASSERT( m_currentFiber != nullptr );
 	m_currentFiber->Setup( m_thisWorkerFiberID, m_context.m_taskManager );
