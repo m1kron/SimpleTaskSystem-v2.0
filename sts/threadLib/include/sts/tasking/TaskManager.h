@@ -7,24 +7,29 @@
 #include <sts\lowlevel\atomic\Atomic.h>
 #include <sts\tasking\TaskHelpers.h>
 #include <sts\tasking\TaskBatch.h>
+#include <sts\lowlevel\thread\thisFiberHelpers.h>
 
 NAMESPACE_STS_BEGIN
 
 class TaskBatch;
+class TaskFiber;
 
 class TaskManager
 {
 public:
 	~TaskManager();
 
-	// Setups worker threads.
-	void Setup();
+	// Starts sts machinary.
+	bool Initialize();
+
+	// Stops sts machinery. 
+	void Deinitialize();
 
 	// Returns how many workers manager has.
 	unsigned GetWorkersCount() const;
 
 	// Tasks will be processed by workers and this thread until condition is satified. 
-	// Function blocks until all tasks are excecuted.
+	// Function blocks until all needed tasks to satisfy condition are excecuted.
 	template< typename TCondition > void RunTasksUsingThisThreadUntil( const TCondition& condition );
 
 	// Creates raw task, which has to be later submitted.
@@ -55,12 +60,20 @@ private:
 	// Tries to steal and process one task. Blocking function.
 	void TryToRunOneTask();
 
+	// Temporary converts main thread to workers. Needed for running tasks on main thread.
+	bool ConvertMainThreadToWorker();
+
+	// Converts from 'worker' back to 'main thread'.
+	void ConvertWorkerToMainThread();
+
 	// Wake ups all worker threads;
 	void WakeUpAllWorkers() const;
 
 	TaskWorkersPool     m_workerThreadsPool;
 	TaskAllocator       m_taskAllocator;
 	Atomic< unsigned >  m_taskDispacherCounter; ///< [NOTE]: does it have to be atomic?
+	sts::FIBER_ID		m_thisFiberID;
+	sts::TaskFiber*		m_currentTaskFiber;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -90,10 +103,14 @@ inline TaskHandle TaskManager::CreateNewTask( const TFunctor& functor, const Tas
 template< typename TCondition > 
 inline void TaskManager::RunTasksUsingThisThreadUntil( const TCondition& condition )
 {
+	VERIFY_SUCCES( ConvertMainThreadToWorker(); );
+
 	while( !condition() )
 	{
 		TryToRunOneTask();
 	}
+
+	ConvertWorkerToMainThread();
 }
 
 NAMESPACE_STS_END

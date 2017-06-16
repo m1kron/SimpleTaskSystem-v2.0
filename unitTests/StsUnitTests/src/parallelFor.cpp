@@ -58,7 +58,7 @@ namespace helpers
 	{
 		TArray testArray;
 		sts::TaskManager manager;
-		manager.Setup();
+		manager.Initialize();
 
 		sts::ParallelForEachUsingTasks( testArray.begin(), testArray.end(),
 			[]( TArray::iterator& it )
@@ -67,6 +67,8 @@ namespace helpers
 		}, manager );
 
 		ASSERT_TRUE( helpers::ChcekIfEqual( testArray.begin(), testArray.end() ) );
+
+		manager.Deinitialize();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////

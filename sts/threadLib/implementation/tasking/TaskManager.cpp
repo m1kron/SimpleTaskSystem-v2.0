@@ -9,42 +9,23 @@ NAMESPACE_STS_BEGIN
 //////////////////////////////////////////////////////
 TaskManager::~TaskManager()
 {
-	unsigned workers_count = GetWorkersCount();
-
-	// Signal all worker that they should finish right now.
-	for( unsigned worker_id = 0; worker_id < workers_count; ++worker_id )
-	{
-		m_workerThreadsPool.GetWorkerAt( worker_id )->FinishWork();
-	}
-
-	// We have to wait for threads to finish their work.
-	unsigned worker_id = 0;
-	while( worker_id < workers_count )
-	{
-		// Check if thread has finish it's work.
-		if( m_workerThreadsPool.GetWorkerAt( worker_id )->HasFinishedWork() )
-		{
-			// Go to next thread.
-			++worker_id;
-		}
-		else
-		{
-			// Yield exection to give worker threads processor time.
-			sts::this_thread::YieldThread();
-		}
-	}
-
-	m_workerThreadsPool.ReleasePool();
+	ASSERT( m_workerThreadsPool.GetPoolSize() == 0 );
 	ASSERT( m_taskAllocator.AreAllTasksReleased() );
 }
 
 //////////////////////////////////////////////////////
-void TaskManager::Setup()
+bool TaskManager::Initialize()
 {
 	unsigned num_cores = tools::GetLogicalCoresSize();
 
 	// Heuristic: create num_cores - 1 working threads:
-	m_workerThreadsPool.InitializePool( num_cores - 1, this );;
+	m_workerThreadsPool.InitializePoolAndStartWorkers( num_cores - 1, this );
+	return true;
+}
+
+void TaskManager::Deinitialize()
+{
+	m_workerThreadsPool.StopWorkersAndReleasePool();
 }
 
 ////////////////////////////////////////////////////////
@@ -133,6 +114,7 @@ void TaskManager::TryToRunOneTask()
 	Task* stealed_task = nullptr;
 
 	// try to steal a task from workers:
+	// [NOTE]: try to balance stealing from all workers equally, not like this!!!
 	unsigned workers_count = m_workerThreadsPool.GetPoolSize();
 	for( unsigned i = 0; i < workers_count; ++i )
 	{
@@ -145,9 +127,43 @@ void TaskManager::TryToRunOneTask()
 
 	// Execute task:
 	if( stealed_task )
-		stealed_task->Run( this );
+	{
+		ASSERT( m_currentTaskFiber->GetCurrentState() == TaskFiberState::Idle );
+		m_currentTaskFiber->SetTaskToExecute( stealed_task );
+		this_fiber::SwitchToFiber( m_currentTaskFiber->GetFiberID() );
+		ASSERT( m_currentTaskFiber->GetCurrentState() == TaskFiberState::Idle );
+
+	}
 	else // Or wait, cuz there aren't any task to execute, the task that we are waiting for should be being executed by thread worker.
-		sts::this_thread::YieldThread();
+		sts::this_thread::SleepFor(2);
+}
+
+/////////////////////////////////////////////////////////
+bool TaskManager::ConvertMainThreadToWorker()
+{
+	m_thisFiberID = sts::this_fiber::ConvertThreadToFiber();
+	ASSERT( m_thisFiberID != INVALID_FIBER_ID );
+
+	if( m_currentTaskFiber = m_workerThreadsPool.m_taskFiberAllocator.AllocateNewTaskFiber() )
+	{
+		m_currentTaskFiber->Setup( m_thisFiberID, this );
+		return true;
+	}
+
+	return false;
+}
+
+/////////////////////////////////////////////////////////
+void TaskManager::ConvertWorkerToMainThread()
+{
+	if( m_currentTaskFiber )
+	{
+		m_workerThreadsPool.m_taskFiberAllocator.ReleaseTaskFiber( m_currentTaskFiber );
+		m_currentTaskFiber = nullptr;
+	}
+
+	VERIFY_SUCCES( sts::this_fiber::ConvertFiberToThread() );
+	m_thisFiberID = INVALID_FIBER_ID;
 }
 
 /////////////////////////////////////////////////////////
