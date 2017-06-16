@@ -28,6 +28,7 @@ TaskFiber* TaskFiberAllocator::AllocateNewTaskFiber()
 /////////////////////////////////////////////////////////
 void TaskFiberAllocator::ReleaseTaskFiber( TaskFiber* fiber )
 {
+	fiber->Reset();
 	VERIFY_SUCCES( m_freeList.PushBack( fiber ) );
 }
 

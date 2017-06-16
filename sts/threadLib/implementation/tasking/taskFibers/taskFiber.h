@@ -19,7 +19,6 @@ STS_ALIGNED( STS_CACHE_LINE_SIZE ) class TaskFiber : public FiberBase
 {
 	BASE_CLASS( FiberBase );
 public:
-	// Ctor.
 	TaskFiber();
 
 	// Setups fiber. Manager is needed to run a task. When task is done, 
@@ -31,6 +30,9 @@ public:
 
 	// Returns current state of the fiber.
 	TaskFiberState GetCurrentState() const;
+
+	// Resets fiber state.
+	void Reset();
 
 private:
 	// Main fiber function.
