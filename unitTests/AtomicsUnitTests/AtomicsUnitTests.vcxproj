@@ -96,6 +96,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_HAS_EXCEPTIONS=0;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)commonLib\commonLib\include;$(SolutionDir)sts\threadLib\include;$(SolutionDir)..\GoogleTestFramework\googletest\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,6 +114,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_HAS_EXCEPTIONS=0;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)commonLib\commonLib\include;$(SolutionDir)sts\threadLib\include;$(SolutionDir)..\GoogleTestFramework\googletest\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +134,8 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_HAS_EXCEPTIONS=0;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)commonLib\commonLib\include;$(SolutionDir)sts\threadLib\include;$(SolutionDir)..\GoogleTestFramework\googletest\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,6 +156,8 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_HAS_EXCEPTIONS=0;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)commonLib\commonLib\include;$(SolutionDir)sts\threadLib\include;$(SolutionDir)..\GoogleTestFramework\googletest\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

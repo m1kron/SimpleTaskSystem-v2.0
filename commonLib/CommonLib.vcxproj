@@ -103,6 +103,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)commonLib\include</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <PreprocessorDefinitions>_MBCS;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -116,6 +118,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)commonLib\include</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <PreprocessorDefinitions>_MBCS;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -131,6 +135,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)commonLib\include</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <PreprocessorDefinitions>_MBCS;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -148,6 +154,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)commonLib\include</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <PreprocessorDefinitions>_MBCS;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
