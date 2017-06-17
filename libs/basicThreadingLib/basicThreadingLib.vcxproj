@@ -33,6 +33,7 @@
     <ClInclude Include="include\thread\thisFiberHelpers.h" />
     <ClInclude Include="include\thread\thisThreadHelpers.h" />
     <ClInclude Include="include\thread\thread.h" />
+    <ClInclude Include="include\tools\tools.h" />
     <ClInclude Include="src\platform\atomicPlatform.h" />
     <ClInclude Include="src\platform\commonPlatformIncludes.h" />
     <ClInclude Include="src\platform\conditionVariablePlatform.h" />
@@ -41,6 +42,7 @@
     <ClInclude Include="src\platform\mutexPlatform.h" />
     <ClInclude Include="src\platform\platformApi.h" />
     <ClInclude Include="src\platform\threadPlatform.h" />
+    <ClInclude Include="src\platform\toolsPlatform.h" />
     <ClInclude Include="src\platform\win\alignmentWinAPI.h" />
     <ClInclude Include="src\platform\win\atomic\atomicWinAPI.h" />
     <ClInclude Include="src\platform\win\synchro\conditionVariableImplWinAPI.h" />
@@ -48,6 +50,7 @@
     <ClInclude Include="src\platform\win\synchro\mutexWinAPI.h" />
     <ClInclude Include="src\platform\win\thread\fiberImplWinAPI.h" />
     <ClInclude Include="src\platform\win\thread\threadImplWinAPI.h" />
+    <ClInclude Include="src\platform\win\tools\toolsWinAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\platform\win\synchro\conditionVariableImplWinAPI.cpp" />
@@ -55,6 +58,7 @@
     <ClCompile Include="src\platform\win\synchro\mutexWinAPI.cpp" />
     <ClCompile Include="src\platform\win\thread\fiberImplWinAPI.cpp" />
     <ClCompile Include="src\platform\win\thread\threadImplWinAPI.cpp" />
+    <ClCompile Include="src\platform\win\tools\toolsWinAPI.cpp" />
     <ClCompile Include="src\spinLock.cpp" />
   </ItemGroup>
   <ItemGroup>
