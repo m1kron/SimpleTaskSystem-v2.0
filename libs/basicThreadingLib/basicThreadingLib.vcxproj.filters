@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{97dba540-f67f-4fd4-bb6e-ac65cf530663}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{75063378-686a-4870-ae3d-66ca0fa2c4b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\atomic">
+      <UniqueIdentifier>{8f31b178-f6c1-4265-b6ad-27a0313ec957}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\synchro">
+      <UniqueIdentifier>{48fefb05-7a51-4162-b043-c8796fee70e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\thread">
+      <UniqueIdentifier>{4c3b5707-7893-4f57-84e5-2655f18181eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\platform">
+      <UniqueIdentifier>{7da4cc96-9ca5-4442-9691-2ac5dc23fc1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\platform\win">
+      <UniqueIdentifier>{4cc89b0e-fb48-403d-9659-aa2896232bea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\platform\win\atomic">
+      <UniqueIdentifier>{6c6b5d6d-20bb-4bcc-8a5c-57ade8ca7215}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\platform\win\synchro">
+      <UniqueIdentifier>{952eb74c-dae8-4c6a-98a1-a07d3e6ea0fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\platform\win\thread">
+      <UniqueIdentifier>{09ca8c05-54c5-4f3e-8c37-aadfee8e1c4a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\atomic\atomic.h">
+      <Filter>include\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="include\atomic\memoryOrder.h">
+      <Filter>include\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="include\thread\fiber.h">
+      <Filter>include\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="include\thread\functorThread.h">
+      <Filter>include\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="include\thread\thisFiberHelpers.h">
+      <Filter>include\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="include\thread\thisThreadHelpers.h">
+      <Filter>include\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="include\thread\thread.h">
+      <Filter>include\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="include\synchro\conditionVariable.h">
+      <Filter>include\synchro</Filter>
+    </ClInclude>
+    <ClInclude Include="include\synchro\lockGuards.h">
+      <Filter>include\synchro</Filter>
+    </ClInclude>
+    <ClInclude Include="include\synchro\manualResetEvent.h">
+      <Filter>include\synchro</Filter>
+    </ClInclude>
+    <ClInclude Include="include\synchro\mutex.h">
+      <Filter>include\synchro</Filter>
+    </ClInclude>
+    <ClInclude Include="include\synchro\spinLock.h">
+      <Filter>include\synchro</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\win\atomic\atomicWinAPI.h">
+      <Filter>src\platform\win\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\win\synchro\conditionVariableImplWinAPI.h">
+      <Filter>src\platform\win\synchro</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\win\synchro\manualResetEventWinAPI.h">
+      <Filter>src\platform\win\synchro</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\win\synchro\mutexWinAPI.h">
+      <Filter>src\platform\win\synchro</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\win\thread\fiberImplWinAPI.h">
+      <Filter>src\platform\win\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\win\thread\threadImplWinAPI.h">
+      <Filter>src\platform\win\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="include\bslApi.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\win\alignmentWinAPI.h">
+      <Filter>src\platform\win</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\atomicPlatform.h">
+      <Filter>src\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\platformApi.h">
+      <Filter>src\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\threadPlatform.h">
+      <Filter>src\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\platform.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\conditionVariablePlatform.h">
+      <Filter>src\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\commonPlatformIncludes.h">
+      <Filter>src\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\manualResetEventPlatform.h">
+      <Filter>src\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\mutexPlatform.h">
+      <Filter>src\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platform\fiberPlatform.h">
+      <Filter>src\platform</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\platform\win\synchro\conditionVariableImplWinAPI.cpp">
+      <Filter>src\platform\win\synchro</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platform\win\synchro\manualResetEventWinAPI.cpp">
+      <Filter>src\platform\win\synchro</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platform\win\synchro\mutexWinAPI.cpp">
+      <Filter>src\platform\win\synchro</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platform\win\thread\fiberImplWinAPI.cpp">
+      <Filter>src\platform\win\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platform\win\thread\threadImplWinAPI.cpp">
+      <Filter>src\platform\win\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spinLock.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
+  </ItemGroup>
+</Project>
