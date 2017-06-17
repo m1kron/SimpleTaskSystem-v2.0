@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\basicThreadingLib\basicThreadingLib.vcxproj">
+      <Project>{35fb4745-aa36-40af-8bcb-2266ea169f61}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\common\common.h" />
+    <ClInclude Include="src\manager\taskManager.h" />
+    <ClInclude Include="src\precompiledHeader\precompiledHeader.h" />
+    <ClInclude Include="src\structures\lockbased\lockBasedPtrQueue.h" />
+    <ClInclude Include="src\structures\lockfree\lockfreePtrQueue.h" />
+    <ClInclude Include="src\taskFiber\taskFiber.h" />
+    <ClInclude Include="src\taskFiber\taskFiberAllocator.h" />
+    <ClInclude Include="src\taskWorker\taskWorker.h" />
+    <ClInclude Include="src\taskWorker\taskWorkersPool.h" />
+    <ClInclude Include="src\task\task.h" />
+    <ClInclude Include="src\task\taskAllocator.h" />
+    <ClInclude Include="src\task\taskBatch.h" />
+    <ClInclude Include="src\task\taskContext.h" />
+    <ClInclude Include="src\task\taskHandle.h" />
+    <ClInclude Include="src\task\taskHelpers.h" />
+    <ClInclude Include="src\tools\parallelFor.h" />
+    <ClInclude Include="src\tools\positiveNumberHasher.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\manager\taskManager.cpp" />
+    <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\taskFiber\taskFiber.cpp" />
+    <ClCompile Include="src\taskFiber\taskFiberAllocator.cpp" />
+    <ClCompile Include="src\taskWorker\taskWorker.cpp" />
+    <ClCompile Include="src\taskWorker\taskWorkersPool.cpp" />
+    <ClCompile Include="src\task\task.cpp" />
+    <ClCompile Include="src\task\taskAllocator.cpp" />
+    <ClCompile Include="src\task\taskBatch.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{391E031B-8570-4BFE-9BE2-4CF390A836D3}</ProjectGuid>
+    <RootNamespace>ThreadLib</RootNamespace>
+    <ProjectName>SimpleTaskSystem</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)_temp\$(PlatformShortName)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)_temp\$(PlatformShortName)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>$(SolutionDir)_temp\$(PlatformShortName)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(SolutionDir)_temp\$(PlatformShortName)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\precompiledHeader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiledHeader.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\precompiledHeader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>false</ExceptionHandling>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiledHeader.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\precompiledHeader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NDEBUG%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiledHeader.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\precompiledHeader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>false</ExceptionHandling>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NDEBUG%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiledHeader.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
