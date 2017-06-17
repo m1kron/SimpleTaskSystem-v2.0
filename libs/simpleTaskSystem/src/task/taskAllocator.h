@@ -24,10 +24,10 @@ public:
 	bool AreAllTasksReleased() const;
 
 	// Returns size of task pool.
-	static unsigned GetTaskPoolSize();
+	static uint32_t GetTaskPoolSize();
 
 	// Debug stuff:
-	bool Debug_TryToReleaseTask( unsigned index );
+	bool Debug_TryToReleaseTask( uint32_t index );
 	bool Debug_IsTaskOccupied( const TaskHandle& handle );
 
 private:
@@ -35,10 +35,10 @@ private:
 
 	// Pool markers marks whether corresponding task slot is used.
 	// Could be bitfield, but it would rise probability of false sharing. 
-	btl::Atomic< unsigned > m_poolMarkers[ TASK_POOL_SIZE ];
+	btl::Atomic< uint32_t > m_poolMarkers[ TASK_POOL_SIZE ];
 
 	// Hasher is used to decrease contention.
-	unsigned m_hashedNumber;
+	uint32_t m_hashedNumber;
 };
 
 NAMESPACE_STS_END

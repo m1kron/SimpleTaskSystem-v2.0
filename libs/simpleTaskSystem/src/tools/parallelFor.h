@@ -12,7 +12,7 @@ template< class Iterator, typename Functor >
 void ParallelForEach( typename Iterator& begin,				///< Begin iterator
 					  typename Iterator& end,				///< End iterator
 					  const Functor& functor,				///< functor will called on every iterator between begin and end.
-					  unsigned max_num_of_threads = 0 );	///< maximum number of threads, that implementation can use. O means that it is up to the implementation.
+					  uint32_t max_num_of_threads = 0 );	///< maximum number of threads, that implementation can use. O means that it is up to the implementation.
 
 // The same as above, but uses task system instead of raw threads.
 template< class Iterator, typename Functor >
@@ -28,7 +28,7 @@ void ParallelForEachUsingTasks( const Iterator& begin,			///< Begin iterator
 //////////////////////////////////////////////////////////////////////////
 
 template< class Iterator, typename Functor >
-void ParallelForEach( const Iterator& begin, const Iterator& end, const Functor& functor, unsigned max_num_of_threads )
+void ParallelForEach( const Iterator& begin, const Iterator& end, const Functor& functor, uint32_t max_num_of_threads )
 {
 	if( max_num_of_threads == 0 )
 		max_num_of_threads = tools::GetLogicalCoresSize();
@@ -42,7 +42,7 @@ void ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 
 	// Setup job.
 	// Split the for amoung requested number of threads (inlcuding thread that called that function):
-	for( unsigned i = 0; i < max_num_of_threads - 1; ++i )
+	for( uint32_t i = 0; i < max_num_of_threads - 1; ++i )
 	{
 		Iterator start_it = begin;
 		std::advance( start_it, i * batch_size );
@@ -65,7 +65,7 @@ void ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 	for( auto& func : functors )
 		workers.emplace_back( FunctorThread() );
 
-	for( unsigned i = 0; i < max_num_of_threads - 1; ++i )
+	for( uint32_t i = 0; i < max_num_of_threads - 1; ++i )
 	{
 		workers[ i ].SetFunctorAndStartThread( functors[ i ] );
 		workers[ i ].SetThreadName( "ParallelFor_WorkerThread" );
@@ -84,7 +84,7 @@ void ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 template< class Iterator, typename Functor >
 void ParallelForEachUsingTasks( const Iterator& begin, const Iterator& end, const Functor& functor, TaskManager& task_manager )
 {
-	unsigned max_num_of_threads = task_manager.GetWorkersCount() + 1;
+	uint32_t max_num_of_threads = task_manager.GetWorkersCount() + 1;
 	auto con_size = std::distance( begin, end );
 	auto batch_size = ( con_size / max_num_of_threads );
 	Iterator last_it = end;
@@ -98,7 +98,7 @@ DBG_ONLY_LINE( std::vector< Iterator > iterators; )
 DBG_ONLY_LINE( iterators.reserve( 2 * ( max_num_of_threads - 1 ) ); )
 
 	// Setup tasks.
-	for( unsigned i = 0; i < max_num_of_threads - 1; ++i )
+	for( uint32_t i = 0; i < max_num_of_threads - 1; ++i )
 	{
 		Iterator start_it = begin;
 		std::advance( start_it, i * batch_size );

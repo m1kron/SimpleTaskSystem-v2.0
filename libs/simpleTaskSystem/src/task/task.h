@@ -45,12 +45,12 @@ public:
 	void Clear();
 
 	// Max size of data that can be stored by task instance.
-	static const size_t DATA_SIZE = ( BTL_CACHE_LINE_SIZE - sizeof( TFunctionPtr ) - sizeof( Task* ) - sizeof( btl::Atomic< unsigned > ) );
+	static const size_t DATA_SIZE = ( BTL_CACHE_LINE_SIZE - sizeof( TFunctionPtr ) - sizeof( Task* ) - sizeof( btl::Atomic< uint32_t > ) );
 
 private:
 	TFunctionPtr m_functionPtr; 
 	Task* m_parentTask;
-	btl::Atomic< unsigned > m_numberOfChildTasks; //< When 0, task is considered as finished.
+	btl::Atomic< uint32_t > m_numberOfChildTasks; //< When 0, task is considered as finished.
 
 	char m_data[ DATA_SIZE ];
 };

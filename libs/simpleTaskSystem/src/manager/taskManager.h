@@ -23,7 +23,7 @@ public:
 	void Deinitialize();
 
 	// Returns how many workers manager has.
-	unsigned GetWorkersCount() const;
+	uint32_t GetWorkersCount() const;
 
 	// Tasks will be processed by workers and this thread until condition is satified. 
 	// Function blocks until all needed tasks to satisfy condition are excecuted.
@@ -68,7 +68,7 @@ private:
 
 	TaskWorkersPool     m_workerThreadsPool;
 	TaskAllocator       m_taskAllocator;
-	btl::Atomic< unsigned >  m_taskDispacherCounter; ///< [NOTE]: does it have to be atomic?
+	btl::Atomic< uint32_t >  m_taskDispacherCounter; ///< [NOTE]: does it have to be atomic?
 	btl::FIBER_ID		m_thisFiberID;
 	TaskFiber*		m_currentTaskFiber;
 };
@@ -78,7 +78,7 @@ private:
 // INLINES:
 //
 ///////////////////////////////////////////////////////////////
-inline unsigned TaskManager::GetWorkersCount() const
+inline uint32_t TaskManager::GetWorkersCount() const
 {
 	return m_workerThreadsPool.GetPoolSize();
 }

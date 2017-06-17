@@ -12,20 +12,20 @@ class TaskWorkersPool
 {
 public:
 	// Initializes to have specified size and starts all workers.
-	void InitializePoolAndStartWorkers( unsigned num_of_workers, TaskManager* task_manager );
+	void InitializePoolAndStartWorkers( uint32_t num_of_workers, TaskManager* task_manager );
 
 	// Send stop signal to all workers in pool and WAITS for them untill they are finished.
 	// Releases then whole pool.
 	void StopWorkersAndReleasePool();
 
 	// Returns worker at given index. Returns null if there aren't such index in the pool.
-	TaskWorkerThread* GetWorkerAt( unsigned index ) const;
+	TaskWorkerThread* GetWorkerAt( uint32_t index ) const;
 
 	// Returns worker that have specified thread_id. Returns null if such thread does not exist in the pool.
 	TaskWorkerThread* FindWorkerWithThreadID( btl::THREAD_ID thread_id ) const;
 
 	// Returns size of the pool.
-	unsigned GetPoolSize() const;
+	uint32_t GetPoolSize() const;
 
 	sts::TaskFiberAllocator m_taskFiberAllocator; // < HACK!! Cannot be here!
 
@@ -40,16 +40,16 @@ private:
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
-inline TaskWorkerThread* TaskWorkersPool::GetWorkerAt( unsigned index ) const
+inline TaskWorkerThread* TaskWorkersPool::GetWorkerAt( uint32_t index ) const
 {
 	ASSERT( index < m_workerThreads.size() );
 	return m_workerThreads[ index ].get();
 }
 
 ////////////////////////////////////////////////////////////////////
-inline unsigned TaskWorkersPool::GetPoolSize() const
+inline uint32_t TaskWorkersPool::GetPoolSize() const
 {
-	return (unsigned)m_workerThreads.size();
+	return (uint32_t)m_workerThreads.size();
 }
 
 

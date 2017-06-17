@@ -76,11 +76,11 @@ Task* TaskWorkerThread::StealTaskFromOtherWorkers()
 {
 	Task* stealed_task = nullptr;
 
-	unsigned workers_count = m_context.m_workersPool->GetPoolSize();
-	for( unsigned i = 1; i < workers_count; ++i )
+	uint32_t workers_count = m_context.m_workersPool->GetPoolSize();
+	for( uint32_t i = 1; i < workers_count; ++i )
 	{
 		// Start from thread that is next to this worker in the pool.
-		unsigned index = ( i + m_context.m_poolIndex ) % workers_count;
+		uint32_t index = ( i + m_context.m_poolIndex ) % workers_count;
 		if( stealed_task = m_context.m_workersPool->GetWorkerAt( index )->TryToStealTask() )
 			return stealed_task;
 	}

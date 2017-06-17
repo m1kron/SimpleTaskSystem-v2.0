@@ -18,7 +18,7 @@ public:
 	void Add( TaskHandle&& task );
 
 	// Returns number of task in this batch.
-	unsigned GetSize() const;
+	uint32_t GetSize() const;
 
 	// Returns true if all tasks in batch are finished.
 	bool AreAllTaskFinished() const;
@@ -30,8 +30,8 @@ public:
 	std::vector< TaskHandle >::const_iterator end() const;
 
 	// Support for normal for loops.
-	TaskHandle& operator[]( unsigned index );
-	const TaskHandle& operator[]( unsigned index ) const;
+	TaskHandle& operator[]( uint32_t index );
+	const TaskHandle& operator[]( uint32_t index ) const;
 
 protected:
 	std::vector< TaskHandle > m_taskBatch;
@@ -69,9 +69,9 @@ inline void TaskBatch::Add( TaskHandle&& task )
 }
 
 ///////////////////////////////////////////////////////////
-inline unsigned TaskBatch::GetSize() const
+inline uint32_t TaskBatch::GetSize() const
 {
-	return (unsigned)m_taskBatch.size();
+	return (uint32_t)m_taskBatch.size();
 }
 
 ////////////////////////////////////////////////////////////
@@ -99,13 +99,13 @@ inline std::vector< TaskHandle >::const_iterator TaskBatch::end() const
 }
 
 ////////////////////////////////////////////////////////////
-inline TaskHandle& TaskBatch::operator[]( unsigned index )
+inline TaskHandle& TaskBatch::operator[]( uint32_t index )
 {
 	return m_taskBatch[ index ];
 }
 
 ////////////////////////////////////////////////////////////
-inline const TaskHandle& TaskBatch::operator[]( unsigned index ) const
+inline const TaskHandle& TaskBatch::operator[]( uint32_t index ) const
 {
 	return m_taskBatch[ index ];
 }

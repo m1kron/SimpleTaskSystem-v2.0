@@ -8,6 +8,6 @@
 
 NAMESPACE_STS_BEGIN
 
-static const unsigned TASK_POOL_SIZE = 2048;
+static const uint32_t TASK_POOL_SIZE = 2048;
 
 NAMESPACE_STS_END

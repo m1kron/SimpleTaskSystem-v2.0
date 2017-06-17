@@ -8,7 +8,7 @@ NAMESPACE_STS_BEGIN
 // Implementation of lock based multiple-producer
 // multiple-consumer circular FIFO queue.
 // Default LockPrimitive is SpinLock.
-template < class T, unsigned SIZE, class TLockPrimitive = btl::SpinLock >
+template < class T, uint32_t SIZE, class TLockPrimitive = btl::SpinLock >
 class LockBasedPtrQueue
 {
 public:
@@ -27,22 +27,22 @@ public:
 	T* PopBack();
 
 	// Returns size of the queue.
-	unsigned Size_NotThreadSafe() const;
+	uint32_t Size_NotThreadSafe() const;
 
 	// Returns maximum size of this queue.
-	unsigned GetMaxSize() const;
+	uint32_t GetMaxSize() const;
 
 private:
 	// Helper function to calculate modulo SIZE of the queue from counter.
-	unsigned CounterToIndex( unsigned counter ) const;
+	uint32_t CounterToIndex( uint32_t counter ) const;
 
 	// -----------------------------------------
 	typedef btl::LockGuard< TLockPrimitive > TLockGuard;
 
 	T* m_queue[ SIZE ];		
 	TLockPrimitive m_lock;
-	unsigned m_readCounter;
-	unsigned m_writeCounter;
+	uint32_t m_readCounter;
+	uint32_t m_writeCounter;
 };
 
 //////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ private:
 //////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE, class TLockPrimitive >
+template < class T, uint32_t SIZE, class TLockPrimitive >
 inline LockBasedPtrQueue<T, SIZE, TLockPrimitive>::LockBasedPtrQueue()
 	: m_writeCounter( 0 )
 	, m_readCounter( 0 )
@@ -61,7 +61,7 @@ inline LockBasedPtrQueue<T, SIZE, TLockPrimitive>::LockBasedPtrQueue()
 }
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE, class TLockPrimitive >
+template < class T, uint32_t SIZE, class TLockPrimitive >
 inline bool LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PushBack( T* const item )
 {
 	TLockGuard guard( m_lock );
@@ -75,7 +75,7 @@ inline bool LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PushBack( T* const item 
 }
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE, class TLockPrimitive >
+template < class T, uint32_t SIZE, class TLockPrimitive >
 inline T* LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PopFront()
 {
 	TLockGuard guard( m_lock );
@@ -86,7 +86,7 @@ inline T* LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PopFront()
 }
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE, class TLockPrimitive >
+template < class T, uint32_t SIZE, class TLockPrimitive >
 inline T* LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PopBack()
 {
 	TLockGuard guard( m_lock );
@@ -97,21 +97,21 @@ inline T* LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PopBack()
 }
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE, class TLockPrimitive >
-inline unsigned LockBasedPtrQueue<T, SIZE, TLockPrimitive>::Size_NotThreadSafe() const
+template < class T, uint32_t SIZE, class TLockPrimitive >
+inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::Size_NotThreadSafe() const
 {
 	return m_writeCounter - m_readCounter;
 }
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE, class TLockPrimitive >
-inline unsigned LockBasedPtrQueue<T, SIZE, TLockPrimitive>::GetMaxSize() const
+template < class T, uint32_t SIZE, class TLockPrimitive >
+inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::GetMaxSize() const
 {
 	return SIZE;
 }
 
-template < class T, unsigned SIZE, class TLockPrimitive >
-inline unsigned LockBasedPtrQueue<T, SIZE, TLockPrimitive>::CounterToIndex( unsigned counter ) const
+template < class T, uint32_t SIZE, class TLockPrimitive >
+inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::CounterToIndex( uint32_t counter ) const
 {
 	return counter & ( SIZE - 1 );
 }

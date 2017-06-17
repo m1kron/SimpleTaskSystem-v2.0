@@ -18,7 +18,7 @@ TaskManager::~TaskManager()
 //////////////////////////////////////////////////////
 bool TaskManager::Initialize()
 {
-	unsigned num_cores = btl::GetLogicalCoresSize();
+	uint32_t num_cores = btl::GetLogicalCoresSize();
 
 	// Heuristic: create num_cores - 1 working threads:
 	m_workerThreadsPool.InitializePoolAndStartWorkers( num_cores - 1, this );
@@ -56,11 +56,11 @@ bool TaskManager::DispatchTask( const TaskHandle& task_handle )
 
 	// SubmitTask is called from other thread, so use normal task dispatching tactic:
 	// try to dispach task equally among all worker threads:
-	unsigned counter = ++m_taskDispacherCounter;
-	unsigned workers_count = GetWorkersCount();
-	unsigned worker_id = counter % workers_count;
+	uint32_t counter = ++m_taskDispacherCounter;
+	uint32_t workers_count = GetWorkersCount();
+	uint32_t worker_id = counter % workers_count;
 
-	for( unsigned i = 0; i < workers_count; ++i )
+	for( uint32_t i = 0; i < workers_count; ++i )
 	{
 		// Try to add to every worker if selected one is full:
 		TaskWorkerThread* worker = m_workerThreadsPool.GetWorkerAt( ( worker_id + i ) % workers_count );
@@ -117,8 +117,8 @@ void TaskManager::TryToRunOneTask()
 
 	// try to steal a task from workers:
 	// [NOTE]: try to balance stealing from all workers equally, not like this!!!
-	unsigned workers_count = m_workerThreadsPool.GetPoolSize();
-	for( unsigned i = 0; i < workers_count; ++i )
+	uint32_t workers_count = m_workerThreadsPool.GetPoolSize();
+	for( uint32_t i = 0; i < workers_count; ++i )
 	{
 		if( stealed_task = m_workerThreadsPool.GetWorkerAt( i )->TryToStealTask() )
 		{
@@ -171,8 +171,8 @@ void TaskManager::ConvertWorkerToMainThread()
 /////////////////////////////////////////////////////////
 void TaskManager::WakeUpAllWorkers() const
 {
-	unsigned workers_count = GetWorkersCount();
-	for( unsigned worker_id = 0; worker_id < workers_count; ++worker_id )
+	uint32_t workers_count = GetWorkersCount();
+	for( uint32_t worker_id = 0; worker_id < workers_count; ++worker_id )
 	{
 		m_workerThreadsPool.GetWorkerAt( worker_id )->WakeUp();
 	}

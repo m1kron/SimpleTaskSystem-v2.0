@@ -18,7 +18,7 @@ struct TaskWorkerContext
 	TaskWorkersPool* m_workersPool;
 	TaskManager* m_taskManager;
 	TaskFiberAllocator* m_fiberAllocator;
-	unsigned m_poolIndex;
+	uint32_t m_poolIndex;
 };
 
 //////////////////////////////////////////////////////////

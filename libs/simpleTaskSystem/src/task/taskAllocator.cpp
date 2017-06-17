@@ -17,11 +17,11 @@ TaskHandle TaskAllocator::AllocateNewTask()
 	// [NOTE] : think about the hash taking cache line size into calcualtion to avoid contention. (?)
 	// [IDEA] : what about taking worker thread id as hash parameter?
 	++m_hashedNumber;
-	unsigned num = CalcHashedNumber< TASK_POOL_SIZE >( m_hashedNumber );
+	uint32_t num = CalcHashedNumber< TASK_POOL_SIZE >( m_hashedNumber );
 
-	for( unsigned i = 0; i < TASK_POOL_SIZE; ++i )
+	for( uint32_t i = 0; i < TASK_POOL_SIZE; ++i )
 	{
-		unsigned index = ( num + i ) & ( TASK_POOL_SIZE - 1 ); // fast modulo
+		uint32_t index = ( num + i ) & ( TASK_POOL_SIZE - 1 ); // fast modulo
 		if( m_poolMarkers[ index ].Exchange( 1, btl::MemoryOrder::Acquire ) == 0 )
 		{
 			// We have available task:
@@ -51,7 +51,7 @@ void TaskAllocator::ReleaseTask( TaskHandle& task_handle )
 ////////////////////////////////////////////////////
 void TaskAllocator::ReleaseAllTasks()
 {
-	for( unsigned i = 0; i < TASK_POOL_SIZE; ++i )
+	for( uint32_t i = 0; i < TASK_POOL_SIZE; ++i )
 	{
 		m_taskPool[ i ].Clear();
 		m_poolMarkers[ i ].Store( 0, btl::MemoryOrder::Relaxed );
@@ -61,7 +61,7 @@ void TaskAllocator::ReleaseAllTasks()
 ////////////////////////////////////////////////////
 bool TaskAllocator::AreAllTasksReleased() const
 {
-	for( unsigned i = 0; i < TASK_POOL_SIZE; ++i )
+	for( uint32_t i = 0; i < TASK_POOL_SIZE; ++i )
 	{
 		if( m_poolMarkers[ i ].Load( btl::MemoryOrder::Relaxed ) == 1 )
 			return false;
@@ -71,16 +71,16 @@ bool TaskAllocator::AreAllTasksReleased() const
 }
 
 ////////////////////////////////////////////////////
-unsigned TaskAllocator::GetTaskPoolSize()
+uint32_t TaskAllocator::GetTaskPoolSize()
 {
 	return TASK_POOL_SIZE;
 }
 
 ////////////////////////////////////////////////////////
-bool TaskAllocator::Debug_TryToReleaseTask( unsigned index )
+bool TaskAllocator::Debug_TryToReleaseTask( uint32_t index )
 {
 	// [NOTE]: i am not clearing task here!
-	unsigned expected = 1;
+	uint32_t expected = 1;
 	return m_poolMarkers[ index ].CompareExchange( expected, 0 );
 }
 

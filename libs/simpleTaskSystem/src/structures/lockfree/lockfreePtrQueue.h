@@ -16,7 +16,7 @@ NAMESPACE_STS_BEGIN
 //		   ^					  ^				   ^
 //      read counter     commited counter       write counter
 //
-template < class T, unsigned SIZE >
+template < class T, uint32_t SIZE >
 class LockFreePtrQueue
 {
 public:
@@ -29,20 +29,20 @@ public:
 	T* PopFront();
 
 	// Returns size of the queue. Not thread safe.
-    unsigned Size_NotThreadSafe() const;
+    uint32_t Size_NotThreadSafe() const;
 
 	// Returns maximum size of this queue.
-	unsigned GetMaxSize() const;
+	uint32_t GetMaxSize() const;
 
 private:
 	// Helper function to calculate modulo SIZE of the queue from counter.
-	unsigned CounterToIndex( unsigned counter ) const;
+	uint32_t CounterToIndex( uint32_t counter ) const;
 
-	btl::Atomic< unsigned > m_readCounter;
+	btl::Atomic< uint32_t > m_readCounter;
 	T* m_queue[ SIZE ];					///< [NOTE]: this arrary also works as a padding between read and write counters to avoid contention.
-	btl::Atomic< unsigned > m_writeCounter;
-	char m_padding[ ( BTL_CACHE_LINE_SIZE - sizeof( btl::Atomic< unsigned > ) ) ]; ///<Another padding to avoid contention.
-	btl::Atomic< unsigned > m_committedWriteCounter;
+	btl::Atomic< uint32_t > m_writeCounter;
+	char m_padding[ ( BTL_CACHE_LINE_SIZE - sizeof( btl::Atomic< uint32_t > ) ) ]; ///<Another padding to avoid contention.
+	btl::Atomic< uint32_t > m_committedWriteCounter;
 };
 
 //////////////////////////////////////////////////////////////
@@ -50,15 +50,15 @@ private:
 // INLINES:
 //
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE >
+template < class T, uint32_t SIZE >
 inline bool LockFreePtrQueue<T, SIZE>::PushBack( T* const item )
 {
 	// First, check if the queue is full:
-	unsigned write_counter = 0;
+	uint32_t write_counter = 0;
 	do
 	{
 		write_counter = m_writeCounter.Load( btl::MemoryOrder::Relaxed );
-		unsigned read_counter = m_readCounter.Load( btl::MemoryOrder::Acquire ); 
+		uint32_t read_counter = m_readCounter.Load( btl::MemoryOrder::Acquire ); 
 
 		if( ( read_counter + SIZE ) == ( write_counter ) )
 		{
@@ -76,7 +76,7 @@ inline bool LockFreePtrQueue<T, SIZE>::PushBack( T* const item )
 	// finished adding new item to the queue. Threads have to commit their data in the same
 	// order as they were writing data to the queue - to gain that, every thread has to set committedWriteCounter
 	// to be + 1 of write counter that given thread got.
-	unsigned expected = write_counter;
+	uint32_t expected = write_counter;
 	while( !m_committedWriteCounter.CompareExchange( expected, write_counter + 1, btl::MemoryOrder::Release ) )
 	{
 		ASSERT( expected <= write_counter );///< Actually fatal assert..
@@ -97,17 +97,17 @@ inline bool LockFreePtrQueue<T, SIZE>::PushBack( T* const item )
 }
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE >
+template < class T, uint32_t SIZE >
 inline T* LockFreePtrQueue<T, SIZE>::PopFront()
 {
-	unsigned current_read_counter = 0;
+	uint32_t current_read_counter = 0;
 	T* return_item = nullptr;
 
 	do
 	{
 		// First check, whether there is anything to pop:
 		current_read_counter = m_readCounter.Load( btl::MemoryOrder::Relaxed );
-		unsigned current_committed_counter = m_committedWriteCounter.Load( btl::MemoryOrder::Acquire );
+		uint32_t current_committed_counter = m_committedWriteCounter.Load( btl::MemoryOrder::Acquire );
 
 		if( current_read_counter == current_committed_counter )
 		{
@@ -116,7 +116,7 @@ inline T* LockFreePtrQueue<T, SIZE>::PopFront()
 		}
 
 		// Grab the data.
-		unsigned queue_index = CounterToIndex( current_read_counter );
+		uint32_t queue_index = CounterToIndex( current_read_counter );
 		return_item = m_queue[ queue_index ];
 
 		// [NOTE]: we can't nullptr queue item here, cuz we don't know yet, whether we succeed.
@@ -134,22 +134,22 @@ inline T* LockFreePtrQueue<T, SIZE>::PopFront()
 }	
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE >
-inline unsigned LockFreePtrQueue<T, SIZE>::Size_NotThreadSafe() const
+template < class T, uint32_t SIZE >
+inline uint32_t LockFreePtrQueue<T, SIZE>::Size_NotThreadSafe() const
 {
 	return ( m_writeCounter - m_readCounter );
 }
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE >
-inline unsigned LockFreePtrQueue<T, SIZE>::GetMaxSize() const
+template < class T, uint32_t SIZE >
+inline uint32_t LockFreePtrQueue<T, SIZE>::GetMaxSize() const
 {
 	return SIZE;
 }
 
 //////////////////////////////////////////////////////////////
-template < class T, unsigned SIZE >
-inline unsigned LockFreePtrQueue<T, SIZE>::CounterToIndex( unsigned counter ) const
+template < class T, uint32_t SIZE >
+inline uint32_t LockFreePtrQueue<T, SIZE>::CounterToIndex( uint32_t counter ) const
 {
 	STATIC_ASSERT( IsPowerOf2< SIZE >::value == 1, "SIZE of LockFreePtrQueue has to be power of 2!" );
 	return counter & ( SIZE - 1 ); 
