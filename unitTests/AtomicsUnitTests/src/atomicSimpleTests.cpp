@@ -1,10 +1,10 @@
 #include <gtest\gtest.h>
-#include <sts\lowlevel\atomic\Atomic.h>
-#include <commonlib\timers\TimerMacros.h>
-#include <sts\lowlevel\thread\FunctorThread.h>
-#include <sts\lowlevel\synchro\SpinLock.h>
-#include <sts\lowlevel\synchro\LockGuards.h>
-#include <sts\lowlevel\synchro\Mutex.h>
+#include "..\..\libs\commonLib\include\timer\timerMacros.h"
+#include "..\..\libs\basicThreadingLib\include\atomic\atomic.h"
+#include "..\..\libs\basicThreadingLib\include\thread\functorThread.h"
+#include "..\..\libs\basicThreadingLib\include\synchro\spinLock.h"
+#include "..\..\libs\basicThreadingLib\include\synchro\lockGuards.h"
+#include "..\..\libs\basicThreadingLib\include\synchro\mutex.h"
 
 namespace helpers
 {
@@ -14,22 +14,22 @@ namespace helpers
 	{
 		TMutex m_lock;
 
-		sts::FunctorThread thread1;
+		btl::FunctorThread thread1;
 		thread1.SetFunctorAndStartThread( [ &m_lock ]
 		{
-			sts::LockGuard< TMutex > guard( m_lock );
-			sts::this_thread::SleepFor( 1000 );
+			btl::LockGuard< TMutex > guard( m_lock );
+			btl::this_thread::SleepFor( 1000 );
 		} );
 
-		sts::this_thread::SleepFor( 10 );
+		btl::this_thread::SleepFor( 10 );
 
 		HighResolutionTimer timer;
 		timer.Start();
 
-		sts::FunctorThread thread2;
+		btl::FunctorThread thread2;
 		thread2.SetFunctorAndStartThread( [ &m_lock, &timer ]
 		{
-			sts::LockGuard< TMutex > guard( m_lock );
+			btl::LockGuard< TMutex > guard( m_lock );
 			timer.Stop();
 		} );
 
@@ -59,12 +59,12 @@ namespace helpers
 
 			static const int iterationCount = 1000000;
 
-			sts::FunctorThread thread1;
+			btl::FunctorThread thread1;
 			thread1.SetFunctorAndStartThread( [ &m_lock, &globalStruct ]
 			{
 				for( int i = 0; i < iterationCount; ++i )
 				{
-					sts::LockGuard< TMutex > guard( m_lock );
+					btl::LockGuard< TMutex > guard( m_lock );
 					globalStruct.val1 += 20;
 					globalStruct.val2 -= 10;
 					globalStruct.val3 += 20;
@@ -72,13 +72,13 @@ namespace helpers
 				}
 			} );
 
-			sts::FunctorThread thread2;
+			btl::FunctorThread thread2;
 
 			thread2.SetFunctorAndStartThread( [ &m_lock, &globalStruct ]
 			{
 				for( int i = 0; i < iterationCount; ++i )
 				{
-					sts::LockGuard< TMutex > guard( m_lock );
+					btl::LockGuard< TMutex > guard( m_lock );
 					globalStruct.val1 -= 10;
 					globalStruct.val2 += 20;
 					globalStruct.val3 -= 10;
@@ -104,22 +104,22 @@ namespace helpers
 		static const int ITERATIONS = 10000000;
 		int globalint = 0;
 
-		sts::FunctorThread thread1;
+		btl::FunctorThread thread1;
 		thread1.SetFunctorAndStartThread( [ &m_lock, &globalint ]
 		{
 			for( int i = 0; i < ITERATIONS; ++i )
 			{
-				sts::LockGuard< TMutex > guard( m_lock );
+				btl::LockGuard< TMutex > guard( m_lock );
 				globalint++;
 			}
 		} );
 
-		sts::FunctorThread thread2;
+		btl::FunctorThread thread2;
 		thread2.SetFunctorAndStartThread( [ &m_lock, &globalint ]
 		{
 			for( int i = 0; i < ITERATIONS; ++i )
 			{
-				sts::LockGuard< TMutex > guard( m_lock );
+				btl::LockGuard< TMutex > guard( m_lock );
 				globalint++;
 			}
 		} );
@@ -135,7 +135,7 @@ namespace helpers
 ////////////////////////////////////////////////////////////
 TEST( AtomicUnitTests, SimpleArithmeticTest )
 {
-	sts::Atomic< int > atm;
+	btl::Atomic< int > atm;
 
 	// UNIT TESTS OF ATOMICS:
 	ASSERT_TRUE( ( atm.Store( 2 ), atm.Load() == 2 ) );
@@ -170,7 +170,7 @@ TEST( AtomicUnitTests, SimpleTwoThreadedInLoop )
 			}
 		}
 	
-		sts::Atomic< unsigned int > atomic_int;
+		btl::Atomic< unsigned int > atomic_int;
 	};
 
 	int iteration = 1000;
@@ -178,10 +178,10 @@ TEST( AtomicUnitTests, SimpleTwoThreadedInLoop )
 	{
 		Test test;
 	
-		sts::FunctorThread thread1;
+		btl::FunctorThread thread1;
 		thread1.SetFunctorAndStartThread( [ &test ] { test.Add(); } );
 	
-		sts::FunctorThread thread2;
+		btl::FunctorThread thread2;
 		thread2.SetFunctorAndStartThread( [ &test ] { test.Sub(); } );
 	
 		thread1.Join();
@@ -191,13 +191,13 @@ TEST( AtomicUnitTests, SimpleTwoThreadedInLoop )
 	
 		Test test2;
 	
-		sts::FunctorThread thread12;
+		btl::FunctorThread thread12;
 		thread12.SetFunctorAndStartThread( [ &test2 ] { test2.Add(); } );
 	
-		sts::FunctorThread thread22;
+		btl::FunctorThread thread22;
 		thread22.SetFunctorAndStartThread( [ &test2 ] { test2.Add(); } );
 	
-		sts::FunctorThread thread32;
+		btl::FunctorThread thread32;
 		thread32.SetFunctorAndStartThread( [ &test2 ] { test2.Exchange(); } );
 	
 		thread12.Join();
@@ -212,35 +212,35 @@ TEST( AtomicUnitTests, SimpleTwoThreadedInLoop )
 ///////////////////////////////////////////////////////////////////////////
 TEST( SynchronizationTests, SimpleStressTest_SpinLock )
 {
-	helpers::StressTest< sts::SpinLock >();
+	helpers::StressTest< btl::SpinLock >();
 }
 
 ///////////////////////////////////////////////////////////////////////////
 TEST( SynchronizationTests, SimpleStressTest_Mutex )
 {
-	helpers::StressTest< sts::Mutex >();
+	helpers::StressTest< btl::Mutex >();
 }
 
 ///////////////////////////////////////////////////////////////////////////
 TEST( SynchronizationTests, AddingOnSpinLock )
 {
-	helpers::SimpleAddingTest< sts::SpinLock >();
+	helpers::SimpleAddingTest< btl::SpinLock >();
 }
 
 ///////////////////////////////////////////////////////////////////////////
 TEST( SynchronizationTests, AddingOnMutex )
 {
-	helpers::SimpleAddingTest< sts::Mutex >();
+	helpers::SimpleAddingTest< btl::Mutex >();
 }
 
 ///////////////////////////////////////////////////////////////////////////
 TEST( SynchronizationTests, SleepOnSpinLock )
 {
-	helpers::SleepOnTest< sts::SpinLock >();
+	helpers::SleepOnTest< btl::SpinLock >();
 }
 
 ///////////////////////////////////////////////////////////////////////////
 TEST( SynchronizationTests, SleepOnMutex )
 {
-	helpers::SleepOnTest< sts::Mutex >();
+	helpers::SleepOnTest< btl::Mutex >();
 }
