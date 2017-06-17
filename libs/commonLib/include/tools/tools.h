@@ -1,11 +1,10 @@
 #pragma once
-#include <commonlib\compile_time_tools\IsPowerOf2.h>
-#include <commonlib\Macros.h>
+#include "..\macros.h"
+#include "..\compileTimeTools\isPowerOf2.h"
 
-///////////////////////////////////////////////////////////
+
 // Returns true if ptr has specified alignment.
 template< unsigned Alignment > bool IsAligned( const void* ptr );
-
 
 ////////////////////////////////////////////////////////////////
 //

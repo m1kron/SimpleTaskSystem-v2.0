@@ -1,6 +1,6 @@
 #pragma once
 #include <cstring>
-#include <commonLib\Macros.h>
+#include "..\macros.h"
 
 ///////////////////////////////////////////////////////////
 // Wrapper for existing buffers, allows to write and read from buffer, but cannot resize the buffer.
@@ -9,16 +9,16 @@ class ExistingBufferWrapper
 public:
 	ExistingBufferWrapper( void* existing_buffer, size_t existing_buffer_size );
 
-	/// Write to buffer from from_buffer.
+	// Write to buffer from from_buffer.
 	// start_offset - indicates where to put data to existing_buffer( offset is relative to existing_buffer )
 	// size - size of data to write
 	// from_buffer - where to take data from
 	void WriteToBuffer( const void* from_buffer, size_t start_offset, size_t size );
 
-	/// Read from existing buffer to out_to_buffer.
+	// Read from existing buffer to out_to_buffer.
 	void ReadFromBuffer( void* out_to_buffer, size_t start_offset, size_t size );
 
-	/// Get size of existing buffer.
+	// Get size of existing buffer.
 	size_t GetSize() const;
 private:
 	void* m_existingBuffer;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.h>
+#include "..\types.h"
 
 class HighResolutionTimer
 {
@@ -14,10 +14,10 @@ public:
 	double ElapsedTimeInSeconds();
 
 private:
-	static LARGE_INTEGER s_Frequency;
+	static uint64_t s_Frequency;
 
-	LARGE_INTEGER m_StartStamp;
-	LARGE_INTEGER m_StopStamp;
+	uint64_t m_StartStamp;
+	uint64_t m_StopStamp;
 };
 
 ///////////////////////////////////////////////////////
@@ -26,6 +26,7 @@ private:
 //
 ///////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////
 inline double HighResolutionTimer::ElapsedTimeInMiliseconds()
 {
 	return ElapsedTimeInSeconds() * 1000;

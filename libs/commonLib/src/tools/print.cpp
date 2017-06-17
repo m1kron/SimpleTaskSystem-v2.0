@@ -1,4 +1,4 @@
-#include <commonlib\prints\Prints.h>
+#include "..\..\include\tools\print.h"
 #include <windows.h>
 #include <stdio.h>
 
@@ -9,5 +9,5 @@ void Print( const char *format, ... )
 	char message[ 2048 ];
 	vsprintf_s( message, format, args );
 	va_end( args );
-	OutputDebugString( message );
+	OutputDebugStringA( message );
 }

@@ -1,28 +1,28 @@
 #pragma once
 
-#include <iostream>
-#include <commonlib\timers\HighResolutionTimer.h>
+#include "..\tools\print.h"
+#include "highResolutionTimer.h"
 
 
 #ifndef PROFILING_DISABLED
 
 #define PREPARE_PROFILING HighResolutionTimer timer;
 
-#define PROFILE_LINE( line, comment_log ) \
-	timer.Reset();                  \
-    timer.Start();                  \
-	line;                           \
-	timer.Stop();                   \
-	std::cout << comment_log << timer.ElapsedTimeInSeconds() << std::endl; \
+#define PROFILE_LINE( line, comment_log )				\
+	timer.Reset();										\
+    timer.Start();										\
+	line;												\
+	timer.Stop();										\
+	Print( "%s %f\n",timer.ElapsedTimeInSeconds() );	\
     
 
 #define BEGIN_PROFILE_SECTION   \
 	timer.Reset();              \
 	timer.Start();
 
-#define END_PROFILE_SECTION( comment_log ) \
-	timer.Stop();                          \
-	std::cout << comment_log << timer.ElapsedTimeInSeconds() << std::endl; 
+#define END_PROFILE_SECTION( comment_log )				\
+	timer.Stop();										\
+	Print( "%s %f\n",timer.ElapsedTimeInSeconds() );
 
 #define ACCUMULATE_PROFILED_TIME( accumulator, num_of_tries )	\
 	accumulator += timer.ElapsedTimeInSeconds();				\

@@ -10,9 +10,11 @@
 #define DBG_ONLY_LINE( ... )
 #endif // DEBUG_MODE
 
-
+#ifdef DEBUG_MODE
 #define ASSERT( condition ) if ( !( condition ) ) { __debugbreak(); }
-//#define ASSERT( ... )
+#else
+#define ASSERT( ... )
+#endif
 
 #define STATIC_ASSERT( condition, message ) static_assert( condition, message );
 

@@ -19,21 +19,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="commonLib\implementation\timers\HighResolutionTimer.cpp" />
-    <ClCompile Include="commonLib\include\commonlib\prints\Prints.cpp" />
+    <ClInclude Include="include\compileTimeTools\isPowerOf2.h" />
+    <ClInclude Include="include\macros.h" />
+    <ClInclude Include="include\timer\highResolutionTimer.h" />
+    <ClInclude Include="include\timer\timerMacros.h" />
+    <ClInclude Include="include\tools\existingBufferWrapper.h" />
+    <ClInclude Include="include\tools\print.h" />
+    <ClInclude Include="include\tools\tools.h" />
+    <ClInclude Include="include\types.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="commonLib\include\commonlib\buffers\ExistingBufferWrapper.h" />
-    <ClInclude Include="commonLib\include\commonlib\compile_time_tools\IsPowerOf2.h" />
-    <ClInclude Include="commonLib\include\commonlib\Macros.h" />
-    <ClInclude Include="commonLib\include\commonlib\prints\Prints.h" />
-    <ClInclude Include="commonLib\include\commonlib\timers\HighResolutionTimer.h" />
-    <ClInclude Include="commonLib\include\commonlib\timers\TimerMacros.h" />
-    <ClInclude Include="commonLib\include\commonlib\tools\Tools.h" />
+    <ClCompile Include="src\timer\highResolutionTimer.cpp" />
+    <ClCompile Include="src\tools\print.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{35FB4173-AA36-40BE-8BCB-2266EA169F61}</ProjectGuid>
-    <RootNamespace>CommonLib</RootNamespace>
+    <RootNamespace>commonLib</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -41,27 +45,27 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -101,7 +105,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>
       </SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)commonLib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
@@ -118,7 +123,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>
       </SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)commonLib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
@@ -136,7 +142,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)commonLib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
@@ -156,7 +163,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)commonLib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
