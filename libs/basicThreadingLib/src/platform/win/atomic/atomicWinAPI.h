@@ -40,7 +40,7 @@ public:
 	LONG FetchOr( LONG value );
 
 private:
-	BSL_ALIGNED( 4 ) volatile LONG m_value;
+	BTL_ALIGNED( 4 ) volatile LONG m_value;
 };
 
 //////////////////////////////////////////////////

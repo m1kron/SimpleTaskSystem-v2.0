@@ -31,7 +31,7 @@ void ConvertToFiber( void* params )
 
 //////////////////////////////////////////////////////
 // static function used to run by win thread
-DWORD ThreadFunction( LPVOID lpParam ) 
+DWORD WINAPI ThreadFunction( LPVOID lpParam )
 {
 	ThreadBase* thread = static_cast<ThreadBase*> ( lpParam );
 	thread->ThreadFunction();
@@ -57,6 +57,7 @@ ThreadImpl::~ThreadImpl()
 {
 	::CloseHandle( m_threadHandle );
 }
+
 ///////////////////////////////////////////////////
 void ThreadImpl::StartThread( ThreadBase* thread )
 {
