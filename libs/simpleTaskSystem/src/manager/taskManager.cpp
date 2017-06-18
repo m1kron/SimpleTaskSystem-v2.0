@@ -6,6 +6,9 @@
 
 NAMESPACE_STS_BEGIN
 
+#define MANAGER_LOG( ... ) LOG( "[MANAGER]: " __VA_ARGS__ );
+#define MAIN_THREAD_WORKER_LOG( ... ) LOG( "[MAIN THREAD WORKER]: " __VA_ARGS__ );
+
 // Implementation of dtor of ITaskManager.
 ITaskManager::~ITaskManager() {}
 
@@ -19,16 +22,20 @@ TaskManager::~TaskManager()
 //////////////////////////////////////////////////////
 bool TaskManager::Initialize()
 {
-	uint32_t num_cores = btl::GetLogicalCoresSize();
+	uint32_t num_cores = btl::GetLogicalCoresSize() - 1;
+
+	MANAGER_LOG( "Initalizing with %i worker threads.", num_cores );
 
 	// Heuristic: create num_cores - 1 working threads:
-	m_workerThreadsPool.InitializePoolAndStartWorkers( num_cores - 1, this, &m_taskFiberAllocator );
+	m_workerThreadsPool.InitializePoolAndStartWorkers( num_cores, this, &m_taskFiberAllocator );
+	
 	return true;
 }
 
 void TaskManager::Deinitialize()
 {
 	m_workerThreadsPool.StopWorkersAndReleasePool();
+	MANAGER_LOG( "Manager deinitialized." );
 }
 
 ////////////////////////////////////////////////////////
@@ -48,7 +55,10 @@ bool TaskManager::DispatchTask( Task* task )
 	TaskWorkerThread* this_thread_worker = m_workerThreadsPool.FindWorkerWithThreadID( btl::this_thread::GetThreadID() );
 
 	if( this_thread_worker && this_thread_worker->AddTask( task ) )
+	{
+		MANAGER_LOG( "SubmitTask called from worker thread, adding task to that thread." );
 		return true;
+	}
 
 	// SubmitTask is called from other thread, so use normal task dispatching tactic:
 	// try to dispach task equally among all worker threads:
@@ -58,13 +68,18 @@ bool TaskManager::DispatchTask( Task* task )
 
 	for( uint32_t i = 0; i < workers_count; ++i )
 	{
+		uint32_t thread_worker_idx = ( worker_id + i ) % workers_count;
 		// Try to add to every worker if selected one is full:
-		TaskWorkerThread* worker = m_workerThreadsPool.GetWorkerAt( ( worker_id + i ) % workers_count );
+		TaskWorkerThread* worker = m_workerThreadsPool.GetWorkerAt( thread_worker_idx );
 
 		if( worker->AddTask( task ) )
+		{
+			MANAGER_LOG( "SubmitTask called from main thread, adding task to %i worker thread.", thread_worker_idx );
 			return true; // Finally, task has been added.
+		}
 	}
 
+	MANAGER_LOG( "Failed to submit task." );
 	return false;
 }
 
@@ -129,14 +144,20 @@ void TaskManager::TryToRunOneTask()
 	// Execute task:
 	if( stealed_task )
 	{
+		MAIN_THREAD_WORKER_LOG( "Stealed task." );
+		MAIN_THREAD_WORKER_LOG( "Switching to fiber to execute task." );
 		ASSERT( m_currentTaskFiber->GetCurrentState() == TaskFiberState::Idle );
 		m_currentTaskFiber->SetTaskToExecute( stealed_task );
 		btl::this_fiber::SwitchToFiber( m_currentTaskFiber->GetFiberID() );
 		ASSERT( m_currentTaskFiber->GetCurrentState() == TaskFiberState::Idle );
-
+		MAIN_THREAD_WORKER_LOG( "Task is executed." );
 	}
-	else // Or wait, cuz there aren't any task to execute, the task that we are waiting for should be being executed by thread worker.
-		btl::this_thread::SleepFor(2);
+	else
+	{
+		MAIN_THREAD_WORKER_LOG( "Condition is not yet met and there is no more work to do, main thread is waiting." );
+		// Or wait, cuz there aren't any task to execute, the task that we are waiting for should be being executed by thread worker.
+		btl::this_thread::SleepFor( 2 );
+	}
 }
 
 /////////////////////////////////////////////////////////
@@ -147,10 +168,12 @@ bool TaskManager::ConvertMainThreadToWorker()
 
 	if( m_currentTaskFiber = m_taskFiberAllocator.AllocateNewTaskFiber() )
 	{
+		MANAGER_LOG( "Converting main thread to worker thread." );
 		m_currentTaskFiber->Setup( m_thisFiberID, this );
 		return true;
 	}
 
+	MANAGER_LOG( "Failed to converting to worker thread." );
 	return false;
 }
 
@@ -165,6 +188,8 @@ void TaskManager::ConvertWorkerToMainThread()
 
 	VERIFY_SUCCES( btl::this_fiber::ConvertFiberToThread() );
 	m_thisFiberID = INVALID_FIBER_ID;
+
+	MANAGER_LOG( "Converting worker thread back to main thread." );
 }
 
 /////////////////////////////////////////////////////////

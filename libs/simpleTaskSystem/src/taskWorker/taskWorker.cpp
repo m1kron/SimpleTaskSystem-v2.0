@@ -5,6 +5,8 @@
 
 NAMESPACE_STS_BEGIN
 
+#define THREAD_LOG( txt, ... ) LOG( "[WORKER_THREAD_ID: %i ]: " txt, m_context.m_poolIndex __VA_ARGS__ );
+
 TaskWorkerThread::TaskWorkerThread( const TaskWorkerContext& context )
     : m_context( context )
     , m_shouldFinishWork( false )
@@ -21,7 +23,11 @@ void TaskWorkerThread::ThreadFunction()
 	ASSERT( m_currentFiber != nullptr );
 	m_currentFiber->Setup( m_thisWorkerFiberID, m_context.m_taskManager );
 
+	THREAD_LOG( "Starting main loop." );
+
 	MainWorkerThreadLoop();
+
+	THREAD_LOG( "Main loop ended." );
 
 	m_context.m_fiberAllocator->ReleaseTaskFiber( m_currentFiber );
 	btl::this_fiber::ConvertFiberToThread();
@@ -36,9 +42,12 @@ void TaskWorkerThread::MainWorkerThreadLoop()
 		m_hasWorkToDoEvent.Wait();
 		m_hasWorkToDoEvent.ResetEvent();
 
+		THREAD_LOG( "Weaking up." );
+
 		// Finish work if requested:
 		if( m_shouldFinishWork )
 		{
+			THREAD_LOG( "Requested to finish work." );
 			m_hasFinishWork = true;
 			return;
 		}
@@ -54,19 +63,29 @@ void TaskWorkerThread::MainWorkerThreadLoop()
 
 			// Local queue is empty, so try to steal task from other threads.
 			if( task == nullptr )
+			{
+				THREAD_LOG( "Stealing task from workers." );
 				task = StealTaskFromOtherWorkers();
-
+			}
+				
 			if( task )
 			{
 				// We have the task, so run it now.
 				ASSERT( m_currentFiber );
 				ASSERT( m_currentFiber->GetCurrentState() == TaskFiberState::Idle );
 				m_currentFiber->SetTaskToExecute( task );
+				THREAD_LOG( "Switching to fiber to execute task." );
 				btl::this_fiber::SwitchToFiber( m_currentFiber->GetFiberID() );
 				ASSERT( m_currentFiber->GetCurrentState() == TaskFiberState::Idle );
+				THREAD_LOG( "Switching back from fiber. Task is done." );
 			}
 			else
+			{
+				THREAD_LOG( "No more tasks to do, going to wait state." );
 				break; // We don't have anything to do, so break and wait for job.
+			}
+
+			THREAD_LOG( "Has %i tasks now in queue...", , m_pendingTaskQueue.Size_NotThreadSafe() );
 		}
 	}
 }
