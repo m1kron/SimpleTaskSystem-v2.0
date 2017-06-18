@@ -28,8 +28,8 @@ public:
 	// Returns nullptr in case of failture.
 	T* PopFront();
 
-	// Returns size of the queue. Not thread safe.
-    uint32_t Size_NotThreadSafe() const;
+	// Returns size of the queue. WARNING! THIS IN GENERAL WILL RETRUN ONLY APPROXIMATED SIZE!
+    uint32_t GetCurrentSize() const;
 
 	// Returns maximum size of this queue.
 	uint32_t GetMaxSize() const;
@@ -135,7 +135,7 @@ inline T* LockFreePtrQueue<T, SIZE>::PopFront()
 
 //////////////////////////////////////////////////////////////
 template < class T, uint32_t SIZE >
-inline uint32_t LockFreePtrQueue<T, SIZE>::Size_NotThreadSafe() const
+inline uint32_t LockFreePtrQueue<T, SIZE>::GetCurrentSize() const
 {
 	return ( m_writeCounter - m_readCounter );
 }

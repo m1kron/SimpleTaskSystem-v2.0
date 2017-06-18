@@ -73,7 +73,7 @@ namespace helpers
 			helpers::QueueAdder( queue, queue.GetMaxSize() );
 			helpers::QueueBackPoper( queue, queue.GetMaxSize() );
 
-			ASSERT_TRUE( queue.Size_NotThreadSafe() == 0 );
+			ASSERT_TRUE( queue.GetCurrentSize() == 0 );
 
 			ASSERT_TRUE( queue.PopBack() == nullptr );
 			ASSERT_TRUE( queue.PopBack() == nullptr );
@@ -91,22 +91,22 @@ namespace helpers
 		{
 			helpers::QueueAdder( queue, queue.GetMaxSize() );
 			helpers::QueuePoper( queue, queue.GetMaxSize() / 2 );
-			ASSERT_TRUE( queue.Size_NotThreadSafe() == queue.GetMaxSize() / 2 );
+			ASSERT_TRUE( queue.GetCurrentSize() == queue.GetMaxSize() / 2 );
 
 			helpers::QueuePoper( queue, queue.GetMaxSize() / 2 );
-			ASSERT_TRUE( queue.Size_NotThreadSafe() == 0 );
+			ASSERT_TRUE( queue.GetCurrentSize() == 0 );
 			ASSERT_TRUE( queue.PopFront() == nullptr );
 			ASSERT_TRUE( queue.PopFront() == nullptr );
 			ASSERT_TRUE( queue.PopFront() == nullptr );
 
 			helpers::QueueAdder( queue, queue.GetMaxSize() );
-			ASSERT_TRUE( queue.Size_NotThreadSafe() == queue.GetMaxSize() );
+			ASSERT_TRUE( queue.GetCurrentSize() == queue.GetMaxSize() );
 			ASSERT_TRUE( queue.PushBack( &SOME_VALUE ) == false );
 			ASSERT_TRUE( queue.PushBack( &SOME_VALUE ) == false );
 			ASSERT_TRUE( queue.PushBack( &SOME_VALUE ) == false );
 
 			helpers::QueuePoper( queue, queue.GetMaxSize() );
-			ASSERT_TRUE( queue.Size_NotThreadSafe() == 0 );
+			ASSERT_TRUE( queue.GetCurrentSize() == 0 );
 		}
 	}
 
@@ -128,7 +128,7 @@ namespace helpers
 			producer.Join();
 			consumer.Join();
 
-			ASSERT_TRUE( queue.Size_NotThreadSafe() == 0 );
+			ASSERT_TRUE( queue.GetCurrentSize() == 0 );
 		}
 	}
 
@@ -152,7 +152,7 @@ namespace helpers
 			producer.Join();
 			consumer.Join();
 
-			ASSERT_TRUE( queue.Size_NotThreadSafe() == 0 );
+			ASSERT_TRUE( queue.GetCurrentSize() == 0 );
 		}
 	}
 
@@ -190,11 +190,11 @@ namespace helpers
 			thread4.Join();
 			thread5.Join();
 
-			unsigned size2 = thread_queue.Size_NotThreadSafe();
+			unsigned size2 = thread_queue.GetCurrentSize();
 			ASSERT_TRUE( size2 == thread_queue.GetMaxSize() );
 
 			helpers::QueuePoper( thread_queue, thread_queue.GetMaxSize() );
-			ASSERT_TRUE( thread_queue.Size_NotThreadSafe() == 0 );
+			ASSERT_TRUE( thread_queue.GetCurrentSize() == 0 );
 		}
 	}
 }

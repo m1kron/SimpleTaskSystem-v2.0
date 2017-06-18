@@ -27,7 +27,7 @@ public:
 	T* PopBack();
 
 	// Returns size of the queue.
-	uint32_t Size_NotThreadSafe() const;
+	uint32_t GetCurrentSize() const;
 
 	// Returns maximum size of this queue.
 	uint32_t GetMaxSize() const;
@@ -40,7 +40,7 @@ private:
 	typedef btl::LockGuard< TLockPrimitive > TLockGuard;
 
 	T* m_queue[ SIZE ];		
-	TLockPrimitive m_lock;
+	mutable TLockPrimitive m_lock;
 	uint32_t m_readCounter;
 	uint32_t m_writeCounter;
 };
@@ -98,8 +98,9 @@ inline T* LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PopBack()
 
 //////////////////////////////////////////////////////////////
 template < class T, uint32_t SIZE, class TLockPrimitive >
-inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::Size_NotThreadSafe() const
+inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::GetCurrentSize() const
 {
+	TLockGuard guard( m_lock );
 	return m_writeCounter - m_readCounter;
 }
 

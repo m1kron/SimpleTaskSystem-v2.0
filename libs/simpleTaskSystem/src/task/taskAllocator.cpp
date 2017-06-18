@@ -50,7 +50,7 @@ void TaskAllocator::ReleaseAllTasks()
 ////////////////////////////////////////////////////
 bool TaskAllocator::AreAllTasksReleased() const
 {
-	return m_freelist.Size_NotThreadSafe() == m_freelist.GetMaxSize();;
+	return m_freelist.GetCurrentSize() == m_freelist.GetMaxSize();;
 }
 
 ////////////////////////////////////////////////////

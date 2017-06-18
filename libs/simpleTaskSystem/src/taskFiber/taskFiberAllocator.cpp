@@ -16,7 +16,7 @@ TaskFiberAllocator::TaskFiberAllocator()
 /////////////////////////////////////////////////////////
 TaskFiberAllocator::~TaskFiberAllocator()
 {
-	ASSERT( m_freeList.Size_NotThreadSafe() == TASK_FIBER_POOL_SIZE );
+	ASSERT( m_freeList.GetCurrentSize() == TASK_FIBER_POOL_SIZE );
 }
 
 /////////////////////////////////////////////////////////
