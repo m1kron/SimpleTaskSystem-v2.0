@@ -1,5 +1,6 @@
 #pragma once
 #include "tools\assertHandler.h"
+#include "tools\print.h"
 
 #ifdef _DEBUG 
 #define DEBUG_MODE
@@ -11,13 +12,18 @@
 #define DBG_ONLY_LINE( ... )
 #endif // DEBUG_MODE
 
+///////////////////////////////////////////////////////////////////////////////////////
+// ASSERTS
 #define ASSERT( condition ) if ( !( condition ) ) { HandleAssert( #condition, __FILE__, __LINE__ ); }
-
 #define STATIC_ASSERT( condition, message ) static_assert( condition, message );
 
-#define BASE_CLASS( base_class ) typedef base_class __base;
+///////////////////////////////////////////////////////////////////////////////////////
+// LOG
+#define LOG( ... ) Print( __VA_ARGS__ );
 
+///////////////////////////////////////////////////////////////////////////////////////
+// UTILITIES
+#define BASE_CLASS( base_class ) typedef base_class __base;
 #define RELEASE( object ) delete object; object = nullptr;
 #define SAFE_RELEASE( object ) if ( object ) delete object; object = nullptr;
-
 #define VERIFY_SUCCES( expr ) bool val = expr; ASSERT( val );
