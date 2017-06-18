@@ -105,6 +105,9 @@
     <ClInclude Include="include\tools\lambdaTask.h">
       <Filter>include\tools</Filter>
     </ClInclude>
+    <ClInclude Include="include\stsExportApi.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
@@ -140,6 +143,5 @@
     <ClCompile Include="src\common\globalApiImpl.cpp">
       <Filter>src\common</Filter>
     </ClCompile>
-    <ClCompile Include="include\iTaskManager.cpp" />
   </ItemGroup>
 </Project>

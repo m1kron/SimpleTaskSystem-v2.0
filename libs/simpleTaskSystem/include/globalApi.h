@@ -1,6 +1,7 @@
 #pragma once
 #include "iTaskManager.h"
+#include "stsExportApi.h"
 
-extern "C" sts::ITaskManager* CreateTaskSystem();
+extern "C" STS_API sts::ITaskManager* CreateTaskSystem();
 
-extern "C" void DestroyTaskSystem( sts::ITaskManager* system );
+extern "C" STS_API void DestroyTaskSystem( sts::ITaskManager* system );

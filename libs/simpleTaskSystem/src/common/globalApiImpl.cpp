@@ -3,7 +3,7 @@
 #include "..\manager\taskManager.h"
 
 /////////////////////////////////////////////////////////////////
-sts::ITaskManager* CreateTaskSystem()
+STS_API sts::ITaskManager* CreateTaskSystem()
 {
 	void* mem = _aligned_malloc( sizeof( sts::TaskManager ), BTL_CACHE_LINE_SIZE );
 
@@ -14,7 +14,7 @@ sts::ITaskManager* CreateTaskSystem()
 }
 
 //////////////////////////////////////////////////////////////////
-void DestroyTaskSystem( sts::ITaskManager* system )
+STS_API void DestroyTaskSystem( sts::ITaskManager* system )
 {
 	sts::TaskManager* manager = static_cast< sts::TaskManager* >( system );
 	manager->Deinitialize();
