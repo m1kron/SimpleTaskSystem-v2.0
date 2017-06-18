@@ -1,28 +1,25 @@
 #pragma once
 #include <vector>
 #include "..\iTaskManager.h"
-#include "..\..\..\basicThreadingLib\include\tools\tools.h"
-#include "..\..\..\basicThreadingLib\include\thread\functorThread.h"
+#include "taskBatch.h"
+#include "lambdaTask.h"
 
 namespace sts
 {
 namespace tools
 {
 
-template< class Iterator, typename Functor >
-void ParallelForEach( typename Iterator& begin,				//< Begin iterator
-					  typename Iterator& end,				//< End iterator
-					  const Functor& functor,				//< functor will called on every iterator between begin and end.
-					  uint32_t max_num_of_threads = 0 );	//< maximum number of threads, that implementation can use. O means that it is up to the implementation.
-
 // Calls functor parallely for each element between begin and end.
 // Tries to balance work load between available logical cores.
 // Function blocks until it is done.
+// Returns true when everything went ok ( and tasks are done ) or false when error and tasks are not done.
+// [NOTE]: this is very simple implementation of parallelFor ( it assumes it takes similar time to process each iterator ).
+// Better implementation would keep spliting range until very small one and execute them. 
 template< class Iterator, typename Functor >
-void ParallelForEachUsingTasks( const Iterator& begin,			//< Begin iterator
+bool ParallelForEachUsingTasks( const Iterator& begin,			//< Begin iterator
 								const Iterator& end,			//< End iterator
 								const Functor& functor,			//< functor will called on every iterator between begin and end.
-								TaskManager& task_manager );	//< task manager instance that will be used to deliver task functionality.
+								ITaskManager* manager );	//< task manager instance that will be used to deliver task functionality.
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -30,75 +27,24 @@ void ParallelForEachUsingTasks( const Iterator& begin,			//< Begin iterator
 //
 //////////////////////////////////////////////////////////////////////////
 
-template< class Iterator, typename Functor >
-void ParallelForEach( const Iterator& begin, const Iterator& end, const Functor& functor, uint32_t max_num_of_threads )
-{
-	if( max_num_of_threads == 0 )
-		max_num_of_threads = tools::GetLogicalCoresSize();
-
-	auto con_size = std::distance( begin, end );;
-	auto batch_size = ( con_size / max_num_of_threads );
-	Iterator last_it = end;
-
-	std::vector< FunctorThread > workers;
-	std::vector<std::function<void( void )> > functors;
-
-	// Setup job.
-	// Split the for amoung requested number of threads (inlcuding thread that called that function):
-	for( uint32_t i = 0; i < max_num_of_threads - 1; ++i )
-	{
-		Iterator start_it = begin;
-		std::advance( start_it, i * batch_size );
-
-		Iterator end_it = start_it;
-		std::advance( end_it, batch_size );
-
-		last_it = end_it;
-
-		std::function< void( void ) > func = [ &functor, start_it, end_it ]()
-		{
-			for( auto it = start_it; it != end_it; ++it )
-				functor( it );
-		};
-
-		functors.emplace_back( std::move( func ) );
-	}
-
-	// Start job. Start workers.
-	for( auto& func : functors )
-		workers.emplace_back( FunctorThread() );
-
-	for( uint32_t i = 0; i < max_num_of_threads - 1; ++i )
-	{
-		workers[ i ].SetFunctorAndStartThread( functors[ i ] );
-		workers[ i ].SetThreadName( "ParallelFor_WorkerThread" );
-	}
-
-	// Do the rest job in this thread:
-	for( auto it = last_it; it != end; ++it )
-		functor( it );
-
-	// Wait for thread to finish their jobs.
-	for( auto& thread : workers )
-		thread.Join();
-}
-
 /////////////////////////////////////////////////////////////////////////////////////
 template< class Iterator, typename Functor >
-void ParallelForEachUsingTasks( const Iterator& begin, const Iterator& end, const Functor& functor, TaskManager& task_manager )
+bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor& functor, ITaskManager* task_manager )
 {
-	uint32_t max_num_of_threads = task_manager.GetWorkersCount() + 1;
+	uint32_t max_num_of_threads = task_manager->GetWorkersCount() + 1;
 	auto con_size = std::distance( begin, end );
 	auto batch_size = ( con_size / max_num_of_threads );
 	Iterator last_it = end;
 
-	sts::TaskBatch_AutoRelease batch( task_manager );
+	TaskBatch_AutoRelease batch( task_manager );
 	
 	// WARNING!
 	// This is needed only in debug mode, cuz in debug stl iterators are so big,
 	// that task's internal storage cannot hold them..
-DBG_ONLY_LINE( std::vector< Iterator > iterators; )
-DBG_ONLY_LINE( iterators.reserve( 2 * ( max_num_of_threads - 1 ) ); )
+#ifdef _DEBUG
+	std::vector< Iterator > iterators;
+	iterators.reserve( 2 * ( max_num_of_threads - 1 ) );
+#endif
 
 	// Setup tasks.
 	for( uint32_t i = 0; i < max_num_of_threads - 1; ++i )
@@ -111,40 +57,44 @@ DBG_ONLY_LINE( iterators.reserve( 2 * ( max_num_of_threads - 1 ) ); )
 
 		last_it = end_it;
 
-DBG_ONLY_LINE( iterators.push_back( start_it ); )
-DBG_ONLY_LINE( iterators.push_back( end_it ); )
-DBG_ONLY_LINE( Iterator& dbg_start_it = iterators[ iterators.size() - 2 ]; )
-DBG_ONLY_LINE( Iterator& dbg_end_it = iterators[ iterators.size() - 1 ]; )
+#ifdef _DEBUG
+		iterators.push_back( start_it ); 
+		iterators.push_back( end_it );
+		Iterator& dbg_start_it = iterators[ iterators.size() - 2 ];
+		Iterator& dbg_end_it = iterators[ iterators.size() - 1 ];
+#endif
 
-#ifdef DEBUG_MODE
+#ifdef _DEBUG
 		// Debug version:
-		auto func = [ &functor, &dbg_start_it, &dbg_end_it ]( TaskContext& )
+		auto func = [ &functor, &dbg_start_it, &dbg_end_it ]( const ITaskContext* )
 		{
 			for( Iterator it = dbg_start_it; it != dbg_end_it; ++it )
 				functor( it );
 		};
 #else
 		// Release version:
-		auto func = [ &functor, start_it, end_it ]( TaskContext& )
+		auto func = [ &functor, start_it, end_it ]( const ITaskContext* )
 		{
 			for( auto it = start_it; it != end_it; ++it )
 				functor( it );
 		};
 #endif
 
-		sts::TaskHandle handle = task_manager.CreateNewTask( func );
-		ASSERT( handle != sts::INVALID_TASK_HANDLE );
-		batch.Add( std::move( handle ) );
+		if( auto handle = LambdaTaskMaker( func, task_manager, nullptr ) )
+			batch.Add( handle );
+		else
+			return false;
 	}
 
-	task_manager.SubmitTaskBatch( batch );
+	if( !batch.SubmitAll() )
+		return false;
 
 	// Do the rest of job using this thread:
 	for( auto it = last_it; it != end; ++it )
 		functor( it );
 
-	// wait for task to finish.
-	task_manager.RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+	// wait for rest to finish.
+	return task_manager->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 }
 
 }

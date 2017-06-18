@@ -10,6 +10,7 @@ namespace tools
 //////////////////////////////////////////////////////////////////////////////////
 // Class represents batch of task - if you have a group of task to submit,
 // task batch more optimal way to do it then submitting tem one by one.
+// Rember to release tasks after execution! ( or use TaskBatch_AutoRelease ).
 class TaskBatch
 {
 public:
@@ -27,6 +28,9 @@ public:
 
 	// Submits all tasks in batch to be executed.
 	bool SubmitAll();
+
+	// Releases all tasks.
+	void ReleaseAllTasks();
 
 	// Support for range based loops.
 	std::vector< const ITaskHandle* >::iterator begin();
@@ -68,7 +72,6 @@ inline TaskBatch::TaskBatch( ITaskManager* manager )
 //////////////////////////////////////////////////////////////////////
 inline TaskBatch::~TaskBatch()
 {
-	m_taskBatch.clear();
 	m_taskManager = nullptr;
 }
 
@@ -140,6 +143,14 @@ inline bool TaskBatch::SubmitAll()
 	return true;
 }
 
+inline void TaskBatch::ReleaseAllTasks()
+{
+	for( auto handle : m_taskBatch )
+		m_taskManager->ReleaseTask( handle );
+
+	m_taskBatch.clear();
+}
+
 ////////////////////////////////////////////////////////////
 inline TaskBatch_AutoRelease::TaskBatch_AutoRelease( ITaskManager* manager )
 	: TaskBatch( manager )
@@ -149,8 +160,7 @@ inline TaskBatch_AutoRelease::TaskBatch_AutoRelease( ITaskManager* manager )
 ////////////////////////////////////////////////////////////
 inline TaskBatch_AutoRelease::~TaskBatch_AutoRelease()
 {
-	for( auto handle : m_taskBatch )
-		m_taskManager->ReleaseTask( handle );
+	ReleaseAllTasks();
 }
 
 }
