@@ -4,11 +4,11 @@
 NAMESPACE_STS_BEGIN
 
 ////////////////////////////////////////////////////////////////////
-void TaskWorkersPool::InitializePoolAndStartWorkers( uint32_t num_of_workers, TaskManager* task_manager )
+void TaskWorkersPool::InitializePoolAndStartWorkers( uint32_t num_of_workers, TaskManager* task_manager, TaskFiberAllocator* task_fiber_allocator )
 {
 	// Create requested number of thread:
 	for( uint32_t i = 0; i < num_of_workers; ++i )
-		m_workerThreads.push_back( std::unique_ptr< TaskWorkerThread >( new TaskWorkerThread( { this, task_manager, &m_taskFiberAllocator, i } ) ) );
+		m_workerThreads.push_back( std::unique_ptr< TaskWorkerThread >( new TaskWorkerThread( { this, task_manager, task_fiber_allocator, i } ) ) );
 
 	// Start threads:
 	for( uint32_t i = 0; i < num_of_workers; ++i )

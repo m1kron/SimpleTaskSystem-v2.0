@@ -1,10 +1,11 @@
 #pragma once
 #include "taskWorker.h"
-#include "..\taskFiber\taskFiberAllocator.h"
+
 
 NAMESPACE_STS_BEGIN
 
 class TaskManager;
+class TaskFiberAllocator;
 
 ////////////////////////////////////////////////////////////
 // Manages pool of worker threads.
@@ -12,7 +13,7 @@ class TaskWorkersPool
 {
 public:
 	// Initializes to have specified size and starts all workers.
-	void InitializePoolAndStartWorkers( uint32_t num_of_workers, TaskManager* task_manager );
+	void InitializePoolAndStartWorkers( uint32_t num_of_workers, TaskManager* task_manager, TaskFiberAllocator* task_fiber_allocator );
 
 	// Send stop signal to all workers in pool and WAITS for them untill they are finished.
 	// Releases then whole pool.
@@ -26,8 +27,6 @@ public:
 
 	// Returns size of the pool.
 	uint32_t GetPoolSize() const;
-
-	sts::TaskFiberAllocator m_taskFiberAllocator; // < HACK!! Cannot be here!
 
 private:
 	std::vector< std::unique_ptr< TaskWorkerThread > > m_workerThreads;

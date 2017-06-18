@@ -3,6 +3,7 @@
 
 #include "..\task\taskAllocator.h"
 #include "..\taskWorker\taskWorkersPool.h"
+#include "..\taskFiber\taskFiberAllocator.h"
 
 #include "..\..\..\basicThreadingLib\include\thread\thisFiberHelpers.h"
 
@@ -46,6 +47,7 @@ private:
 	void WakeUpAllWorkers() const;
 
 	TaskWorkersPool			m_workerThreadsPool;
+	TaskFiberAllocator		m_taskFiberAllocator;
 	TaskAllocator			m_taskAllocator;
 	btl::Atomic< uint32_t > m_taskDispacherCounter; //< [NOTE]: does it have to be atomic?
 	btl::FIBER_ID			m_thisFiberID;

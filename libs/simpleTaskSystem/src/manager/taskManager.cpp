@@ -22,7 +22,7 @@ bool TaskManager::Initialize()
 	uint32_t num_cores = btl::GetLogicalCoresSize();
 
 	// Heuristic: create num_cores - 1 working threads:
-	m_workerThreadsPool.InitializePoolAndStartWorkers( num_cores - 1, this );
+	m_workerThreadsPool.InitializePoolAndStartWorkers( num_cores - 1, this, &m_taskFiberAllocator );
 	return true;
 }
 
@@ -145,7 +145,7 @@ bool TaskManager::ConvertMainThreadToWorker()
 	m_thisFiberID = btl::this_fiber::ConvertThreadToFiber();
 	ASSERT( m_thisFiberID != INVALID_FIBER_ID );
 
-	if( m_currentTaskFiber = m_workerThreadsPool.m_taskFiberAllocator.AllocateNewTaskFiber() )
+	if( m_currentTaskFiber = m_taskFiberAllocator.AllocateNewTaskFiber() )
 	{
 		m_currentTaskFiber->Setup( m_thisFiberID, this );
 		return true;
@@ -159,7 +159,7 @@ void TaskManager::ConvertWorkerToMainThread()
 {
 	if( m_currentTaskFiber )
 	{
-		m_workerThreadsPool.m_taskFiberAllocator.ReleaseTaskFiber( m_currentTaskFiber );
+		m_taskFiberAllocator.ReleaseTaskFiber( m_currentTaskFiber );
 		m_currentTaskFiber = nullptr;
 	}
 
