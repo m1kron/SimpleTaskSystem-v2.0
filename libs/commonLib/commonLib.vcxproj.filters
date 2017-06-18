@@ -48,6 +48,9 @@
     <ClInclude Include="include\compileTimeTools\isPowerOf2.h">
       <Filter>include\compileTimeTools</Filter>
     </ClInclude>
+    <ClInclude Include="include\tools\assertHandler.h">
+      <Filter>include\tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\tools\print.cpp">
@@ -55,6 +58,9 @@
     </ClCompile>
     <ClCompile Include="src\timer\highResolutionTimer.cpp">
       <Filter>src\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tools\assertHandler.cpp">
+      <Filter>src\tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

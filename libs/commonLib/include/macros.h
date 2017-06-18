@@ -1,4 +1,5 @@
 #pragma once
+#include "tools\assertHandler.h"
 
 #ifdef _DEBUG 
 #define DEBUG_MODE
@@ -10,11 +11,7 @@
 #define DBG_ONLY_LINE( ... )
 #endif // DEBUG_MODE
 
-#ifdef DEBUG_MODE
-#define ASSERT( condition ) if ( !( condition ) ) { __debugbreak(); }
-#else
-#define ASSERT( ... )
-#endif
+#define ASSERT( condition ) if ( !( condition ) ) { HandleAssert( #condition, __FILE__, __LINE__ ); }
 
 #define STATIC_ASSERT( condition, message ) static_assert( condition, message );
 

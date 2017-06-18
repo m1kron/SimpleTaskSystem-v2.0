@@ -23,6 +23,7 @@
     <ClInclude Include="include\macros.h" />
     <ClInclude Include="include\timer\highResolutionTimer.h" />
     <ClInclude Include="include\timer\timerMacros.h" />
+    <ClInclude Include="include\tools\assertHandler.h" />
     <ClInclude Include="include\tools\existingBufferWrapper.h" />
     <ClInclude Include="include\tools\print.h" />
     <ClInclude Include="include\tools\tools.h" />
@@ -30,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\timer\highResolutionTimer.cpp" />
+    <ClCompile Include="src\tools\assertHandler.cpp" />
     <ClCompile Include="src\tools\print.cpp" />
   </ItemGroup>
   <ItemGroup>
