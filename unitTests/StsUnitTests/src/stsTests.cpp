@@ -1,6 +1,9 @@
 #include <gtest\gtest.h>
 #include <array>
-#include <sts\tasking\TaskManager.h>
+#include "..\..\libs\simpleTaskSystem\include\globalApi.h"
+#include "..\..\libs\simpleTaskSystem\include\tools\taskBatch.h"
+#include "..\..\libs\simpleTaskSystem\include\tools\lambdaTask.h"
+#include "..\..\libs\commonLib\include\tools\existingBufferWrapper.h"
 
 namespace helpers
 {
@@ -32,7 +35,7 @@ namespace helpers
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	void TaskFunction( sts::TaskContext& context )
+	void TaskFunction( const sts::ITaskContext* context )
 	{
 		int sum = 0;
 		for( int i = 0; i < 10000000; ++i )
@@ -40,12 +43,12 @@ namespace helpers
 			sum += ( i % 4 ) / 2;
 		}
 
-		ExistingBufferWrapperWriter writeBuffer( context.GetThisTask()->GetRawDataPtr(), context.GetThisTask()->GetDataSize() );
+		ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writeBuffer.Write( sum );
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	void TaskFunctionFast( sts::TaskContext& context )
+	void TaskFunctionFast( const sts::ITaskContext* context )
 	{
 		int sum = 0;
 		for( int i = 0; i < 100000; ++i )
@@ -53,43 +56,8 @@ namespace helpers
 			sum += ( i % 4 ) / 2;
 		}
 
-		ExistingBufferWrapperWriter writeBuffer( context.GetThisTask()->GetRawDataPtr(), context.GetThisTask()->GetDataSize() );
+		ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writeBuffer.Write( sum );
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	void ReleaseTasks( sts::TaskAllocator& allocator, unsigned release_task_num )
-	{
-		for( unsigned j = 0; j < release_task_num; ++j )
-		{
-			while( 1 )
-			{
-				for( unsigned i = 0; i < sts::TaskAllocator::GetTaskPoolSize(); ++i )
-				{
-					if( allocator.Debug_TryToReleaseTask( i ) )
-					{
-						goto endloop;
-						break;
-					}
-				}
-			}
-		endloop:;
-		}
-
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	void AllocateFunc( sts::TaskAllocator& allocator, unsigned max_size )
-	{
-		for( unsigned i = 0; i < max_size; ++i )
-		{
-			sts::TaskHandle handle = sts::INVALID_TASK_HANDLE;
-			do
-			{
-				sts::TaskHandle handle2 = allocator.AllocateNewTask();
-				handle = std::move( handle2 );
-			} while( handle == sts::INVALID_TASK_HANDLE );
-		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -105,13 +73,13 @@ namespace helpers
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	void CalcualteItemAndWriteToArray( sts::TaskContext& context )
+	void CalcualteItemAndWriteToArray( const sts::ITaskContext* context )
 	{
 		std::array<int, 200>* array_ptr = nullptr;
 		int my_index = -1;
 
 		// Read needed parameters.
-		ExistingBufferWrapperReader reader( context.GetThisTask()->GetRawDataPtr(), context.GetThisTask()->GetDataSize() );
+		ExistingBufferWrapperReader reader( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		reader.Read( array_ptr );
 		reader.Read( my_index );
 
@@ -123,12 +91,12 @@ namespace helpers
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	void ArraySummer( sts::TaskContext& context )
+	void ArraySummer( const sts::ITaskContext* context )
 	{
 		std::array<int, 200>* array_ptr = nullptr;
 
 		// Read the array.
-		ExistingBufferWrapperReader reader( context.GetThisTask()->GetRawDataPtr(), context.GetThisTask()->GetDataSize() );
+		ExistingBufferWrapperReader reader( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		reader.Read( array_ptr );
 
 		// Calculate sum.
@@ -139,39 +107,94 @@ namespace helpers
 		}
 
 		// Write result.
-		ExistingBufferWrapperWriter writeBuffer( context.GetThisTask()->GetRawDataPtr(), context.GetThisTask()->GetDataSize() );
+		ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writeBuffer.Write( sum );
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+	template< typename T >
+	T ReadFromTask( const sts::ITaskHandle* handle )
+	{
+		ExistingBufferWrapperReader reader( handle->GetTaskStorage(), handle->GetTaskStorageSize() );
+		T val;
+		reader.Read( val );
+		return val;
 	}
 }
 
-//////////////////////////////////////////////////////////////////////
-TEST( STSCommonLib, CompileTimeUtilsTest )
+//////////////////////////////////////////////////////////
+TEST( STSTest, SimpleSingleTask )
 {
-	static_assert( IsPowerOf2<2048>::value == 1, "IsPowerOf2 does not work!" );
-	static_assert( IsPowerOf2<2049>::value == 0, "IsPowerOf2 does not work!" );
-	static_assert( IsPowerOf2<128>::value == 1, "IsPowerOf2 does not work!" );
-	static_assert( IsPowerOf2<130>::value == 0, "IsPowerOf2 does not work!" );
+	sts::ITaskManager* manager = CreateTaskSystem();
+	const sts::ITaskHandle* task_handle = manager->CreateNewTask( &helpers::TaskFunction, nullptr );
+
+	ASSERT_TRUE( manager->SubmitTask( task_handle ) );
+	ASSERT_TRUE( manager->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
+
+	ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
+
+	manager->ReleaseTask( task_handle );
+	DestroyTaskSystem( manager );
+}
+
+//////////////////////////////////////////////////////////
+TEST( STSTest, SimpleSingleLambdaTask )
+{
+	sts::ITaskManager* manager = CreateTaskSystem();
+	auto task_handle = sts::tools::LambdaTaskMaker( []( const sts::ITaskContext* )
+	{
+		int sum = 0;
+		for( int i = 0; i < 10000; ++i )
+			sum += i;
+	}, manager, nullptr );
+
+	ASSERT_TRUE( manager->SubmitTask( task_handle ) );
+	ASSERT_TRUE( manager->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
+
+	manager->ReleaseTask( task_handle );
+	DestroyTaskSystem( manager );
+}
+
+///////////////////////////////////////////////////////////////////
+TEST( STSTest, SimpleChainTask )
+{
+	sts::ITaskManager* manager = CreateTaskSystem();
+	auto root_task_handle = manager->CreateNewTask( &helpers::TaskFunction, nullptr );
+	auto child_task_handle = manager->CreateNewTask( &helpers::TaskFunction, root_task_handle );
+
+	ASSERT_TRUE( manager->SubmitTask( root_task_handle ) );
+	ASSERT_TRUE( manager->SubmitTask( child_task_handle ) );
+	ASSERT_TRUE( manager->RunTasksUsingThisThreadUntil( [ &root_task_handle ]() { return root_task_handle->IsFinished(); }  ) );
+
+	ASSERT_TRUE( helpers::ReadFromTask<int>( root_task_handle ) > 0 );
+	ASSERT_TRUE( helpers::ReadFromTask<int>( child_task_handle ) > 0 );
+
+	manager->ReleaseTask( root_task_handle );
+	manager->ReleaseTask( child_task_handle );
+	DestroyTaskSystem( manager );
 }
 
 TEST( STSTest, SimpleFlatTree )
 {
-	sts::TaskManager manager;
-	manager.Initialize();
-	
-	sts::TaskBatch_AutoRelease batch( manager );
-
-	for( int i = 0; i < 1000; ++i )
+	sts::ITaskManager* manager = CreateTaskSystem();
 	{
-		auto taskHandle = manager.CreateNewTask( helpers::TaskFunctionFast );
-		ASSERT_TRUE( taskHandle != sts::INVALID_TASK_HANDLE );
-		batch.Add( std::move( taskHandle ) );
+		sts::tools::TaskBatch_AutoRelease batch( manager );
+
+		for( int i = 0; i < 1000; ++i )
+		{
+			auto taskHandle = manager->CreateNewTask( helpers::TaskFunctionFast, nullptr );
+			ASSERT_TRUE( taskHandle != nullptr );
+			batch.Add( taskHandle );
+		}
+
+		ASSERT_TRUE( batch.SubmitAll() );
+
+		manager->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+
+		for( auto task_handle : batch )
+			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
 	}
-
-	ASSERT_TRUE( manager.SubmitTaskBatch( batch ) );
-
-	manager.RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
-
-	manager.Deinitialize();
+	DestroyTaskSystem( manager );
 }
 
 ////////////////////////////////////////////////////////////////////////

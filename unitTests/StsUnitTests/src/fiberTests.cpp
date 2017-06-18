@@ -1,16 +1,16 @@
 #include <gtest\gtest.h>
-#include <sts\lowlevel\thread\fiber.h>
+#include "..\..\libs\basicThreadingLib\include\thread\fiber.h"
 #include <vector>
 
 namespace helpers
 {
 	//////////////////////////////////////////////////////
 	// class used for testing fibers
-	class TestFiber : public sts::FiberBase
+	class TestFiber : public btl::FiberBase
 	{
 	public:
 		TestFiber()
-			: sts::FiberBase( true )
+			: btl::FiberBase( true )
 			, m_integer( nullptr )
 			, m_base( 1 )
 			, m_nextFiber( nullptr )
@@ -26,22 +26,22 @@ namespace helpers
 			if( m_nextFiber )
 			{
 				m_nextFiber->m_prevFiber = this;
-				sts::this_fiber::SwitchToFiber( m_nextFiber->GetFiberID() );
+				btl::this_fiber::SwitchToFiber( m_nextFiber->GetFiberID() );
 			}
 
 			*m_integer += m_base * 9;
 
 			if( m_prevFiber )
-				sts::this_fiber::SwitchToFiber( m_prevFiber->GetFiberID() );
+				btl::this_fiber::SwitchToFiber( m_prevFiber->GetFiberID() );
 			else
-				sts::this_fiber::SwitchToFiber( m_prevID );
+				btl::this_fiber::SwitchToFiber( m_prevID );
 		}
 
 		unsigned m_base;
 		unsigned* m_integer;
 		TestFiber* m_nextFiber;
 		TestFiber* m_prevFiber;
-		sts::FIBER_ID m_prevID;
+		btl::FIBER_ID m_prevID;
 	};
 }
 
@@ -63,14 +63,14 @@ TEST( FiberTests, FiberSwitching )
 			fibers[ i - 1 ]->m_nextFiber = fiber;
 	}
 
-	sts::FIBER_ID thisThreadFiberID = sts::this_fiber::ConvertThreadToFiber();
+	btl::FIBER_ID thisThreadFiberID = btl::this_fiber::ConvertThreadToFiber();
 
 	helpers::TestFiber* first = fibers[ 0 ];
 	first->m_prevID = thisThreadFiberID;
 
-	sts::this_fiber::SwitchToFiber( first->GetFiberID() );
+	btl::this_fiber::SwitchToFiber( first->GetFiberID() );
 
-	ASSERT_TRUE( sts::this_fiber::ConvertFiberToThread() );
+	ASSERT_TRUE( btl::this_fiber::ConvertFiberToThread() );
 
 	unsigned wantedInt = ( unsigned ) pow( 10, NUM_OF_FIBERS );
 	wantedInt -= 1;

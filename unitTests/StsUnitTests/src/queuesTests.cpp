@@ -1,8 +1,12 @@
 #include <gtest\gtest.h>
-#include <sts\structures\lockfree\lockfreePtrQueue.h>
-#include <sts\structures\lockbased\lockBasedPtrQueue.h>
-#include <sts\lowlevel\thread\FunctorThread.h>
-#include <sts\lowlevel\synchro\Mutex.h>
+// HACKY TEST, CUZ queus won't be a part of public interface of sts!
+
+#include "..\..\libs\simpleTaskSystem\src\common\common.h"
+#include "..\..\libs\simpleTaskSystem\src\structures\lockbased\lockBasedPtrQueue.h"
+#include "..\..\libs\simpleTaskSystem\src\structures\lockfree\lockfreePtrQueue.h"
+
+#include "..\..\libs\basicThreadingLib\include\thread\functorThread.h"
+#include "..\..\libs\basicThreadingLib\include\synchro\mutex.h"
 
 namespace helpers
 {
@@ -19,7 +23,7 @@ namespace helpers
 		for( unsigned i = 0; i < elements_to_push; ++i )
 		{
 			float* data = &SOME_VALUE;
-			while( !queue.PushBack( data ) ) { sts::this_thread::YieldThread(); }
+			while( !queue.PushBack( data ) ) { btl::this_thread::YieldThread(); }
 		}
 	}
 
@@ -30,7 +34,7 @@ namespace helpers
 		for( unsigned i = 0; i < elements_to_pop; ++i )
 		{
 			float* ptr = nullptr;
-			while( !( ptr = queue.PopFront() ) ) { sts::this_thread::YieldThread(); }
+			while( !( ptr = queue.PopFront() ) ) { btl::this_thread::YieldThread(); }
 
 			ASSERT_TRUE( ptr != nullptr );
 			ASSERT_TRUE( *ptr == SOME_VALUE );
@@ -44,7 +48,7 @@ namespace helpers
 		for( unsigned i = 0; i < elements_to_pop; ++i )
 		{
 			float* ptr = nullptr;
-			while( !( ptr = queue.PopBack() ) ) { sts::this_thread::YieldThread(); }
+			while( !( ptr = queue.PopBack() ) ) { btl::this_thread::YieldThread(); }
 
 			ASSERT_TRUE( ptr != nullptr );
 			ASSERT_TRUE( *ptr == SOME_VALUE );
@@ -115,10 +119,10 @@ namespace helpers
 		const unsigned elemnts_to_process = 100 * QUEUE_SIZE;
 		for( int i = 0; i < 10; ++i )
 		{
-			sts::FunctorThread producer;
+			btl::FunctorThread producer;
 			producer.SetFunctorAndStartThread( [ &queue, elemnts_to_process ] { helpers::QueueAdder( queue, elemnts_to_process ); } );
 
-			sts::FunctorThread consumer;
+			btl::FunctorThread consumer;
 			consumer.SetFunctorAndStartThread( [ &queue, elemnts_to_process ] { helpers::QueuePoper( queue, elemnts_to_process ); } );
 
 			producer.Join();
@@ -137,12 +141,12 @@ namespace helpers
 		const unsigned elemnts_to_process = 100 * QUEUE_SIZE;
 		for( int i = 0; i < 10; ++i )
 		{
-			sts::FunctorThread producer;
+			btl::FunctorThread producer;
 			producer.SetFunctorAndStartThread( [ &queue, elemnts_to_process ] { helpers::QueueAdder( queue, elemnts_to_process ); } );
 
-			sts::this_thread::SleepFor( 10 );
+			btl::this_thread::SleepFor( 10 );
 
-			sts::FunctorThread consumer;
+			btl::FunctorThread consumer;
 			consumer.SetFunctorAndStartThread( [ &queue, elemnts_to_process ] { helpers::QueueBackPoper( queue, elemnts_to_process ); } );
 
 			producer.Join();
@@ -165,17 +169,17 @@ namespace helpers
 
 		for( int i = 0; i < 50; ++i )
 		{
-			sts::FunctorThread thread1;
+			btl::FunctorThread thread1;
 			thread1.SetFunctorAndStartThread( [ &thread_queue, max_size ] { helpers::QueueAdder( thread_queue, max_size ); } );
-			sts::FunctorThread thread2;
+			btl::FunctorThread thread2;
 			thread2.SetFunctorAndStartThread( [ &thread_queue, max_size ] { helpers::QueueAdder( thread_queue, max_size ); } );
-			sts::FunctorThread thread3;
+			btl::FunctorThread thread3;
 			thread3.SetFunctorAndStartThread( [ &thread_queue, max_size ] { helpers::QueueAdder( thread_queue, max_size ); } );
 
 			unsigned num_to_pop_per_thread = ( num_to_pop - thread_queue.GetMaxSize() ) / 2;
-			sts::FunctorThread thread4;
+			btl::FunctorThread thread4;
 			thread4.SetFunctorAndStartThread( [ &thread_queue, num_to_pop_per_thread ] { helpers::QueuePoper( thread_queue, num_to_pop_per_thread ); } );
-			sts::FunctorThread thread5;
+			btl::FunctorThread thread5;
 			thread5.SetFunctorAndStartThread( [ &thread_queue, num_to_pop_per_thread ] { helpers::QueuePoper( thread_queue, num_to_pop_per_thread ); } );
 
 			helpers::QueueAdder( thread_queue, max_size + ( num_to_pop - NUM_OF_ADDING_THREADS * max_size ) );
@@ -198,13 +202,13 @@ namespace helpers
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_PopBack_Lockbased_SpinLock )
 {
-	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_PopBack_Lockbased_Mutex )
 {
-	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,13 +220,13 @@ TEST( QueueTests, SingleThreaded_Lockfree )
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_Lockbased_SpinLock )
 {
-	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_Lockbased_Mutex )
 {
-	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,25 +238,25 @@ TEST( QueueTests, SingleProducerAndConsumer_Lockfree )
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_Lockbased_SpinLock )
 {
-	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_Lockbased_Mutex )
 {
-	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_PopBack_Lockbased_SpinLock )
 {
-	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_PopBack_Lockbased_Mutex )
 {
-	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -264,11 +268,11 @@ TEST( QueueTests, MultipleProducersAndConsumers_Lockfree )
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, MultipleProducersAndConsumers_LockBased_SpinLock )
 {
-	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::SpinLock > >();
+	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, MultipleProducersAndConsumers_LockBased_Mutex )
 {
-	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, sts::Mutex > >();
+	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
 }
