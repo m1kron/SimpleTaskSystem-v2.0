@@ -217,7 +217,7 @@
     <ProjectReference Include="..\..\libs\basicThreadingLib\basicThreadingLib.vcxproj">
       <Project>{35fb4745-aa36-40af-8bcb-2266ea169f61}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\simpleTaskSystem\simpleTaskSystem.vcxproj">
+    <ProjectReference Include="..\..\libs\simpleTaskSystem\SimpleTaskSystem.vcxproj">
       <Project>{391e031b-8570-4bfe-9be2-4cf390a836d3}</Project>
     </ProjectReference>
   </ItemGroup>

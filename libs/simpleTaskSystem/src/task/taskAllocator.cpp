@@ -11,7 +11,7 @@ TaskAllocator::TaskAllocator()
 	for( uint32_t i = 0; i < TASK_POOL_SIZE; ++i )
 	{
 		m_taskHandlePool[ i ].AssociateTask( &m_taskPool[ i ] );
-		VERIFY_SUCCES( m_freelist.PushBack( &m_taskHandlePool[ i ] ) );
+		VERIFY_SUCCESS( m_freelist.PushBack( &m_taskHandlePool[ i ] ) );
 	}
 }
 
@@ -37,7 +37,7 @@ void TaskAllocator::ReleaseTask( const ITaskHandle* task_handle )
 	handle->GetTask()->Clear();
 
 	// Add to free list.
-	VERIFY_SUCCES( m_freelist.PushBack( handle ) );
+	VERIFY_SUCCESS( m_freelist.PushBack( handle ) );
 }
 
 ////////////////////////////////////////////////////

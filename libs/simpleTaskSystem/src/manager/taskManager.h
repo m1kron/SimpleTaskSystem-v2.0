@@ -4,14 +4,15 @@
 #include "..\task\taskAllocator.h"
 #include "..\taskWorker\taskWorkersPool.h"
 #include "..\taskFiber\taskFiberAllocator.h"
-
-#include "..\..\..\basicThreadingLib\include\thread\thisFiberHelpers.h"
+#include "..\taskWorker\taskWorkerInstanceHub.h"
 
 NAMESPACE_STS_BEGIN
 
 class TaskBatch;
 class TaskFiber;
 
+// Heart of sts system.
+// TODO: This has to be splitted into submodules.
 class TaskManager : public ITaskManager
 {
 public:
@@ -47,11 +48,50 @@ private:
 	void WakeUpAllWorkers() const;
 
 	TaskWorkersPool			m_workerThreadsPool;
+	TaskWorkerInstancesHub	m_workerInstancesHub;
 	TaskFiberAllocator		m_taskFiberAllocator;
 	TaskAllocator			m_taskAllocator;
+	TaskWorkerInstance		m_mainThreadInstanceWorker;
 	btl::Atomic< uint32_t > m_taskDispacherCounter; //< [NOTE]: does it have to be atomic?
-	btl::FIBER_ID			m_thisFiberID;
-	TaskFiber*				m_currentTaskFiber;
+	btl::Atomic< uint32_t > m_isActingAsTaskWorker;
+
 };
+
+//////////////////////////////////////////////////////////////////
+//
+// INLINES:
+//
+//////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////
+inline TaskManager::~TaskManager()
+{
+	ASSERT( m_workerThreadsPool.GetPoolSize() == 0 );
+	ASSERT( m_taskAllocator.AreAllTasksReleased() );
+}
+
+////////////////////////////////////////////////////////
+inline const ITaskHandle* TaskManager::CreateNewTask( const ITaskHandle* parent_task_handle )
+{
+	return CreateNewTaskImpl( parent_task_handle );
+}
+
+/////////////////////////////////////////////////////////
+inline void TaskManager::ReleaseTask( const ITaskHandle* task_handle )
+{
+	m_taskAllocator.ReleaseTask( task_handle );
+}
+
+/////////////////////////////////////////////////////////
+inline bool TaskManager::AreAllTasksReleased() const
+{
+	return m_taskAllocator.AreAllTasksReleased();
+}
+
+/////////////////////////////////////////////////////////
+inline int TaskManager::GetWorkersCount() const
+{
+	return m_workerThreadsPool.GetPoolSize();
+}
 
 NAMESPACE_STS_END

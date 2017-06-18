@@ -39,7 +39,10 @@
     <ClInclude Include="src\structures\lockfree\lockfreePtrQueue.h" />
     <ClInclude Include="src\taskFiber\taskFiber.h" />
     <ClInclude Include="src\taskFiber\taskFiberAllocator.h" />
-    <ClInclude Include="src\taskWorker\taskWorker.h" />
+    <ClInclude Include="src\taskWorker\taskWorkerInstance.h" />
+    <ClInclude Include="src\taskWorker\taskWorkerInstanceContext.h" />
+    <ClInclude Include="src\taskWorker\taskWorkerInstanceHub.h" />
+    <ClInclude Include="src\taskWorker\taskWorkerThread.h" />
     <ClInclude Include="src\taskWorker\taskWorkersPool.h" />
     <ClInclude Include="src\task\task.h" />
     <ClInclude Include="src\task\taskAllocator.h" />
@@ -58,7 +61,8 @@
     </ClCompile>
     <ClCompile Include="src\taskFiber\taskFiber.cpp" />
     <ClCompile Include="src\taskFiber\taskFiberAllocator.cpp" />
-    <ClCompile Include="src\taskWorker\taskWorker.cpp" />
+    <ClCompile Include="src\taskWorker\taskWorkerInstance.cpp" />
+    <ClCompile Include="src\taskWorker\taskWorkerThread.cpp" />
     <ClCompile Include="src\taskWorker\taskWorkersPool.cpp" />
     <ClCompile Include="src\task\task.cpp" />
     <ClCompile Include="src\task\taskAllocator.cpp" />
@@ -140,7 +144,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <AdditionalOptions>
       </AdditionalOptions>
-      <PreprocessorDefinitions>STS_DLL;_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LOGS_ENABLED;STS_DLL;_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -163,7 +167,7 @@
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <AdditionalOptions>
       </AdditionalOptions>
-      <PreprocessorDefinitions>STS_DLL;_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LOGS_ENABLED;STS_DLL;_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -187,7 +191,7 @@
       <AdditionalOptions>
       </AdditionalOptions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <PreprocessorDefinitions>STS_DLL;_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NDEBUG%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LOGS_ENABLED;STS_DLL;_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NDEBUG%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -213,7 +217,7 @@
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <AdditionalOptions>
       </AdditionalOptions>
-      <PreprocessorDefinitions>STS_DLL;_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NDEBUG%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LOGS_ENABLED;STS_DLL;_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NDEBUG%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>

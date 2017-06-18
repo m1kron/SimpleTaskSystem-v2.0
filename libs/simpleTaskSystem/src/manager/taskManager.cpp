@@ -2,22 +2,13 @@
 #include "taskManager.h"
 
 #include "..\..\..\basicThreadingLib\include\tools\tools.h"
-#include "..\..\..\basicThreadingLib\include\thread\functorThread.h"
 
 NAMESPACE_STS_BEGIN
 
 #define MANAGER_LOG( ... ) LOG( "[MANAGER]: " __VA_ARGS__ );
-#define MAIN_THREAD_WORKER_LOG( ... ) LOG( "[MAIN THREAD WORKER]: " __VA_ARGS__ );
 
 // Implementation of dtor of ITaskManager.
 ITaskManager::~ITaskManager() {}
-
-//////////////////////////////////////////////////////
-TaskManager::~TaskManager()
-{
-	ASSERT( m_workerThreadsPool.GetPoolSize() == 0 );
-	ASSERT( m_taskAllocator.AreAllTasksReleased() );
-}
 
 //////////////////////////////////////////////////////
 bool TaskManager::Initialize()
@@ -26,22 +17,40 @@ bool TaskManager::Initialize()
 
 	MANAGER_LOG( "Initalizing with %i worker threads.", num_cores );
 
+	// Init main thread worker instance.
+	auto idx = m_workerInstancesHub.Register( &m_mainThreadInstanceWorker );
+	VERIFY_SUCCESS( m_mainThreadInstanceWorker.Initalize( { this, &m_workerInstancesHub, &m_taskFiberAllocator, idx } ) );
+
 	// Heuristic: create num_cores - 1 working threads:
-	m_workerThreadsPool.InitializePoolAndStartWorkers( num_cores, this, &m_taskFiberAllocator );
+	m_workerThreadsPool.InitializePool( num_cores );
+
+	// Initialize worker threads and worker instances:
+	for( uint32_t i = 0; i < m_workerThreadsPool.GetPoolSize(); ++i )
+	{
+		TaskWorkerThread* workerThread = m_workerThreadsPool.GetWorkerAt( i );
+		
+		auto idx = m_workerInstancesHub.Register( workerThread->GetWorkerInstance() );
+		VERIFY_SUCCESS( workerThread->Start( { this, &m_workerInstancesHub, &m_taskFiberAllocator, idx } ) );
+	}
 	
 	return true;
 }
 
 void TaskManager::Deinitialize()
 {
-	m_workerThreadsPool.StopWorkersAndReleasePool();
-	MANAGER_LOG( "Manager deinitialized." );
-}
+	// Signal all worker that they should finish right now.
+	for( uint32_t i = 0; i < m_workerThreadsPool.GetPoolSize(); ++i )
+		m_workerThreadsPool.GetWorkerAt( i )->FinishWork();
 
-////////////////////////////////////////////////////////
-const ITaskHandle* TaskManager::CreateNewTask( const ITaskHandle* parent_task_handle )
-{
-	return CreateNewTaskImpl( parent_task_handle );
+	// Wait until all workers are done;
+	for( uint32_t i = 0; i < m_workerThreadsPool.GetPoolSize(); ++i )
+		m_workerThreadsPool.GetWorkerAt( i )->Join();
+
+	m_mainThreadInstanceWorker.Deinitalize();
+
+	m_workerInstancesHub.UnregisterAll();
+	m_workerThreadsPool.ReleasePool();
+	MANAGER_LOG( "Manager deinitialized." );
 }
 
 /////////////////////////////////////////////////////////
@@ -54,14 +63,22 @@ bool TaskManager::DispatchTask( Task* task )
 	// for improving cache usage.
 	TaskWorkerThread* this_thread_worker = m_workerThreadsPool.FindWorkerWithThreadID( btl::this_thread::GetThreadID() );
 
-	if( this_thread_worker && this_thread_worker->AddTask( task ) )
+	if( this_thread_worker && this_thread_worker->GetWorkerInstance()->AddTask( task ) )
 	{
 		MANAGER_LOG( "SubmitTask called from worker thread, adding task to that thread." );
 		return true;
 	}
 
-	// SubmitTask is called from other thread, so use normal task dispatching tactic:
-	// try to dispach task equally among all worker threads:
+	// SubmitTask is called from other thread and main thread is acting now as a worker thread, so add task to main worker instance:
+	if( m_isActingAsTaskWorker.Load() == 1 )
+	{
+		MANAGER_LOG( "SubmitTask called from other thread then worker thread, but main task is acting as a worker instance, so task is added the main thread." );
+		m_mainThreadInstanceWorker.AddTask( task );
+		return true;
+	}
+
+	// SubmitTask is called from other thread, and main thread is not acting as a worker now, so use normal task dispatching tactic:
+	// Try to dispach task equally among all worker threads:
 	uint32_t counter = ++m_taskDispacherCounter;
 	uint32_t workers_count = GetWorkersCount();
 	uint32_t worker_id = counter % workers_count;
@@ -72,9 +89,9 @@ bool TaskManager::DispatchTask( Task* task )
 		// Try to add to every worker if selected one is full:
 		TaskWorkerThread* worker = m_workerThreadsPool.GetWorkerAt( thread_worker_idx );
 
-		if( worker->AddTask( task ) )
+		if( worker->GetWorkerInstance()->AddTask( task ) )
 		{
-			MANAGER_LOG( "SubmitTask called from main thread, adding task to %i worker thread.", thread_worker_idx );
+			MANAGER_LOG( "SubmitTask called from other thread, adding task to %i worker thread.", thread_worker_idx );
 			return true; // Finally, task has been added.
 		}
 	}
@@ -98,104 +115,39 @@ bool TaskManager::SubmitTask( const ITaskHandle* task_handle )
 }
 
 /////////////////////////////////////////////////////////
-//bool TaskManager::SubmitTaskBatch( const TaskBatch& batch )
-//{
-//	for( const TaskHandle& handle : batch )
-//	{
-//		if( !DispatchTask( handle ) )
-//			return false;
-//	}
-//
-//	// Wake up threads.
-//	WakeUpAllWorkers();
-//
-//	return true;
-//}
-
-/////////////////////////////////////////////////////////
-void TaskManager::ReleaseTask( const ITaskHandle* task_handle )
-{
-	m_taskAllocator.ReleaseTask( task_handle );
-}
-
-/////////////////////////////////////////////////////////
-bool TaskManager::AreAllTasksReleased() const
-{
-	return m_taskAllocator.AreAllTasksReleased();
-}
-
-/////////////////////////////////////////////////////////
 void TaskManager::TryToRunOneTask()
 {
-	Task* stealed_task = nullptr;
-
-	// try to steal a task from workers:
-	// [NOTE]: try to balance stealing from all workers equally, not like this!!!
-	uint32_t workers_count = m_workerThreadsPool.GetPoolSize();
-	for( uint32_t i = 0; i < workers_count; ++i )
-	{
-		if( stealed_task = m_workerThreadsPool.GetWorkerAt( i )->TryToStealTask() )
-		{
-			ASSERT( stealed_task->IsReadyToBeExecuted() );
-			break;
-		}
-	}
-
-	// Execute task:
-	if( stealed_task )
-	{
-		MAIN_THREAD_WORKER_LOG( "Stealed task." );
-		MAIN_THREAD_WORKER_LOG( "Switching to fiber to execute task." );
-		ASSERT( m_currentTaskFiber->GetCurrentState() == TaskFiberState::Idle );
-		m_currentTaskFiber->SetTaskToExecute( stealed_task );
-		btl::this_fiber::SwitchToFiber( m_currentTaskFiber->GetFiberID() );
-		ASSERT( m_currentTaskFiber->GetCurrentState() == TaskFiberState::Idle );
-		MAIN_THREAD_WORKER_LOG( "Task is executed." );
-	}
-	else
-	{
-		MAIN_THREAD_WORKER_LOG( "Condition is not yet met and there is no more work to do, main thread is waiting." );
-		// Or wait, cuz there aren't any task to execute, the task that we are waiting for should be being executed by thread worker.
+	bool executed_anything = m_mainThreadInstanceWorker.TryToExecuteSingleTask();
+	if( !executed_anything )
 		btl::this_thread::SleepFor( 2 );
-	}
 }
 
 /////////////////////////////////////////////////////////
 bool TaskManager::ConvertMainThreadToWorker()
 {
-	m_thisFiberID = btl::this_fiber::ConvertThreadToFiber();
-	ASSERT( m_thisFiberID != INVALID_FIBER_ID );
-
-	if( m_currentTaskFiber = m_taskFiberAllocator.AllocateNewTaskFiber() )
+	if( m_isActingAsTaskWorker.Exchange( 1, btl::MemoryOrder::Acquire ) == 0 )
 	{
-		MANAGER_LOG( "Converting main thread to worker thread." );
-		m_currentTaskFiber->Setup( m_thisFiberID, this );
-		return true;
+		if( m_mainThreadInstanceWorker.ConvertToFiber() )
+		{
+			MANAGER_LOG( "Converting main thread to worker thread." );
+			return true;
+		}
+	}
+	else
+	{
+		MANAGER_LOG( "Attempt to covnert main thread to worker thread while it is already done! Calling ConvertMainThreadToWorker from two different threads?." );
 	}
 
-	MANAGER_LOG( "Failed to converting to worker thread." );
+	MANAGER_LOG( "Failed to convert to fiber." );
 	return false;
 }
 
 /////////////////////////////////////////////////////////
 void TaskManager::ConvertWorkerToMainThread()
 {
-	if( m_currentTaskFiber )
-	{
-		m_taskFiberAllocator.ReleaseTaskFiber( m_currentTaskFiber );
-		m_currentTaskFiber = nullptr;
-	}
-
-	VERIFY_SUCCES( btl::this_fiber::ConvertFiberToThread() );
-	m_thisFiberID = INVALID_FIBER_ID;
-
+	VERIFY_SUCCESS( m_mainThreadInstanceWorker.ConvertToThread() );
 	MANAGER_LOG( "Converting worker thread back to main thread." );
-}
-
-/////////////////////////////////////////////////////////
-int TaskManager::GetWorkersCount() const
-{
-	return m_workerThreadsPool.GetPoolSize();
+	m_isActingAsTaskWorker.Exchange( 0, btl::MemoryOrder::Release );
 }
 
 /////////////////////////////////////////////////////////

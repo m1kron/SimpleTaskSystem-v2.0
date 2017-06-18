@@ -1,23 +1,19 @@
 #pragma once
-#include "taskWorker.h"
+#include "taskWorkerThread.h"
 
 
 NAMESPACE_STS_BEGIN
-
-class TaskManager;
-class TaskFiberAllocator;
 
 ////////////////////////////////////////////////////////////
 // Manages pool of worker threads.
 class TaskWorkersPool
 {
 public:
-	// Initializes to have specified size and starts all workers.
-	void InitializePoolAndStartWorkers( uint32_t num_of_workers, TaskManager* task_manager, TaskFiberAllocator* task_fiber_allocator );
+	// Initializes to have specified size.
+	void InitializePool( uint32_t num_of_workers );
 
-	// Send stop signal to all workers in pool and WAITS for them untill they are finished.
-	// Releases then whole pool.
-	void StopWorkersAndReleasePool();
+	// Releases whole pool.
+	void ReleasePool();
 
 	// Returns worker at given index. Returns null if there aren't such index in the pool.
 	TaskWorkerThread* GetWorkerAt( uint32_t index ) const;
@@ -49,6 +45,13 @@ inline TaskWorkerThread* TaskWorkersPool::GetWorkerAt( uint32_t index ) const
 inline uint32_t TaskWorkersPool::GetPoolSize() const
 {
 	return (uint32_t)m_workerThreads.size();
+}
+
+////////////////////////////////////////////////////////////////////
+inline void TaskWorkersPool::ReleasePool()
+{
+	// Release all worker instances;
+	m_workerThreads.clear();
 }
 
 

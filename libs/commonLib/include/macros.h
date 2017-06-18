@@ -30,4 +30,4 @@
 #define BASE_CLASS( base_class ) typedef base_class __base;
 #define RELEASE( object ) delete object; object = nullptr;
 #define SAFE_RELEASE( object ) if ( object ) delete object; object = nullptr;
-#define VERIFY_SUCCES( expr ) bool val = expr; ASSERT( val );
+#define VERIFY_SUCCESS( expr ) { bool val = expr; ASSERT( val ); }
