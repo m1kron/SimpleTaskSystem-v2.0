@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9173B8AD-AE27-444A-88F7-494C2197E042}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>ThreadLibTestDemo</RootNamespace>
+    <RootNamespace>stsUnitTests</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -217,10 +217,7 @@
     <ProjectReference Include="..\..\libs\basicThreadingLib\basicThreadingLib.vcxproj">
       <Project>{35fb4745-aa36-40af-8bcb-2266ea169f61}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\commonLib\commonLib.vcxproj">
-      <Project>{35fb4173-aa36-40be-8bcb-2266ea169f61}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\libs\simpleTaskSystem\SimpleTaskSystem.vcxproj">
+    <ProjectReference Include="..\..\libs\simpleTaskSystem\simpleTaskSystem.vcxproj">
       <Project>{391e031b-8570-4bfe-9be2-4cf390a836d3}</Project>
     </ProjectReference>
   </ItemGroup>

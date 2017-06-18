@@ -68,7 +68,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{391E031B-8570-4BFE-9BE2-4CF390A836D3}</ProjectGuid>
     <RootNamespace>ThreadLib</RootNamespace>
-    <ProjectName>SimpleTaskSystem</ProjectName>
+    <ProjectName>simpleTaskSystem</ProjectName>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
