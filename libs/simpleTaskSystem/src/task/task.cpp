@@ -1,5 +1,6 @@
 #include "precompiledHeader.h"
 #include "task.h"
+#include "taskContext.h"
 #include "..\manager\taskManager.h"
 #include "..\..\..\commonLib\include\tools\tools.h"
 
@@ -21,9 +22,9 @@ Task::Task()
 }
 
 ///////////////////////////////////////////////////////
-const size_t Task::GetDataSize()
+const size_t Task::GetStorageSize()
 {
-	return DATA_SIZE;
+	return STORAGE_SIZE;
 }
 
 ///////////////////////////////////////////////////////
@@ -31,10 +32,10 @@ void Task::Run( TaskManager* task_manager )
 {
 	ASSERT( IsReadyToBeExecuted() );
 
-	TaskContext taskContext( *task_manager, this );
+	TaskContext taskContext( task_manager, this );
 
 	// Execute task function:
-	m_functionPtr( taskContext );
+	m_functionPtr( &taskContext );
 
 	// We are finished, so we can't have any dependant tasks now.
 	uint32_t dependent_num = m_numberOfChildTasks.Decrement();
@@ -49,7 +50,7 @@ void Task::Run( TaskManager* task_manager )
 		// Parent is ready to be executed, so add it to our thread.
 		if( parent_dependant_task == 1 )
 		{
-			bool submitted = task_manager->SubmitTask( TaskHandle( m_parentTask ) );
+			bool submitted = task_manager->DispatchTask( m_parentTask );
 			ASSERT( submitted );
 		}		
 	}

@@ -20,7 +20,7 @@ void FunctorTaskMaker( TaskHandle& task_handle, const TFunctor& funtor );
 ////////////////////////////////////////////////////////
 // This function will extract functor and call it.
 template< typename TFunctor >
-void FunctorTaskFunction( TaskContext& context ) 
+void FunctorTaskFunction( const ITaskContext* context ) 
 {
 	// This helper class is used to retrive functor from task data, cuz
 	// in general TFunctor might not have ctor that we can use here ( without paramters ).

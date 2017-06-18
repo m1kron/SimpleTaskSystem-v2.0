@@ -1,6 +1,6 @@
 #pragma once
-#include "..\..\..\basicThreadingLib\include\thread\thisThreadHelpers.h"
-#include "..\..\..\basicThreadingLib\include\atomic\atomic.h"
+#include "..\..\..\..\basicThreadingLib\include\thread\thisThreadHelpers.h"
+#include "..\..\..\..\basicThreadingLib\include\atomic\atomic.h"
 
 NAMESPACE_STS_BEGIN
 

@@ -1,6 +1,5 @@
 #pragma once
-#include "taskContext.h"
-#include "..\..\..\commonLib\include\tools\existingBufferWrapper.h"
+#include "..\..\include\iTaskHandle.h"
 #include "..\..\..\basicThreadingLib\include\atomic\atomic.h"
 
 NAMESPACE_STS_BEGIN
@@ -12,15 +11,13 @@ class TaskManager;
 BTL_ALIGNED( BTL_CACHE_LINE_SIZE ) class Task
 {
 public:
-	// Task function archetype.
-	typedef void( *TFunctionPtr ) ( TaskContext& task_context );
 
 	// Default ctor.
 	Task();
 
-	// Return max size of raw data, that task can hold. If you need more, you have to allocated it on your own.
+	// Returns size of the storage of the task.
 	// TODO: constexpr..
-	static const size_t GetDataSize();
+	static const size_t GetStorageSize();
 
 	// Main task function called by task worker.
 	void Run( TaskManager* task_manager );
@@ -33,26 +30,26 @@ public:
 
 	// Marks this task as a child of parent task. Parent task will be
 	// executed after all child tasks are done.
-	void AddParent( const TaskHandle& parentTask );
+	void AddParent( Task* parentTask );
 
 	// Set main task function.
-	void SetTaskFunction( TFunctionPtr function );
+	void SetTaskFunction( TTaskFunctionPtr function );
 
-	// Returns raw task data pointer.
-	void* GetRawDataPtr();
+	// Returns storage pointer.
+	void* GetStoragePtr();
 
 	// Clears task.
 	void Clear();
 
 	// Max size of data that can be stored by task instance.
-	static const size_t DATA_SIZE = ( BTL_CACHE_LINE_SIZE - sizeof( TFunctionPtr ) - sizeof( Task* ) - sizeof( btl::Atomic< uint32_t > ) );
+	static const size_t STORAGE_SIZE = ( BTL_CACHE_LINE_SIZE - sizeof( TTaskFunctionPtr ) - sizeof( Task* ) - sizeof( btl::Atomic< uint32_t > ) );
 
 private:
-	TFunctionPtr m_functionPtr; 
+	TTaskFunctionPtr m_functionPtr;
 	Task* m_parentTask;
 	btl::Atomic< uint32_t > m_numberOfChildTasks; //< When 0, task is considered as finished.
 
-	char m_data[ DATA_SIZE ];
+	char m_storage[ STORAGE_SIZE ];
 };
 
 ///////////////////////////////////////////////////////////////
@@ -74,7 +71,7 @@ inline bool Task::IsReadyToBeExecuted() const
 }
 
 ////////////////////////////////////////////////////////
-inline void Task::SetTaskFunction( TFunctionPtr function )
+inline void Task::SetTaskFunction( TTaskFunctionPtr function )
 {
 	ASSERT( function != nullptr );
 	ASSERT( m_functionPtr == nullptr );
@@ -84,19 +81,19 @@ inline void Task::SetTaskFunction( TFunctionPtr function )
 }
 
 ////////////////////////////////////////////////////////
-inline void Task::AddParent( const TaskHandle& parentTask )
+inline void Task::AddParent( Task* parentTask )
 {
-	ASSERT( parentTask != INVALID_TASK_HANDLE );
+	ASSERT( parentTask != nullptr );
 	ASSERT( m_parentTask == nullptr );
 
-	m_parentTask = parentTask.m_task;
+	m_parentTask = parentTask;
 	m_parentTask->m_numberOfChildTasks.Increment();
 }
 
 ////////////////////////////////////////////////////////
-inline void* Task::GetRawDataPtr()
+inline void* Task::GetStoragePtr()
 {
-	return m_data;
+	return m_storage;
 }
 
 ////////////////////////////////////////////////////////

@@ -1,54 +1,49 @@
 #pragma once
+#include "..\..\include\iTaskHandle.h"
 
 NAMESPACE_STS_BEGIN
 
-/////////////////////////////////////////////////////////////
-// Handle, that holds entry in pool and allows to release slot.
-class TaskHandle
+class Task;
+
+// Implementation of ITaskHandle interface.
+class TaskHandle : public ITaskHandle
 {
 	friend class TaskAllocator;
-	friend class TaskManager;
-	friend class Task;
-	friend class TaskContext;
 public:
 	TaskHandle();
 
+	static const TaskHandle* AsTaskHandle( const ITaskHandle* handle );
+
 	// Move ctor:
-	TaskHandle( TaskHandle&& other_task );
-	TaskHandle& operator=( TaskHandle&& other );
+	TaskHandle( TaskHandle&& other_task ) = delete;
+	TaskHandle& operator=( TaskHandle&& other ) = delete;
 
 	// Cannot copy:
 	TaskHandle( TaskHandle& ) = delete;
 	TaskHandle& operator=( TaskHandle& other ) = delete;
 
-	// Comparsion operators:
-	bool operator==( const TaskHandle& other ) const;
-	bool operator!=( const TaskHandle& other ) const;
+	// Get associated task.
+	Task* GetTask() const;
 
-	// Class member access operator.
-	Task* operator->( ) const;//rethink this.
-
-	// Makes this handle invalid.
-	void Invalidate();
-
+	// ITaskHandle interface:
+	void SetTaskFunction( TTaskFunctionPtr function ) const override;
+	void AddParent( const ITaskHandle* parentTaskHandle ) const override;
+	bool IsFinished() const override;
+	size_t GetTaskStorageSize() const override;
+	void* GetTaskStorage() const override;
+	// ---
 private:
-	TaskHandle( Task* task );
+	// Associates task with this handle.
+	void AssociateTask( Task* task );
 
 	Task* m_task;
 };
-
-#define INVALID_TASK_HANDLE TaskHandle()
-
 
 ////////////////////////////////////////////////////////
 //
 // INLINES:
 //
 ////////////////////////////////////////////////////////
-inline TaskHandle::TaskHandle( Task* task )
-	: m_task( task )
-{
-}
 
 ////////////////////////////////////////////////////////
 inline TaskHandle::TaskHandle()
@@ -57,44 +52,21 @@ inline TaskHandle::TaskHandle()
 }
 
 ////////////////////////////////////////////////////////
-inline TaskHandle::TaskHandle( TaskHandle&& other_task )
-	: m_task( other_task.m_task )
+inline const TaskHandle* TaskHandle::AsTaskHandle( const ITaskHandle* handle )
 {
-	other_task.Invalidate();
+	return static_cast< const TaskHandle* >( handle );
 }
 
 ////////////////////////////////////////////////////////
-inline Task* TaskHandle::operator->( ) const
+inline void TaskHandle::AssociateTask( Task* task )
+{
+	m_task = task;
+}
+
+////////////////////////////////////////////////////////
+inline Task* TaskHandle::GetTask() const
 {
 	return m_task;
 }
-
-////////////////////////////////////////////////////////s
-inline TaskHandle& TaskHandle::operator=( TaskHandle&& other )
-{
-	m_task = other.m_task;
-	other.Invalidate();
-
-	return *this;
-}
-
-////////////////////////////////////////////////////////s
-inline bool TaskHandle::operator==( const TaskHandle& other ) const
-{
-	return m_task == other.m_task;
-}
-
-////////////////////////////////////////////////////////s
-inline bool TaskHandle::operator!=( const TaskHandle& other ) const
-{
-	return m_task != other.m_task;
-}
-
-////////////////////////////////////////////////////////
-inline void TaskHandle::Invalidate()
-{
-	m_task = nullptr;
-}
-
 
 NAMESPACE_STS_END

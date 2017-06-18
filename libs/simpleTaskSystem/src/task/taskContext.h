@@ -1,30 +1,29 @@
 #pragma once
-#include "taskHandle.h"
+#include "..\..\include\iTaskContext.h"
 
 NAMESPACE_STS_BEGIN
 
-class TaskManager;
+class ITaskManager;
 class Task;
 
-/////////////////////////////////////////////////////////
-// Stores context of given task execution.
-class TaskContext
+// Implementation of ITaskContext.
+class TaskContext : public ITaskContext
 {
 public:
-	TaskContext( TaskManager& manager, Task* this_task );
+	TaskContext( ITaskManager* manager, Task* running_task );
 
-	// Returns this task.
-	const TaskHandle& GetThisTask() const;
-
-	// Returns task manager.
-	TaskManager& GetTaskManager();
+	// ITaskContext interface:
+	ITaskManager* GetTaskManager() const override;
+	size_t GetThisTaskStorageSize() const override;
+	void* GetThisTaskStorage() const override;
+	// ---
 
 	// Wait until given condition is satisfied, blocks exeution of this task.
 	//template< class TCondtion > void WaitFor( const TCondtion& condition ) const;
 
 private:
-	TaskManager& m_taskManager;
-	TaskHandle m_thisTaskHandle;
+	ITaskManager* m_taskManager;
+	Task* m_task;
 };
 
 ///////////////////////////////////////////////////////////
@@ -33,23 +32,11 @@ private:
 //
 ///////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////
-inline TaskContext::TaskContext( TaskManager& manager, Task* this_task )
+/////////////////////////////////////////////////////
+inline TaskContext::TaskContext( ITaskManager* manager, Task* this_task )
 	: m_taskManager( manager )
-	, m_thisTaskHandle( this_task )
+	, m_task( this_task )
 {
-}
-
-///////////////////////////////////////////////////////
-inline const TaskHandle& TaskContext::GetThisTask() const
-{
-	return m_thisTaskHandle;
-}
-
-///////////////////////////////////////////////////////
-inline TaskManager& TaskContext::GetTaskManager()
-{
-	return m_taskManager;
 }
 
 ///////////////////////////////////////////////////////

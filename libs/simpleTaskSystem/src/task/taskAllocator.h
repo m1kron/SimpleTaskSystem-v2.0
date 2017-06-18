@@ -1,6 +1,7 @@
 #pragma once
 #include "task.h"
 #include "taskHandle.h"
+#include "..\structures\lockfree\lockfreePtrQueue.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -10,12 +11,13 @@ class TaskAllocator
 public:
 	// Not thread safe ctor.
 	TaskAllocator();
+	~TaskAllocator();
 
 	// Allocates new task, this is lock free method.
-	TaskHandle AllocateNewTask();
+	const ITaskHandle* AllocateNewTask();
 
 	// Release task back to pool, lock free method.
-	void ReleaseTask( TaskHandle& task );
+	void ReleaseTask( const ITaskHandle* task );
 
 	// Releases all tasks.
 	void ReleaseAllTasks();
@@ -26,19 +28,10 @@ public:
 	// Returns size of task pool.
 	static uint32_t GetTaskPoolSize();
 
-	// Debug stuff:
-	bool Debug_TryToReleaseTask( uint32_t index );
-	bool Debug_IsTaskOccupied( const TaskHandle& handle );
-
 private:
 	Task m_taskPool[ TASK_POOL_SIZE ];
-
-	// Pool markers marks whether corresponding task slot is used.
-	// Could be bitfield, but it would rise probability of false sharing. 
-	btl::Atomic< uint32_t > m_poolMarkers[ TASK_POOL_SIZE ];
-
-	// Hasher is used to decrease contention.
-	uint32_t m_hashedNumber;
+	TaskHandle m_taskHandlePool[ TASK_POOL_SIZE ];
+	LockFreePtrQueue< const ITaskHandle, TASK_POOL_SIZE > m_freelist;
 };
 
 NAMESPACE_STS_END

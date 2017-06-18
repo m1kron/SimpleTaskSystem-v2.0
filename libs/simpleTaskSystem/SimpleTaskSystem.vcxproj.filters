@@ -90,6 +90,15 @@
     <ClInclude Include="src\tools\positiveNumberHasher.h">
       <Filter>src\tools</Filter>
     </ClInclude>
+    <ClInclude Include="include\iTaskHandle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\iTaskContext.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\iTaskManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
@@ -118,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="src\taskWorker\taskWorkersPool.cpp">
       <Filter>src\taskWorker</Filter>
+    </ClCompile>
+    <ClCompile Include="src\task\taskHandle.cpp">
+      <Filter>src\task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\task\taskContext.cpp">
+      <Filter>src\task</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

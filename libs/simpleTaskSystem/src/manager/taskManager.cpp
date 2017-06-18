@@ -5,7 +5,6 @@
 #include "..\..\..\basicThreadingLib\include\tools\tools.h"
 #include "..\..\..\basicThreadingLib\include\thread\functorThread.h"
 
-
 NAMESPACE_STS_BEGIN
 
 //////////////////////////////////////////////////////
@@ -31,27 +30,27 @@ void TaskManager::Deinitialize()
 }
 
 ////////////////////////////////////////////////////////
-TaskHandle TaskManager::CreateNewTask( Task::TFunctionPtr task_function, const TaskHandle& parent_task_handle )
+const ITaskHandle* TaskManager::CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* parent_task_handle )
 {
-	TaskHandle new_task_handle = CreateNewTaskImpl( parent_task_handle );
+	const ITaskHandle* new_task_handle = CreateNewTaskImpl( parent_task_handle );
 
-	if( new_task_handle != INVALID_TASK_HANDLE )
+	if( new_task_handle != nullptr )
 		new_task_handle->SetTaskFunction( task_function );
 
 	return new_task_handle;
 }
 
 /////////////////////////////////////////////////////////
-bool TaskManager::DispatchTask( const TaskHandle& task_handle )
+bool TaskManager::DispatchTask( Task* task )
 {
-	if( !task_handle->IsReadyToBeExecuted() )
+	if( !task->IsReadyToBeExecuted() )
 		return true; // Means that tasks has dependencies and cannot be dispatched now.
 
 	// If submit task is called from one of the worker thread, add task to that thread,
 	// for improving cache usage.
 	TaskWorkerThread* this_thread_worker = m_workerThreadsPool.FindWorkerWithThreadID( btl::this_thread::GetThreadID() );
 
-	if( this_thread_worker && this_thread_worker->AddTask( task_handle.m_task ) )
+	if( this_thread_worker && this_thread_worker->AddTask( task ) )
 		return true;
 
 	// SubmitTask is called from other thread, so use normal task dispatching tactic:
@@ -65,7 +64,7 @@ bool TaskManager::DispatchTask( const TaskHandle& task_handle )
 		// Try to add to every worker if selected one is full:
 		TaskWorkerThread* worker = m_workerThreadsPool.GetWorkerAt( ( worker_id + i ) % workers_count );
 
-		if( worker->AddTask( task_handle.m_task ) )
+		if( worker->AddTask( task ) )
 			return true; // Finally, task has been added.
 	}
 
@@ -73,9 +72,12 @@ bool TaskManager::DispatchTask( const TaskHandle& task_handle )
 }
 
 /////////////////////////////////////////////////////////
-bool TaskManager::SubmitTask( const TaskHandle& task_handle )
+bool TaskManager::SubmitTask( const ITaskHandle* task_handle )
 {
-	bool ret_val = DispatchTask( task_handle );
+	auto handle = TaskHandle::AsTaskHandle( task_handle );
+	ASSERT( handle );
+
+	bool ret_val = DispatchTask( handle->GetTask() );
 
 	// Wake up threads.
 	WakeUpAllWorkers();
@@ -84,22 +86,22 @@ bool TaskManager::SubmitTask( const TaskHandle& task_handle )
 }
 
 /////////////////////////////////////////////////////////
-bool TaskManager::SubmitTaskBatch( const TaskBatch& batch )
-{
-	for( const TaskHandle& handle : batch )
-	{
-		if( !DispatchTask( handle ) )
-			return false;
-	}
-
-	// Wake up threads.
-	WakeUpAllWorkers();
-
-	return true;
-}
+//bool TaskManager::SubmitTaskBatch( const TaskBatch& batch )
+//{
+//	for( const TaskHandle& handle : batch )
+//	{
+//		if( !DispatchTask( handle ) )
+//			return false;
+//	}
+//
+//	// Wake up threads.
+//	WakeUpAllWorkers();
+//
+//	return true;
+//}
 
 /////////////////////////////////////////////////////////
-void TaskManager::ReleaseTask( TaskHandle& task_handle )
+void TaskManager::ReleaseTask( const ITaskHandle* task_handle )
 {
 	m_taskAllocator.ReleaseTask( task_handle );
 }
@@ -169,6 +171,12 @@ void TaskManager::ConvertWorkerToMainThread()
 }
 
 /////////////////////////////////////////////////////////
+int TaskManager::GetWorkersCount() const
+{
+	return m_workerThreadsPool.GetPoolSize();
+}
+
+/////////////////////////////////////////////////////////
 void TaskManager::WakeUpAllWorkers() const
 {
 	uint32_t workers_count = GetWorkersCount();
@@ -179,14 +187,14 @@ void TaskManager::WakeUpAllWorkers() const
 }
 
 /////////////////////////////////////////////////////////
-TaskHandle TaskManager::CreateNewTaskImpl( const TaskHandle& parent_task_handle )
+const ITaskHandle* TaskManager::CreateNewTaskImpl( const ITaskHandle* parent_task_handle )
 {
-	TaskHandle new_task_handle = m_taskAllocator.AllocateNewTask();
+	const ITaskHandle* new_task_handle = m_taskAllocator.AllocateNewTask();
 
-	if( new_task_handle == INVALID_TASK_HANDLE )
-		return INVALID_TASK_HANDLE;
+	if( new_task_handle == nullptr )
+		return nullptr;
 
-	if( parent_task_handle != INVALID_TASK_HANDLE )
+	if( parent_task_handle != nullptr )
 		new_task_handle->AddParent( parent_task_handle );
 
 	return new_task_handle;
