@@ -37,6 +37,9 @@
     <Filter Include="src\tools">
       <UniqueIdentifier>{dec32279-7723-435a-a4ca-a5e2b4c2f224}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\tools">
+      <UniqueIdentifier>{e5dff130-9e71-41aa-a05b-4ae0e5456d39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\precompiledHeader\precompiledHeader.h">
@@ -60,16 +63,10 @@
     <ClInclude Include="src\task\taskAllocator.h">
       <Filter>src\task</Filter>
     </ClInclude>
-    <ClInclude Include="src\task\taskBatch.h">
-      <Filter>src\task</Filter>
-    </ClInclude>
     <ClInclude Include="src\task\taskContext.h">
       <Filter>src\task</Filter>
     </ClInclude>
     <ClInclude Include="src\task\taskHandle.h">
-      <Filter>src\task</Filter>
-    </ClInclude>
-    <ClInclude Include="src\task\taskHelpers.h">
       <Filter>src\task</Filter>
     </ClInclude>
     <ClInclude Include="src\taskFiber\taskFiber.h">
@@ -84,9 +81,6 @@
     <ClInclude Include="src\taskWorker\taskWorkersPool.h">
       <Filter>src\taskWorker</Filter>
     </ClInclude>
-    <ClInclude Include="src\tools\parallelFor.h">
-      <Filter>src\tools</Filter>
-    </ClInclude>
     <ClInclude Include="src\tools\positiveNumberHasher.h">
       <Filter>src\tools</Filter>
     </ClInclude>
@@ -98,6 +92,18 @@
     </ClInclude>
     <ClInclude Include="include\iTaskManager.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\globalApi.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tools\taskBatch.h">
+      <Filter>include\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tools\parallelFor.h">
+      <Filter>include\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tools\lambdaTask.h">
+      <Filter>include\tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -111,9 +117,6 @@
       <Filter>src\task</Filter>
     </ClCompile>
     <ClCompile Include="src\task\taskAllocator.cpp">
-      <Filter>src\task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\task\taskBatch.cpp">
       <Filter>src\task</Filter>
     </ClCompile>
     <ClCompile Include="src\taskFiber\taskFiber.cpp">
@@ -134,5 +137,9 @@
     <ClCompile Include="src\task\taskContext.cpp">
       <Filter>src\task</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\globalApiImpl.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="include\iTaskManager.cpp" />
   </ItemGroup>
 </Project>

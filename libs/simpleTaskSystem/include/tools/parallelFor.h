@@ -1,22 +1,23 @@
 #pragma once
 #include <vector>
-#include "..\manager\taskManager.h"
+#include "..\iTaskManager.h"
 #include "..\..\..\basicThreadingLib\include\tools\tools.h"
 #include "..\..\..\basicThreadingLib\include\thread\functorThread.h"
 
 namespace sts
 {
+namespace tools
+{
 
-// Calls functor parallely for each element between begin and end.
-// Tries to balance work load between available logical cores.
-// Function blocks until it is done. Function creates new Thread instances inside.
 template< class Iterator, typename Functor >
 void ParallelForEach( typename Iterator& begin,				//< Begin iterator
 					  typename Iterator& end,				//< End iterator
 					  const Functor& functor,				//< functor will called on every iterator between begin and end.
 					  uint32_t max_num_of_threads = 0 );	//< maximum number of threads, that implementation can use. O means that it is up to the implementation.
 
-// The same as above, but uses task system instead of raw threads.
+// Calls functor parallely for each element between begin and end.
+// Tries to balance work load between available logical cores.
+// Function blocks until it is done.
 template< class Iterator, typename Functor >
 void ParallelForEachUsingTasks( const Iterator& begin,			//< Begin iterator
 								const Iterator& end,			//< End iterator
@@ -146,4 +147,5 @@ DBG_ONLY_LINE( Iterator& dbg_end_it = iterators[ iterators.size() - 1 ]; )
 	task_manager.RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 }
 
+}
 }

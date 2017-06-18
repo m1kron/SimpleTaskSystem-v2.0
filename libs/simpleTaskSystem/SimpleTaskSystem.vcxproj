@@ -24,9 +24,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\globalApi.h" />
     <ClInclude Include="include\iTaskContext.h" />
     <ClInclude Include="include\iTaskHandle.h" />
     <ClInclude Include="include\iTaskManager.h" />
+    <ClInclude Include="include\tools\lambdaTask.h" />
+    <ClInclude Include="include\tools\parallelFor.h" />
+    <ClInclude Include="include\tools\taskBatch.h" />
     <ClInclude Include="src\common\common.h" />
     <ClInclude Include="src\manager\taskManager.h" />
     <ClInclude Include="src\precompiledHeader\precompiledHeader.h" />
@@ -38,14 +42,12 @@
     <ClInclude Include="src\taskWorker\taskWorkersPool.h" />
     <ClInclude Include="src\task\task.h" />
     <ClInclude Include="src\task\taskAllocator.h" />
-    <ClInclude Include="src\task\taskBatch.h" />
     <ClInclude Include="src\task\taskContext.h" />
     <ClInclude Include="src\task\taskHandle.h" />
-    <ClInclude Include="src\task\taskHelpers.h" />
-    <ClInclude Include="src\tools\parallelFor.h" />
     <ClInclude Include="src\tools\positiveNumberHasher.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\common\globalApiImpl.cpp" />
     <ClCompile Include="src\manager\taskManager.cpp" />
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -59,7 +61,6 @@
     <ClCompile Include="src\taskWorker\taskWorkersPool.cpp" />
     <ClCompile Include="src\task\task.cpp" />
     <ClCompile Include="src\task\taskAllocator.cpp" />
-    <ClCompile Include="src\task\taskBatch.cpp" />
     <ClCompile Include="src\task\taskContext.cpp" />
     <ClCompile Include="src\task\taskHandle.cpp" />
   </ItemGroup>

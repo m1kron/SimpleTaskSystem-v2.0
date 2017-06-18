@@ -4,6 +4,9 @@
 
 NAMESPACE_STS_BEGIN
 
+// Implementation of dtor of ITaskHandle.
+ITaskHandle::~ITaskHandle() {}
+
 ///////////////////////////////////////////////////////////////////
 void TaskHandle::SetTaskFunction( TTaskFunctionPtr function ) const
 {

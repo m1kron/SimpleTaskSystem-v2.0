@@ -1,11 +1,13 @@
 #include "precompiledHeader.h"
 #include "taskManager.h"
-#include "..\task\taskBatch.h"
 
 #include "..\..\..\basicThreadingLib\include\tools\tools.h"
 #include "..\..\..\basicThreadingLib\include\thread\functorThread.h"
 
 NAMESPACE_STS_BEGIN
+
+// Implementation of dtor of ITaskManager.
+ITaskManager::~ITaskManager() {}
 
 //////////////////////////////////////////////////////
 TaskManager::~TaskManager()
@@ -30,14 +32,9 @@ void TaskManager::Deinitialize()
 }
 
 ////////////////////////////////////////////////////////
-const ITaskHandle* TaskManager::CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* parent_task_handle )
+const ITaskHandle* TaskManager::CreateNewTask( const ITaskHandle* parent_task_handle )
 {
-	const ITaskHandle* new_task_handle = CreateNewTaskImpl( parent_task_handle );
-
-	if( new_task_handle != nullptr )
-		new_task_handle->SetTaskFunction( task_function );
-
-	return new_task_handle;
+	return CreateNewTaskImpl( parent_task_handle );
 }
 
 /////////////////////////////////////////////////////////

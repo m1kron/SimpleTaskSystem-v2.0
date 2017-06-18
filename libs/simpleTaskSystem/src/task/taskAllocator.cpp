@@ -30,7 +30,7 @@ const ITaskHandle* TaskAllocator::AllocateNewTask()
 ////////////////////////////////////////////////////
 void TaskAllocator::ReleaseTask( const ITaskHandle* task_handle )
 {
-	ASSERT( task_handle != INVALID_TASK_HANDLE );
+	ASSERT( task_handle != nullptr );
 	const TaskHandle* handle = TaskHandle::AsTaskHandle( task_handle );
 
 	// Make task available to others.

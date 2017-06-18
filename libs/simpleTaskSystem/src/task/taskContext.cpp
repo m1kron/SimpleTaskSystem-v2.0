@@ -4,6 +4,9 @@
 
 NAMESPACE_STS_BEGIN
 
+// Implementation of dtor of ITaskContext.
+ITaskContext::~ITaskContext() {}
+
 //////////////////////////////////////////////////////
 ITaskManager* TaskContext::GetTaskManager() const
 {
