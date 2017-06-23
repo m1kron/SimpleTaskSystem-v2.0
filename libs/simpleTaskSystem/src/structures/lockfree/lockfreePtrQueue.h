@@ -57,8 +57,8 @@ inline bool LockFreePtrQueue<T, SIZE>::PushBack( T* const item )
 	uint32_t write_counter = 0;
 	do
 	{
-		write_counter = m_writeCounter.Load( btl::MemoryOrder::Relaxed );
-		uint32_t read_counter = m_readCounter.Load( btl::MemoryOrder::Acquire ); 
+		write_counter = m_writeCounter.Load( btl::MemoryOrder::Acquire );
+		uint32_t read_counter = m_readCounter.Load( btl::MemoryOrder::Relaxed ); 
 
 		if( ( read_counter + SIZE ) == ( write_counter ) )
 		{
@@ -106,8 +106,8 @@ inline T* LockFreePtrQueue<T, SIZE>::PopFront()
 	do
 	{
 		// First check, whether there is anything to pop:
-		current_read_counter = m_readCounter.Load( btl::MemoryOrder::Relaxed );
-		uint32_t current_committed_counter = m_committedWriteCounter.Load( btl::MemoryOrder::Acquire );
+		current_read_counter = m_readCounter.Load( btl::MemoryOrder::Acquire );
+		uint32_t current_committed_counter = m_committedWriteCounter.Load( btl::MemoryOrder::Relaxed );
 
 		if( current_read_counter == current_committed_counter )
 		{
