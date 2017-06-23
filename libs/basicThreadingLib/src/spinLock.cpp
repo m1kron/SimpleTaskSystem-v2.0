@@ -42,7 +42,7 @@ bool SpinLock::TryToLock()
 //////////////////////////////////////////////////////////////////
 void SpinLock::Unlock()
 {
-	m_atomic.Exchange( 0, MemoryOrder::Release );
+	m_atomic.Store( 0, MemoryOrder::Release );
 }
 
 NAMESPACE_BTL_END
