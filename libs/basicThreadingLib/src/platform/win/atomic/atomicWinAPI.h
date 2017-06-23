@@ -10,10 +10,8 @@ NAMESPACE_PLATFORM_API_BEGIN
 
 //////////////////////////////////////////////////
 // Memory barrier
-inline void FullMemoryBarrier()
-{
-	MemoryBarrier();
-}
+#define FULL_MEMORY_BARRIER MemoryBarrier()
+#define COMPILER_BARRIER _ReadWriteBarrier()
 
 //////////////////////////////////////////////////
 //
@@ -40,7 +38,7 @@ public:
 	LONG FetchOr( LONG value );
 
 private:
-	BTL_ALIGNED( 4 ) volatile LONG m_value;
+	BTL_ALIGNED( 4 ) LONG m_value;
 };
 
 //////////////////////////////////////////////////
@@ -58,10 +56,11 @@ inline Atomic32Impl::Atomic32Impl()
 
 inline LONG Atomic32Impl::Load( MemoryOrder order ) const
 {
-	LONG val = m_value;
+	LONG val = m_value; //< Every load has acquire semantics on x86.
+	COMPILER_BARRIER;
 
 	if( order == MemoryOrder::SeqCst )
-		FullMemoryBarrier();
+		FULL_MEMORY_BARRIER; //< Is this needed?
 
 	return val;
 }
@@ -69,8 +68,12 @@ inline LONG Atomic32Impl::Load( MemoryOrder order ) const
 //////////////////////////////////////////////////
 inline void Atomic32Impl::Store( LONG value, MemoryOrder order )
 {
-	if (order != MemoryOrder::SeqCst)
-		m_value = value;
+	if( order != MemoryOrder::SeqCst )
+	{
+		COMPILER_BARRIER;
+		m_value = value; // Every store has release semantics on x86.
+		COMPILER_BARRIER;
+	}
 	else
 		InterlockedExchange( &m_value, value );
 }
