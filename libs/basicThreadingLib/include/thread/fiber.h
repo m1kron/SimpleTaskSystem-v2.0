@@ -20,7 +20,7 @@ public:
 
 protected:
 	// If you want system default stack size, set it to 0.
-	FiberBase( unsigned stackSize );
+	FiberBase( uint32_t stackSize );
 	FiberBase( FiberBase&& other );
 
 	~FiberBase();
@@ -36,7 +36,7 @@ protected:
 //////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////
-inline FiberBase::FiberBase( unsigned stackSize )
+inline FiberBase::FiberBase( uint32_t stackSize )
 {
 	__base::CreateFiber( this, stackSize );
 }

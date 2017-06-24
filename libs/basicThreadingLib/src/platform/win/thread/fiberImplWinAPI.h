@@ -1,5 +1,6 @@
 #pragma once
 #include "..\..\platformApi.h"
+#include "..\..\..\..\..\commonLib\include\types.h"
 #include <windows.h>
 
 NAMESPACE_BTL_BEGIN
@@ -29,7 +30,7 @@ protected:
 
 	~FiberImpl();
 
-	void CreateFiber( FiberBase* fiber, unsigned stackSize );
+	void CreateFiber( FiberBase* fiber, uint32_t stackSize );
 	void DeleteFiber();
 	FIBER_ID GetFiberID() const;
 

@@ -71,7 +71,7 @@ FiberImpl::~FiberImpl()
 }
 
 ///////////////////////////////////////////////////
-void FiberImpl::CreateFiber( FiberBase* fiber, unsigned stackSize = 200 * 1024 )
+void FiberImpl::CreateFiber( FiberBase* fiber, uint32_t stackSize )
 {
 	m_id = ::CreateFiber( stackSize, FiberFunction, fiber );
 	ASSERT( m_id != INVALID_FIBER_ID );
