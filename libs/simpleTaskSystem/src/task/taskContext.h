@@ -4,13 +4,13 @@
 NAMESPACE_STS_BEGIN
 
 class ITaskManager;
-class Task;
+class TaskFiber;
 
 // Implementation of ITaskContext.
 class TaskContext : public ITaskContext
 {
 public:
-	TaskContext( ITaskManager* manager, Task* running_task );
+	TaskContext( ITaskManager* manager, TaskFiber* task_fiber );
 
 	// ITaskContext interface:
 	ITaskManager* GetTaskManager() const override;
@@ -23,7 +23,7 @@ public:
 
 private:
 	ITaskManager* m_taskManager;
-	Task* m_task;
+	TaskFiber* m_taskFiber;
 };
 
 ///////////////////////////////////////////////////////////
@@ -33,10 +33,16 @@ private:
 ///////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////
-inline TaskContext::TaskContext( ITaskManager* manager, Task* this_task )
+inline TaskContext::TaskContext( ITaskManager* manager, TaskFiber* task_fiber )
 	: m_taskManager( manager )
-	, m_task( this_task )
+	, m_taskFiber( task_fiber )
 {
+}
+
+//////////////////////////////////////////////////////
+inline ITaskManager* TaskContext::GetTaskManager() const
+{
+	return m_taskManager;
 }
 
 ///////////////////////////////////////////////////////

@@ -4,7 +4,7 @@
 NAMESPACE_STS_BEGIN
 
 class Task;
-class TaskManager;
+class ITaskManager;
 
 // Describes TaskWorkerFiver
 enum class TaskFiberState
@@ -21,17 +21,23 @@ public:
 	TaskFiber();
 
 	// Setups fiber. Manager is needed to run a task. When task is done, 
-	// fiber will switch to prevFiberID.
-	void Setup( btl::FIBER_ID prevFiberID, TaskManager* manager );
+	// fiber will switch to parentFiberID.
+	void Setup( btl::FIBER_ID parent_fiber_id, ITaskManager* manager );
 
 	// Sets task to execute by fiber.
 	void SetTaskToExecute( Task* task );
 
-	// Returns current state of the fiber.
+	// Returns task that this fiber is taking care of.
+	Task* GetTask() const;
+
+	// Returns current state of this fiber.
 	TaskFiberState GetCurrentState() const;
 
 	// Resets fiber state.
 	void Reset();
+
+	// Performs switch to parentFiber
+	void SwitchToParentFiber();
 
 private:
 	// Main fiber function.
@@ -39,8 +45,8 @@ private:
 
 	TaskFiberState m_state;
 	Task* m_taskToExecute;
-	TaskManager* m_taskManager;
-	btl::FIBER_ID m_prevFiberID;
+	ITaskManager* m_taskManager;
+	btl::FIBER_ID m_parentFiberID;
 };
 
 ////////////////////////////////////////////////////////////
@@ -50,9 +56,9 @@ private:
 ////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////
-inline void TaskFiber::Setup( btl::FIBER_ID prevFiberID, TaskManager* manager )
+inline void TaskFiber::Setup( btl::FIBER_ID parent_fiber_id, ITaskManager* manager )
 {
-	m_prevFiberID = prevFiberID;
+	m_parentFiberID = parent_fiber_id;
 	m_taskManager = manager;
 }
 
@@ -63,9 +69,21 @@ inline void TaskFiber::SetTaskToExecute( Task* task )
 }
 
 ////////////////////////////////////////////////////////////
+inline Task* TaskFiber::GetTask() const
+{
+	return m_taskToExecute;
+}
+
+////////////////////////////////////////////////////////////
 inline TaskFiberState TaskFiber::GetCurrentState() const
 {
 	return m_state;
+}
+
+///////////////////////////////////////////////////////////
+inline void TaskFiber::SwitchToParentFiber()
+{
+	btl::this_fiber::SwitchToFiber( m_parentFiberID );
 }
 
 NAMESPACE_STS_END

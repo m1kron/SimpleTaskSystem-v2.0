@@ -1,6 +1,7 @@
 #include "precompiledHeader.h"
 #include "taskContext.h"
 #include "task.h"
+#include "..\taskFiber\taskFiber.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -8,21 +9,15 @@ NAMESPACE_STS_BEGIN
 ITaskContext::~ITaskContext() {}
 
 //////////////////////////////////////////////////////
-ITaskManager* TaskContext::GetTaskManager() const
-{
-	return m_taskManager;
-}
-
-//////////////////////////////////////////////////////
 size_t TaskContext::GetThisTaskStorageSize() const
 {
-	return m_task->GetStorageSize();
+	return m_taskFiber->GetTask()->GetStorageSize();
 }
 
 //////////////////////////////////////////////////////
 void* TaskContext::GetThisTaskStorage() const
 {
-	return m_task->GetStoragePtr();
+	return m_taskFiber->GetTask()->GetStoragePtr();
 }
 
 NAMESPACE_STS_END

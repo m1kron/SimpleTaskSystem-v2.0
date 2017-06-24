@@ -1,6 +1,7 @@
 #include "precompiledHeader.h"
 #include "TaskFiber.h"
 #include "..\task\task.h"
+#include "..\task\taskContext.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -22,13 +23,14 @@ void TaskFiber::FiberFunction()
 
 		ASSERT( m_taskToExecute != nullptr );
 		ASSERT( m_taskManager != nullptr );
-		ASSERT( m_prevFiberID != INVALID_FIBER_ID );
+		ASSERT( m_parentFiberID != INVALID_FIBER_ID );
 
-		m_taskToExecute->Run( m_taskManager );
+		TaskContext context( m_taskManager, this );
+
+		m_taskToExecute->Run( &context );
 		m_state = TaskFiberState::Idle;
-		m_taskToExecute = nullptr;
 
-		btl::this_fiber::SwitchToFiber( m_prevFiberID );
+		SwitchToParentFiber();
 	}
 }
 
@@ -37,7 +39,7 @@ void TaskFiber::Reset()
 {
 	m_taskToExecute = nullptr;
 	m_taskManager = nullptr;
-	m_prevFiberID = INVALID_FIBER_ID;
+	m_parentFiberID = INVALID_FIBER_ID;
 	m_state = TaskFiberState::Idle;
 }
 

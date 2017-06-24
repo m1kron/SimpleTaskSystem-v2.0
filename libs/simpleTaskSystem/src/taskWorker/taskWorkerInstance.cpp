@@ -2,6 +2,8 @@
 #include "taskWorkerInstance.h"
 #include "taskWorkerInstanceHub.h"
 #include "..\taskFiber\taskFiberAllocator.h"
+#include "..\task\task.h"
+#include "..\manager\taskManager.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -66,7 +68,9 @@ bool TaskWorkerInstance::TryToExecuteSingleTask()
 		WORKER_LOG( "Switching to fiber to execute task." );
 		btl::this_fiber::SwitchToFiber( m_currentFiber->GetFiberID() );
 		ASSERT( m_currentFiber->GetCurrentState() == TaskFiberState::Idle );
-		WORKER_LOG( "Switching back from fiber. Task is done." );
+		WORKER_LOG( "Switching back from fiber." );
+
+		OnFinishedTaskFiber( m_currentFiber );
 	}
 	else
 	{
@@ -74,9 +78,24 @@ bool TaskWorkerInstance::TryToExecuteSingleTask()
 		return false; // We don't have anything to do, so break and wait for job.
 	}
 
-	WORKER_LOG( "Has %i tasks now in queue...", , m_pendingTaskQueue.GetCurrentSize() );
+	WORKER_LOG( "Has %i tasks now in queue...",, m_pendingTaskQueue.GetCurrentSize() );
 
 	return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+void TaskWorkerInstance::OnFinishedTaskFiber( TaskFiber* finished_task_fiber )
+{
+	WORKER_LOG( "Task is done." );
+	Task* finished_task = finished_task_fiber->GetTask();
+
+	// Check if task has any dependency - if has and it is ready, then submit it now.
+	if( Task* parent_of_finished_task = finished_task->GetParentTask() )
+		if( parent_of_finished_task->IsReadyToBeExecuted() )
+			VERIFY_SUCCESS( AddTask( parent_of_finished_task ) ); //< Add task to local queue.
+
+	// Clear task in fiber.
+	finished_task_fiber->SetTaskToExecute( nullptr );
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +125,13 @@ void TaskWorkerInstance::ReleaseFiber( TaskFiber* fiber )
 void TaskWorkerInstance::SetupFiber( TaskFiber* fiber )
 {
 	fiber->Setup( m_thisFiberID, m_context.m_taskManager );
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+bool TaskWorkerInstance::AddTask( Task* task )
+{
+	WORKER_LOG( "Added new task to local queue." );
+	return m_pendingTaskQueue.PushBack( task );
 }
 
 

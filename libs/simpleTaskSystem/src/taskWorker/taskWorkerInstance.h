@@ -49,6 +49,9 @@ public:
 	Task* TryToStealTaskFromThisInstance();
 
 private:
+	// Handles fiber with finished task.
+	void OnFinishedTaskFiber( TaskFiber* finished_task_fiber );
+
 	// Tries to steal a task from other worker instances.
 	Task* TryToStealTaskFromOtherInstances();
 
@@ -87,12 +90,6 @@ inline bool TaskWorkerInstance::Deinitalize()
 inline bool TaskWorkerInstance::IsConvertedToFiber() const
 {
 	return m_thisFiberID != INVALID_FIBER_ID;
-}
-
-//////////////////////////////////////////////////////////////////////////////////
-inline bool TaskWorkerInstance::AddTask( Task* task )
-{
-	return m_pendingTaskQueue.PushBack( task );
 }
 
 //////////////////////////////////////////////////////////////////////////////////

@@ -4,7 +4,7 @@
 
 NAMESPACE_STS_BEGIN
 
-class TaskManager;
+class ITaskContext;
 
 /////////////////////////////////////////////////////////
 // Task respresent basic unit of execution in the system.
@@ -20,7 +20,7 @@ public:
 	static const size_t GetStorageSize();
 
 	// Main task function called by task worker.
-	void Run( TaskManager* task_manager );
+	void Run( ITaskContext* context );
 
 	// Returns true if task is finished ( execution of task function is over ).
 	bool IsFinished() const; 
@@ -31,6 +31,9 @@ public:
 	// Marks this task as a child of parent task. Parent task will be
 	// executed after all child tasks are done.
 	void AddParent( Task* parentTask );
+
+	// Returns parent task.
+	Task* GetParentTask() const;
 
 	// Set main task function.
 	void SetTaskFunction( TTaskFunctionPtr function );
@@ -88,6 +91,12 @@ inline void Task::AddParent( Task* parentTask )
 
 	m_parentTask = parentTask;
 	m_parentTask->m_numberOfChildTasks.Increment();
+}
+
+////////////////////////////////////////////////////////
+inline Task* Task::GetParentTask() const
+{
+	return m_parentTask;
 }
 
 ////////////////////////////////////////////////////////
