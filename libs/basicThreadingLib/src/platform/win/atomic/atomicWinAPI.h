@@ -1,9 +1,9 @@
 #pragma once
-#include "..\alignmentWinAPI.h"
 #include "..\..\platformApi.h"
 #include "..\..\..\..\include\atomic\memoryOrder.h"
 #include "..\..\..\..\..\commonLib\include\tools\tools.h"
 #include <windows.h>
+#include <intrin.h>
 
 NAMESPACE_BTL_BEGIN
 NAMESPACE_PLATFORM_API_BEGIN
@@ -26,19 +26,19 @@ public:
 
 	Atomic32Impl();
 
-	LONG Load( MemoryOrder order = MemoryOrder::SeqCst ) const;
-	void Store( LONG value, MemoryOrder order = MemoryOrder::SeqCst );
-	bool CompareExchange( LONG& expected_val, LONG value_to_set, MemoryOrder order = MemoryOrder::SeqCst );
-	LONG Exchange( LONG desired, MemoryOrder order = MemoryOrder::SeqCst );
-	LONG FetchAdd( LONG value ); 
-	LONG FetchSub( LONG value );
-	LONG Increment();
-	LONG Decrement();
-	LONG FetchAnd( LONG value );
-	LONG FetchOr( LONG value );
+	TAtomicType Load( MemoryOrder order = MemoryOrder::SeqCst ) const;
+	void Store( TAtomicType value, MemoryOrder order = MemoryOrder::SeqCst );
+	bool CompareExchange( TAtomicType& expected_val, TAtomicType value_to_set, MemoryOrder order = MemoryOrder::SeqCst );
+	TAtomicType Exchange( TAtomicType desired, MemoryOrder order = MemoryOrder::SeqCst );
+	TAtomicType FetchAdd( TAtomicType value );
+	TAtomicType FetchSub( TAtomicType value );
+	TAtomicType Increment();
+	TAtomicType Decrement();
+	TAtomicType FetchAnd( TAtomicType value );
+	TAtomicType FetchOr( TAtomicType value );
 
 private:
-	BTL_ALIGNED( 4 ) LONG m_value;
+	BTL_ALIGNED( 4 ) TAtomicType m_value;
 };
 
 //////////////////////////////////////////////////
@@ -54,9 +54,9 @@ inline Atomic32Impl::Atomic32Impl()
 	ASSERT( IsAligned< 4 >( this ) );
 }
 
-inline LONG Atomic32Impl::Load( MemoryOrder order ) const
+inline Atomic32Impl::TAtomicType Atomic32Impl::Load( MemoryOrder order ) const
 {
-	LONG val = m_value; //< Every load has acquire semantics on x86.
+	TAtomicType val = m_value; //< Every load has acquire semantics on x86.
 	COMPILER_BARRIER;
 
 	if( order == MemoryOrder::SeqCst )
@@ -66,7 +66,7 @@ inline LONG Atomic32Impl::Load( MemoryOrder order ) const
 }
 
 //////////////////////////////////////////////////
-inline void Atomic32Impl::Store( LONG value, MemoryOrder order )
+inline void Atomic32Impl::Store( TAtomicType value, MemoryOrder order )
 {
 	if( order != MemoryOrder::SeqCst )
 	{
@@ -75,58 +75,58 @@ inline void Atomic32Impl::Store( LONG value, MemoryOrder order )
 		COMPILER_BARRIER;
 	}
 	else
-		InterlockedExchange( &m_value, value );
+		_InterlockedExchange( &m_value, value );
 }
 
 //////////////////////////////////////////////////
-inline bool Atomic32Impl::CompareExchange( LONG& expected_val, LONG value_to_set, MemoryOrder order )
+inline bool Atomic32Impl::CompareExchange( TAtomicType& expected_val, TAtomicType value_to_set, MemoryOrder order )
 {
-	LONG prev_val = expected_val;
-	expected_val = InterlockedCompareExchange( &m_value, value_to_set, expected_val );
+	TAtomicType prev_val = expected_val;
+	expected_val = _InterlockedCompareExchange( &m_value, value_to_set, expected_val );
 
 	return prev_val == expected_val;
 }
 
 //////////////////////////////////////////////////
-inline LONG Atomic32Impl::Exchange( LONG desired, MemoryOrder order )
+inline Atomic32Impl::TAtomicType Atomic32Impl::Exchange( TAtomicType desired, MemoryOrder order )
 {
-	return InterlockedExchange( &m_value, desired );
+	return _InterlockedExchange( &m_value, desired );
 }
 
 //////////////////////////////////////////////////
-inline LONG Atomic32Impl::FetchAdd( LONG value )
+inline Atomic32Impl::TAtomicType Atomic32Impl::FetchAdd( TAtomicType value )
 {
-	return InterlockedAdd( &m_value, value );
+	return _InterlockedAdd( &m_value, value );
 }
 
 //////////////////////////////////////////////////
-inline LONG Atomic32Impl::FetchSub( LONG value )
+inline Atomic32Impl::TAtomicType Atomic32Impl::FetchSub( TAtomicType value )
 {
-	return InterlockedAdd( &m_value, -value );
+	return _InterlockedAdd( &m_value, -value );
 }
 
 //////////////////////////////////////////////////
-inline LONG Atomic32Impl::Increment()
+inline Atomic32Impl::TAtomicType Atomic32Impl::Increment()
 {
-	return InterlockedIncrement( &m_value );
+	return _InterlockedIncrement( &m_value );
 }
 
 //////////////////////////////////////////////////
-inline LONG Atomic32Impl::Decrement()
+inline Atomic32Impl::TAtomicType Atomic32Impl::Decrement()
 {
-	return InterlockedDecrement( &m_value );
+	return _InterlockedDecrement( &m_value );
 }
 
 //////////////////////////////////////////////////
-inline LONG Atomic32Impl::FetchAnd( LONG value )
+inline Atomic32Impl::TAtomicType Atomic32Impl::FetchAnd( TAtomicType value )
 {
-	return InterlockedAnd( &m_value, value );
+	return _InterlockedAnd( &m_value, value );
 }
 
 //////////////////////////////////////////////////
-inline LONG Atomic32Impl::FetchOr( LONG value )
+inline Atomic32Impl::TAtomicType Atomic32Impl::FetchOr( TAtomicType value )
 {
-	return InterlockedOr( &m_value, value );
+	return _InterlockedOr( &m_value, value );
 }
 
 NAMESPACE_PLATFORM_API_END
