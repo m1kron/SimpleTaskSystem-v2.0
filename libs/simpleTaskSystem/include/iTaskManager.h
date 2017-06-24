@@ -45,7 +45,7 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////
 //
-// IMPLEMENTATION:
+// INLINES:
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -69,9 +69,7 @@ inline bool ITaskManager::RunTasksUsingThisThreadUntil( const TCondition & condi
 		return false;
 
 	while( !condition() )
-	{
 		TryToRunOneTask();
-	}
 
 	ConvertWorkerToMainThread();
 	return true;
