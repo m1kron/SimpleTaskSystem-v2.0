@@ -70,7 +70,7 @@ bool TaskManager::DispatchTask( Task* task )
 	}
 
 	// SubmitTask is called from other thread and main thread is acting now as a worker thread, so add task to main worker instance:
-	if( m_isActingAsTaskWorker.Load() == 1 )
+	if( m_isActingAsTaskWorker.Load( btl::MemoryOrder::Acquire ) == 1 )
 	{
 		MANAGER_LOG( "SubmitTask called from other thread then worker thread, but main task is acting as a worker instance, so task is added the main thread." );
 		m_mainThreadInstanceWorker.AddTask( task );
@@ -125,7 +125,7 @@ void TaskManager::TryToRunOneTask()
 /////////////////////////////////////////////////////////
 bool TaskManager::ConvertMainThreadToWorker()
 {
-	if( m_isActingAsTaskWorker.Exchange( 1, btl::MemoryOrder::Acquire ) == 0 )
+	if( m_isActingAsTaskWorker.Exchange( 1 ) == 0 )
 	{
 		if( m_mainThreadInstanceWorker.ConvertToFiber() )
 		{
@@ -147,7 +147,7 @@ void TaskManager::ConvertWorkerToMainThread()
 {
 	VERIFY_SUCCESS( m_mainThreadInstanceWorker.ConvertToThread() );
 	MANAGER_LOG( "Converting worker thread back to main thread." );
-	m_isActingAsTaskWorker.Exchange( 0, btl::MemoryOrder::Release );
+	m_isActingAsTaskWorker.Store( 0, btl::MemoryOrder::Release );
 }
 
 /////////////////////////////////////////////////////////
