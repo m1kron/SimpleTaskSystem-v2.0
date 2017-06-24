@@ -1,136 +1,7 @@
 #include <gtest\gtest.h>
-#include "..\..\libs\commonLib\include\timer\timerMacros.h"
 #include "..\..\libs\basicThreadingLib\include\atomic\atomic.h"
 #include "..\..\libs\basicThreadingLib\include\thread\functorThread.h"
-#include "..\..\libs\basicThreadingLib\include\synchro\spinLock.h"
-#include "..\..\libs\basicThreadingLib\include\synchro\lockGuards.h"
-#include "..\..\libs\basicThreadingLib\include\synchro\mutex.h"
 
-namespace helpers
-{
-	///////////////////////////////////////////////////////////////////////////
-	template< class TMutex >
-	void SleepOnTest()
-	{
-		TMutex m_lock;
-
-		btl::FunctorThread thread1;
-		thread1.SetFunctorAndStartThread( [ &m_lock ]
-		{
-			btl::LockGuard< TMutex > guard( m_lock );
-			btl::this_thread::SleepFor( 1000 );
-		} );
-
-		btl::this_thread::SleepFor( 10 );
-
-		HighResolutionTimer timer;
-		timer.Start();
-
-		btl::FunctorThread thread2;
-		thread2.SetFunctorAndStartThread( [ &m_lock, &timer ]
-		{
-			btl::LockGuard< TMutex > guard( m_lock );
-			timer.Stop();
-		} );
-
-		thread1.Join();
-		thread2.Join();
-
-		auto elapsed = timer.ElapsedTimeInSeconds();
-		ASSERT_TRUE( elapsed > 0.99 );
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////
-	template< class TMutex >
-	void SimpleAddingTest()
-	{
-		for( int i = 0; i < 50; ++i )
-		{
-			TMutex m_lock;
-			struct SomeStruct
-			{
-				int val1;
-				int val2;
-				int val3;
-				int val4;
-			};
-
-			SomeStruct globalStruct{ 0, 0, 0, 0 };
-
-			static const int iterationCount = 1000000;
-
-			btl::FunctorThread thread1;
-			thread1.SetFunctorAndStartThread( [ &m_lock, &globalStruct ]
-			{
-				for( int i = 0; i < iterationCount; ++i )
-				{
-					btl::LockGuard< TMutex > guard( m_lock );
-					globalStruct.val1 += 20;
-					globalStruct.val2 -= 10;
-					globalStruct.val3 += 20;
-					globalStruct.val4 -= 10;
-				}
-			} );
-
-			btl::FunctorThread thread2;
-
-			thread2.SetFunctorAndStartThread( [ &m_lock, &globalStruct ]
-			{
-				for( int i = 0; i < iterationCount; ++i )
-				{
-					btl::LockGuard< TMutex > guard( m_lock );
-					globalStruct.val1 -= 10;
-					globalStruct.val2 += 20;
-					globalStruct.val3 -= 10;
-					globalStruct.val4 += 20;
-				}
-			} );
-
-			thread1.Join();
-			thread2.Join();
-
-			ASSERT_TRUE( globalStruct.val1 == 10 * iterationCount );
-			ASSERT_TRUE( globalStruct.val2 == 10 * iterationCount );
-			ASSERT_TRUE( globalStruct.val3 == 10 * iterationCount );
-			ASSERT_TRUE( globalStruct.val4 == 10 * iterationCount );
-		}
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	template< class TMutex >
-	void StressTest()
-	{
-		TMutex m_lock;
-		static const int ITERATIONS = 10000000;
-		int globalint = 0;
-
-		btl::FunctorThread thread1;
-		thread1.SetFunctorAndStartThread( [ &m_lock, &globalint ]
-		{
-			for( int i = 0; i < ITERATIONS; ++i )
-			{
-				btl::LockGuard< TMutex > guard( m_lock );
-				globalint++;
-			}
-		} );
-
-		btl::FunctorThread thread2;
-		thread2.SetFunctorAndStartThread( [ &m_lock, &globalint ]
-		{
-			for( int i = 0; i < ITERATIONS; ++i )
-			{
-				btl::LockGuard< TMutex > guard( m_lock );
-				globalint++;
-			}
-		} );
-
-
-		thread1.Join();
-		thread2.Join();
-
-		ASSERT_TRUE( globalint = 2 * ITERATIONS );
-	}
-}
 
 //////////////////////////////////////////////////////////////////////
 TEST( STSCommonLib, CompileTimeUtilsTest )
@@ -152,8 +23,8 @@ TEST( AtomicUnitTests, SimpleArithmeticTest )
 	ASSERT_TRUE( atm.Load() == 5 );
 
 	int k = 5;
-	ASSERT_TRUE( ( atm.CompareExchange( k, 10 ), atm.Load() == 10 ) );
-	ASSERT_TRUE( ( atm.FetchAdd( 10 ), atm.Load() == 20 ) );
+	ASSERT_TRUE( ( atm.CompareExchange( k, 10 ), atm == 10 ) );
+	ASSERT_TRUE( ( atm.FetchAdd( 10 ), atm == 20 ) );
 	ASSERT_TRUE( ( atm.FetchSub( 5 ), atm == 15 ) );
 	ASSERT_TRUE( ( atm.FetchOr( 5 ), atm == ( 15 | 5 ) ) );
 	atm.Store( 100 );
@@ -183,7 +54,7 @@ TEST( AtomicUnitTests, SimpleTwoThreadedInLoop )
 	};
 
 	int iteration = 1000;
-	while( iteration != 0 ) // repeated 10000
+	while( iteration != 0 ) 
 	{
 		Test test;
 	
@@ -218,38 +89,58 @@ TEST( AtomicUnitTests, SimpleTwoThreadedInLoop )
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-TEST( SynchronizationTests, SimpleStressTest_SpinLock )
+/////////////////////////////////////////////////////////////
+TEST( AtomicUnitTests, AquireReleaseTest )
 {
-	helpers::StressTest< btl::SpinLock >();
-}
+	// NOTE: this test will pass without using atomic on x86 architecture..
 
-///////////////////////////////////////////////////////////////////////////
-TEST( SynchronizationTests, SimpleStressTest_Mutex )
-{
-	helpers::StressTest< btl::Mutex >();
-}
+	static const int MAX_ITERATIONS = 1000000000;
 
-///////////////////////////////////////////////////////////////////////////
-TEST( SynchronizationTests, AddingOnSpinLock )
-{
-	helpers::SimpleAddingTest< btl::SpinLock >();
-}
+	btl::Atomic<int> g_atomic;
+	struct Number
+	{
+		int a;
+		int b;
+		int c;
+	};
 
-///////////////////////////////////////////////////////////////////////////
-TEST( SynchronizationTests, AddingOnMutex )
-{
-	helpers::SimpleAddingTest< btl::Mutex >();
-}
+	Number g_number = { 0, 0, 0 };
 
-///////////////////////////////////////////////////////////////////////////
-TEST( SynchronizationTests, SleepOnSpinLock )
-{
-	helpers::SleepOnTest< btl::SpinLock >();
-}
+	btl::FunctorThread thread1;
+	thread1.SetFunctorAndStartThread( [ &g_atomic, &g_number ] 
+	{ 
+		for ( int i = 0; i < MAX_ITERATIONS; ++i )
+		{
+			auto num = g_atomic.Load( btl::MemoryOrder::Acquire );
+			if( num == 0 )
+			{
+				g_number.a++;
+				g_number.b += 2;
+				g_number.c += 4;
+				g_atomic.Store( 1, btl::MemoryOrder::Release );
+			}
+		}
+	} );
 
-///////////////////////////////////////////////////////////////////////////
-TEST( SynchronizationTests, SleepOnMutex )
-{
-	helpers::SleepOnTest< btl::Mutex >();
+	btl::FunctorThread thread2;
+	thread2.SetFunctorAndStartThread( [ &g_atomic, &g_number ]
+	{
+		for( int i = 0; i < MAX_ITERATIONS; ++i )
+		{
+			auto num = g_atomic.Load( btl::MemoryOrder::Acquire );
+			if( num == 1 )
+			{
+				g_number.a++;
+				g_number.b += 2;
+				g_number.c += 4;
+				g_atomic.Store( 0, btl::MemoryOrder::Release );
+			}
+		}
+	} );
+
+	thread1.Join();
+	thread2.Join();
+
+	ASSERT_TRUE( g_number.b == 2 * g_number.a );
+	ASSERT_TRUE( g_number.c == 4 * g_number.a );
 }

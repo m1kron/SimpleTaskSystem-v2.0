@@ -178,6 +178,7 @@
   <ItemGroup>
     <ClCompile Include="src\atomicSimpleTests.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\synchronizationTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libs\basicThreadingLib\basicThreadingLib.vcxproj">
