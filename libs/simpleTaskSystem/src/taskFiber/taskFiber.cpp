@@ -29,7 +29,6 @@ void TaskFiber::FiberFunction()
 
 		m_taskToExecute->Run( &context );
 		m_state = TaskFiberState::Idle;
-
 		SwitchToParentFiber();
 	}
 }
@@ -41,6 +40,13 @@ void TaskFiber::Reset()
 	m_taskManager = nullptr;
 	m_parentFiberID = INVALID_FIBER_ID;
 	m_state = TaskFiberState::Idle;
+}
+
+///////////////////////////////////////////////////////////
+void TaskFiber::SuspendExecution()
+{
+	m_state = TaskFiberState::Suspended;
+	SwitchToParentFiber();
 }
 
 NAMESPACE_STS_END

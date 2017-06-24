@@ -20,4 +20,10 @@ void* TaskContext::GetThisTaskStorage() const
 	return m_taskFiber->GetTask()->GetStoragePtr();
 }
 
+//////////////////////////////////////////////////////
+void TaskContext::SuspendExecution() const
+{
+	m_taskFiber->SuspendExecution();
+}
+
 NAMESPACE_STS_END

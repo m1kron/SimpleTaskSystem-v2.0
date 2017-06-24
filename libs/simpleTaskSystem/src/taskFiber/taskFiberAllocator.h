@@ -20,7 +20,6 @@ public:
 	void ReleaseTaskFiber( TaskFiber* fiber );
 
 private:
-	static const int TASK_FIBER_POOL_SIZE = 512;
 	TaskFiber m_fiberPool[ TASK_FIBER_POOL_SIZE ];		//< Main pool of fibers of static size ( for now ).
 	LockFreePtrQueue< TaskFiber, TASK_FIBER_POOL_SIZE > m_freeList;
 };

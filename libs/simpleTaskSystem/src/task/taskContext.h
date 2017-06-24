@@ -16,10 +16,8 @@ public:
 	ITaskManager* GetTaskManager() const override;
 	size_t GetThisTaskStorageSize() const override;
 	void* GetThisTaskStorage() const override;
+	void SuspendExecution() const override;
 	// ---
-
-	// Wait until given condition is satisfied, blocks exeution of this task.
-	//template< class TCondtion > void WaitFor( const TCondtion& condition ) const;
 
 private:
 	ITaskManager* m_taskManager;
@@ -44,13 +42,5 @@ inline ITaskManager* TaskContext::GetTaskManager() const
 {
 	return m_taskManager;
 }
-
-///////////////////////////////////////////////////////
-//template< class TCondtion >
-//inline void TaskContext::WaitFor( const TCondtion& condition ) const
-//{
-//	m_taskManager.RunTasksUsingThisThreadUntil( condition );
-//}
-
 
 NAMESPACE_STS_END

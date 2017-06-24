@@ -9,5 +9,6 @@
 NAMESPACE_STS_BEGIN
 
 static const uint32_t TASK_POOL_SIZE = 2048;
+static const uint32_t TASK_FIBER_POOL_SIZE = 512;
 
 NAMESPACE_STS_END

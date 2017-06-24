@@ -36,10 +36,13 @@ public:
 	// Resets fiber state.
 	void Reset();
 
+	// Suspends execution of the task.
+	void SuspendExecution();
+
+private:
 	// Performs switch to parentFiber
 	void SwitchToParentFiber();
 
-private:
 	// Main fiber function.
 	void FiberFunction();
 

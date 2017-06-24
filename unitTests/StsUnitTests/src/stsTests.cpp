@@ -7,6 +7,8 @@
 
 namespace helpers
 {
+	static const int SOME_CONST = 0xdeedbeef;
+
 	//////////////////////////////////////////////////////////////////////
 	template< class TIter >
 	static void CalculateBigSum( TIter& it ) // WARNING! This method has to take it and fill it, otherwise, it will be optimaized by compiler in release!!!
@@ -16,9 +18,7 @@ namespace helpers
 
 		int sum = 0;
 		for( int i = 0; i < IterationNumberSmall; ++i )
-		{
-			sum += ( i % 4 ) / 2;
-		}
+			sum += ( i % 5 ) / 2;
 
 		*it = sum;
 	}
@@ -39,9 +39,7 @@ namespace helpers
 	{
 		int sum = 0;
 		for( int i = 0; i < 10000000; ++i )
-		{
-			sum += ( i % 4 ) / 2;
-		}
+			sum += ( i % 5 ) / 2;
 
 		ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writeBuffer.Write( sum );
@@ -52,12 +50,44 @@ namespace helpers
 	{
 		int sum = 0;
 		for( int i = 0; i < 100000; ++i )
-		{
-			sum += ( i % 4 ) / 2;
-		}
+			sum += ( i % 5 ) / 2;
 
 		ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writeBuffer.Write( sum );
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	template< int ChildsSize >
+	void TaskFunctionDynamicTree( const sts::ITaskContext* context )
+	{
+		sts::tools::TaskBatch_AutoRelease batch( context->GetTaskManager() );
+
+		for( int i = 0; i < ChildsSize; ++i )
+		{
+			auto task_handle = context->GetTaskManager()->CreateNewTask( helpers::TaskFunctionFast, nullptr );
+			helpers::WriteToTask< int >( task_handle, 0 );
+			batch.Add( task_handle );
+		}
+
+		batch.SubmitAll();
+
+		context->WaitFor( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+
+		bool ok = true;
+		for( auto task_handle : batch )
+		{
+			if( helpers::ReadFromTask<int>( task_handle ) == 0 )
+			{
+				ok = false;
+				break;
+			}
+		}
+
+		if( ok )
+		{
+			ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+			writeBuffer.Write( SOME_CONST );
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -65,9 +95,7 @@ namespace helpers
 	{
 		int sum = item;
 		for( int i = 0; i < 100000; ++i )
-		{
 			sum += ( i % 4 ) / 2;
-		}
 
 		return sum;
 	}
@@ -120,9 +148,17 @@ namespace helpers
 		reader.Read( val );
 		return val;
 	}
+
+	////////////////////////////////////////////////////////////////////////////
+	template< typename T >
+	void WriteToTask( const sts::ITaskHandle* handle, const T& val )
+	{
+		ExistingBufferWrapperWriter writeBuffer( handle->GetTaskStorage(), handle->GetTaskStorageSize() );
+		writeBuffer.Write( val );
+	}
 }
 
-//////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 TEST( STSTest, SimpleSingleTask )
 {
 	sts::ITaskManager* manager = CreateTaskSystem();
@@ -174,6 +210,7 @@ TEST( STSTest, SimpleChainTask )
 	DestroyTaskSystem( manager );
 }
 
+///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleFlatTree )
 {
 	sts::ITaskManager* manager = CreateTaskSystem();
@@ -182,9 +219,10 @@ TEST( STSTest, SimpleFlatTree )
 
 		for( int i = 0; i < 1000; ++i )
 		{
-			auto taskHandle = manager->CreateNewTask( helpers::TaskFunctionFast, nullptr );
-			ASSERT_TRUE( taskHandle != nullptr );
-			batch.Add( taskHandle );
+			auto task_handle = manager->CreateNewTask( helpers::TaskFunctionFast, nullptr );
+			ASSERT_TRUE( task_handle != nullptr );
+			helpers::WriteToTask( task_handle, 0 );
+			batch.Add( task_handle );
 		}
 
 		ASSERT_TRUE( batch.SubmitAll() );
@@ -196,6 +234,27 @@ TEST( STSTest, SimpleFlatTree )
 	}
 	DestroyTaskSystem( manager );
 }
+
+///////////////////////////////////////////////////////////////////
+TEST( STSTest, SimpleDynamicTree )
+{
+	sts::ITaskManager* manager = CreateTaskSystem();
+	{
+		sts::tools::TaskBatch_AutoRelease batch( manager );
+
+		auto task_handle = manager->CreateNewTask( helpers::TaskFunctionDynamicTree< 2 >, nullptr );
+		batch.Add( task_handle );
+		helpers::WriteToTask( task_handle, 0 );
+
+		ASSERT_TRUE( batch.SubmitAll() );
+		manager->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+
+		for( auto task_handle : batch )
+			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) == helpers::SOME_CONST );
+	}
+	DestroyTaskSystem( manager );
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 //TEST( STSTest, DynamicTaskTreeTest1 )
