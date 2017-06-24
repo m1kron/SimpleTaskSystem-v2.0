@@ -93,12 +93,6 @@
     <ClInclude Include="src\platform\win\thread\threadImplWinAPI.h">
       <Filter>src\platform\win\thread</Filter>
     </ClInclude>
-    <ClInclude Include="include\bslApi.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\win\alignmentWinAPI.h">
-      <Filter>src\platform\win</Filter>
-    </ClInclude>
     <ClInclude Include="src\platform\atomicPlatform.h">
       <Filter>src\platform</Filter>
     </ClInclude>
@@ -134,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="src\platform\win\tools\toolsWinAPI.h">
       <Filter>src\platform\win\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\btlApi.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

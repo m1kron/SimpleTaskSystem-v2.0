@@ -1,6 +1,5 @@
 #pragma once
 #include "..\atomic\atomic.h"
-#include "..\..\..\commonLib\include\types.h"
 
 NAMESPACE_BTL_BEGIN
 
@@ -25,7 +24,7 @@ public:
 	void Unlock();
 
 private:
-	Atomic< int32_t > m_atomic;
+	Atomic< uint32_t > m_atomic;
 };
 
 NAMESPACE_BTL_END

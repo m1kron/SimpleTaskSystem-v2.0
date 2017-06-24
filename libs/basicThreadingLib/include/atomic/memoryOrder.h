@@ -1,5 +1,5 @@
 #pragma once
-#include "..\bslApi.h"
+#include "..\btlApi.h"
 
 NAMESPACE_BTL_BEGIN
 

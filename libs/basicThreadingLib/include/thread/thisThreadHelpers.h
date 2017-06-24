@@ -1,6 +1,5 @@
 #pragma once
 #include "..\..\src\platform\threadPlatform.h"
-#include "..\..\..\commonLib\include\macros.h"
 
 NAMESPACE_BTL_BEGIN
 

@@ -1,6 +1,5 @@
 #pragma once
-#include "..\..\..\commonLib\include\macros.h"
-#include "..\bslApi.h"
+#include "..\btlApi.h"
 
 NAMESPACE_BTL_BEGIN
 

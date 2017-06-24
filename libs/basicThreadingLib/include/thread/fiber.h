@@ -1,7 +1,6 @@
 #pragma once
 #include <functional>
 #include "thisFiberHelpers.h"
-#include "..\..\..\commonLib\include\macros.h"
 
 NAMESPACE_BTL_BEGIN
 

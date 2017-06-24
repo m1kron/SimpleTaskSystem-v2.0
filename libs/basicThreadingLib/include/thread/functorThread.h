@@ -2,7 +2,6 @@
 
 #include <functional>
 #include "thread.h"
-#include "..\..\..\commonLib\include\macros.h"
 #include "..\..\src\platform\threadPlatform.h"
 
 NAMESPACE_BTL_BEGIN

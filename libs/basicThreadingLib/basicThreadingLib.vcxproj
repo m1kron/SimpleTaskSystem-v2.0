@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\atomic\atomic.h" />
     <ClInclude Include="include\atomic\memoryOrder.h" />
-    <ClInclude Include="include\bslApi.h" />
+    <ClInclude Include="include\btlApi.h" />
     <ClInclude Include="include\platform.h" />
     <ClInclude Include="include\synchro\conditionVariable.h" />
     <ClInclude Include="include\synchro\lockGuards.h" />
@@ -43,7 +43,6 @@
     <ClInclude Include="src\platform\platformApi.h" />
     <ClInclude Include="src\platform\threadPlatform.h" />
     <ClInclude Include="src\platform\toolsPlatform.h" />
-    <ClInclude Include="src\platform\win\alignmentWinAPI.h" />
     <ClInclude Include="src\platform\win\atomic\atomicWinAPI.h" />
     <ClInclude Include="src\platform\win\synchro\conditionVariableImplWinAPI.h" />
     <ClInclude Include="src\platform\win\synchro\manualResetEventWinAPI.h" />
