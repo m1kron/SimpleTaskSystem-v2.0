@@ -4,6 +4,9 @@
 #include "..\..\libs\simpleTaskSystem\include\tools\taskBatch.h"
 #include "..\..\libs\simpleTaskSystem\include\tools\lambdaTask.h"
 #include "..\..\libs\commonLib\include\tools\existingBufferWrapper.h"
+#include "..\..\libs\commonLib\include\timer\timerMacros.h"
+#include "..\..\libs\basicThreadingLib\include\atomic\atomic.h"
+#include "..\..\libs\basicThreadingLib\include\thread\thisThreadHelpers.h"
 
 namespace helpers
 {
@@ -473,5 +476,39 @@ TEST(STSTest, StaticTaskTreeTest)
 				ASSERT_TRUE( handle->IsFinished() );
 			}
 		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////
+TEST( STSTest, FlushingSuspendedTasks )
+{
+	btl::Atomic< int > atomic;
+
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	{
+		sts::tools::TaskBatch_AutoRelease batch( system_interface );
+
+		for( int i = 0; i < 20; ++i )
+		{
+			auto lambda = [&atomic]( const sts::ITaskContext* context )
+			{
+				context->WaitFor( [ &atomic ]() { return atomic.Load( btl::MemoryOrder::Acquire ) == 1; } );
+			};
+
+			auto handle = sts::tools::LambdaTaskMaker( lambda, system_interface, nullptr );
+			batch.Add( handle );
+		}
+
+		HighResolutionTimer timer;
+		timer.Start();
+
+		ASSERT_TRUE( batch.SubmitAll() );
+		system_interface->RunTasksUsingThisThreadUntil( [ &timer ]() { return timer.ElapsedTimeInSeconds() > 1.0; } );
+
+		atomic.Store( 1, btl::MemoryOrder::Release );
+
+		btl::this_thread::SleepFor( 1000 );
+
+		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 	}
 }
