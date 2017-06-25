@@ -10,6 +10,25 @@ namespace helpers
 	static const int SOME_CONST = 0xdeedbeef;
 
 	//////////////////////////////////////////////////////////////////////
+	class StaticTaskSystem
+	{
+	public:
+		StaticTaskSystem() { m_manager = CreateTaskSystem(); }
+		~StaticTaskSystem() { DestroyTaskSystem( m_manager ); }
+
+		sts::ITaskManager* GetTaskSystem() { return m_manager;  }
+
+		static sts::ITaskManager* GetStaticTaskSystem()
+		{
+			static StaticTaskSystem system;
+			return system.GetTaskSystem();
+		}
+
+	private:
+		sts::ITaskManager* m_manager;
+	};
+
+	//////////////////////////////////////////////////////////////////////
 	template< class TIter >
 	static void CalculateBigSum( TIter& it ) // WARNING! This method has to take it and fill it, otherwise, it will be optimaized by compiler in release!!!
 	{
@@ -161,7 +180,7 @@ namespace helpers
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleSingleTask )
 {
-	sts::ITaskManager* manager = CreateTaskSystem();
+	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	const sts::ITaskHandle* task_handle = manager->CreateNewTask( &helpers::TaskFunction, nullptr );
 
 	ASSERT_TRUE( manager->SubmitTask( task_handle ) );
@@ -170,13 +189,12 @@ TEST( STSTest, SimpleSingleTask )
 	ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
 
 	manager->ReleaseTask( task_handle );
-	DestroyTaskSystem( manager );
 }
 
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleSingleLambdaTask )
 {
-	sts::ITaskManager* manager = CreateTaskSystem();
+	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	auto task_handle = sts::tools::LambdaTaskMaker( []( const sts::ITaskContext* )
 	{
 		int sum = 0;
@@ -188,13 +206,12 @@ TEST( STSTest, SimpleSingleLambdaTask )
 	ASSERT_TRUE( manager->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
 
 	manager->ReleaseTask( task_handle );
-	DestroyTaskSystem( manager );
 }
 
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleChainTask )
 {
-	sts::ITaskManager* manager = CreateTaskSystem();
+	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	auto root_task_handle = manager->CreateNewTask( &helpers::TaskFunction, nullptr );
 	auto child_task_handle = manager->CreateNewTask( &helpers::TaskFunction, root_task_handle );
 
@@ -207,13 +224,12 @@ TEST( STSTest, SimpleChainTask )
 
 	manager->ReleaseTask( root_task_handle );
 	manager->ReleaseTask( child_task_handle );
-	DestroyTaskSystem( manager );
 }
 
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleFlatTree )
 {
-	sts::ITaskManager* manager = CreateTaskSystem();
+	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
 		sts::tools::TaskBatch_AutoRelease batch( manager );
 
@@ -232,13 +248,12 @@ TEST( STSTest, SimpleFlatTree )
 		for( auto task_handle : batch )
 			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
 	}
-	DestroyTaskSystem( manager );
 }
 
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleDynamicTree )
 {
-	sts::ITaskManager* manager = CreateTaskSystem();
+	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
 		sts::tools::TaskBatch_AutoRelease batch( manager );
 
@@ -252,7 +267,6 @@ TEST( STSTest, SimpleDynamicTree )
 		for( auto task_handle : batch )
 			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) == helpers::SOME_CONST );
 	}
-	DestroyTaskSystem( manager );
 }
 
 
