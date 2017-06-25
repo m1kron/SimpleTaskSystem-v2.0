@@ -2,6 +2,7 @@
 #include "taskWorkerInstanceContext.h"
 #include "..\structures\lockbased\lockBasedPtrQueue.h"
 #include "..\..\..\basicThreadingLib\include\thread\thisFiberHelpers.h"
+#include "..\..\..\basicThreadingLib\include\thread\thisThreadHelpers.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -39,10 +40,16 @@ public:
 	// from other worker instances. Returns true if there is more work to do, false it there is no work on this worker instance.
 	bool TryToExecuteSingleTask();
 
-private:
+	// Returns thread id that this instance is working on.
+	btl::THREAD_ID GetThreadID() const;
+
+	// Returns this instance id.
+	uint32_t GetInstanceID() const;
+
 	// Tries to steal a task from this worker instance.
 	Task* TryToStealTaskFromThisInstance();
 
+private:
 	// Setups given fiber.
 	void SetupFiber( TaskFiber* fiber );
 
@@ -84,7 +91,9 @@ private:
 	LockBasedPtrQueue< Task, TASK_POOL_SIZE > m_pendingTaskQueue;
 	TaskWorkerInstanceContext m_context;
 	TaskFiber* m_currentFiber;
+	btl::Atomic< uint32_t > m_convertedFlag;
 	btl::FIBER_ID m_thisFiberID;
+	btl::THREAD_ID m_convertedThreadID;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -97,6 +106,7 @@ private:
 inline TaskWorkerInstance::TaskWorkerInstance()
 	: m_currentFiber( nullptr )
 	, m_thisFiberID( INVALID_FIBER_ID )
+	, m_convertedThreadID( INVALID_THREAD_ID )
 {
 }
 
@@ -115,13 +125,26 @@ inline bool TaskWorkerInstance::Deinitalize()
 //////////////////////////////////////////////////////////////////////////////////
 inline bool TaskWorkerInstance::IsConvertedToFiber() const
 {
-	return m_thisFiberID != INVALID_FIBER_ID;
+	auto val = m_convertedFlag.Load( btl::MemoryOrder::Acquire );
+	return val == 1 && m_thisFiberID != INVALID_FIBER_ID;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 inline Task* TaskWorkerInstance::TryToStealTaskFromThisInstance()
 {
 	return m_pendingTaskQueue.PopFront();
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+inline btl::THREAD_ID TaskWorkerInstance::GetThreadID() const
+{
+	return m_convertedThreadID;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+inline uint32_t TaskWorkerInstance::GetInstanceID() const
+{
+	return m_context.m_id;
 }
 
 NAMESPACE_STS_END

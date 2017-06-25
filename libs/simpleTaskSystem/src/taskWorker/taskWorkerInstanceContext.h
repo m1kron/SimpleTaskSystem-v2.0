@@ -2,16 +2,16 @@
 
 NAMESPACE_STS_BEGIN
 
-class TaskWorkerInstancesHub;
-class TaskManager;
+class Dispatcher;
+class ITaskManager;
 class TaskFiberAllocator;
 class TaskFiber;
 
-// Contains necessary info for task worker instance.
+// Contains necessary context for task worker instance.
 struct TaskWorkerInstanceContext
 {
-	TaskManager* m_taskManager;
-	TaskWorkerInstancesHub* m_taskWorkerInstancesHub;
+	ITaskManager* m_taskManager;
+	Dispatcher* m_dispatcher;
 	TaskFiberAllocator* m_fiberAllocator;
 	uint32_t m_id;
 };

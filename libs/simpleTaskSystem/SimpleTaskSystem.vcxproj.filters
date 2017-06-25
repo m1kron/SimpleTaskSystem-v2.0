@@ -40,6 +40,12 @@
     <Filter Include="include\tools">
       <UniqueIdentifier>{e5dff130-9e71-41aa-a05b-4ae0e5456d39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\backend">
+      <UniqueIdentifier>{8b6cc9bb-9372-490a-acf1-4d20d103e181}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\backend\dispatcher">
+      <UniqueIdentifier>{60bfd790-1865-48d8-9fba-83192cbf5572}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\precompiledHeader\precompiledHeader.h">
@@ -111,11 +117,11 @@
     <ClInclude Include="src\taskWorker\taskWorkerInstance.h">
       <Filter>src\taskWorker</Filter>
     </ClInclude>
-    <ClInclude Include="src\taskWorker\taskWorkerInstanceHub.h">
-      <Filter>src\taskWorker</Filter>
-    </ClInclude>
     <ClInclude Include="src\taskWorker\taskWorkerInstanceContext.h">
       <Filter>src\taskWorker</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\dispatcher\dispatcher.h">
+      <Filter>src\backend\dispatcher</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="src\taskWorker\taskWorkerInstance.cpp">
       <Filter>src\taskWorker</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\dispatcher\dispatcher.cpp">
+      <Filter>src\backend\dispatcher</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,9 +1,8 @@
 #include "precompiledHeader.h"
 #include "taskWorkerInstance.h"
-#include "taskWorkerInstanceHub.h"
+#include "..\backend\dispatcher\dispatcher.h"
 #include "..\taskFiber\taskFiberAllocator.h"
 #include "..\task\task.h"
-#include "..\manager\taskManager.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -16,7 +15,7 @@ bool TaskWorkerInstance::Initalize( const TaskWorkerInstanceContext& context )
 {
 	ASSERT( context.m_fiberAllocator );
 	ASSERT( context.m_taskManager );
-	ASSERT( context.m_taskWorkerInstancesHub );
+	ASSERT( context.m_dispatcher );
 
 	m_context = context;
 	if( m_currentFiber = m_context.m_fiberAllocator->AllocateNewTaskFiber() )
@@ -28,19 +27,33 @@ bool TaskWorkerInstance::Initalize( const TaskWorkerInstanceContext& context )
 //////////////////////////////////////////////////////////////////////////////////
 bool TaskWorkerInstance::ConvertToFiber()
 {
-	ASSERT( !IsConvertedToFiber() );
+	if( IsConvertedToFiber() )
+	{
+		ASSERT( false );
+		return false; //< Already converted to fiber!!
+	}
+
 	m_thisFiberID = btl::this_fiber::ConvertThreadToFiber();
 	SetupFiber( m_currentFiber );
-	return IsConvertedToFiber();
+	m_convertedThreadID = btl::this_thread::GetThreadID();
+	m_convertedFlag.Store( 1, btl::MemoryOrder::Release );
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 bool TaskWorkerInstance::ConvertToThread()
 {
-	ASSERT( IsConvertedToFiber() );
+	if( !IsConvertedToFiber() )
+	{
+		ASSERT( false );
+		return false; //< Was not coverted to fiber!!
+	}
+
 	btl::this_fiber::ConvertFiberToThread();
 	m_thisFiberID = INVALID_FIBER_ID;
-	return !IsConvertedToFiber();
+	m_convertedThreadID = INVALID_THREAD_ID;
+	m_convertedFlag.Store( 0, btl::MemoryOrder::Release );
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -227,21 +240,7 @@ Task* TaskWorkerInstance::TrytoGetTaskToExecute()
 //////////////////////////////////////////////////////////////////////////////////
 Task* TaskWorkerInstance::TryToStealTaskFromOtherInstances()
 {
-	Task* stealed_task = nullptr;
-
-	const uint32_t instances_count = m_context.m_taskWorkerInstancesHub->GetRegisteredInstancesCount();
-	for( uint32_t i = 1; i < instances_count; ++i )
-	{
-		// Start from thread that is next to this worker in the pool.
-		uint32_t index = ( i + m_context.m_id ) % instances_count;
-		if( stealed_task = m_context.m_taskWorkerInstancesHub->GetRegisteredInstanceAt( index )->TryToStealTaskFromThisInstance() )
-		{
-			WORKER_LOG( "Stealed task from worker instance with index %i",, index );
-			return stealed_task;
-		}
-	}
-
-	return nullptr;
+	return m_context.m_dispatcher->TryToStealTaskFromOtherWorkerInstances( GetInstanceID() );
 }
 
 //////////////////////////////////////////////////////////////////////////////////

@@ -4,7 +4,7 @@
 #include "..\task\taskAllocator.h"
 #include "..\taskWorker\taskWorkersPool.h"
 #include "..\taskFiber\taskFiberAllocator.h"
-#include "..\taskWorker\taskWorkerInstanceHub.h"
+#include "..\backend\dispatcher\dispatcher.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -37,9 +37,6 @@ public:
 	// Returns true if all tasks are released.
 	bool AreAllTasksReleased() const;
 
-	// Dispatches single task. Returs true if success.
-	bool DispatchTask( Task* task );
-
 private:
 	// Allocates new task and set optional parent.
 	const ITaskHandle* CreateNewTaskImpl( const ITaskHandle* parent_task_handle );
@@ -48,13 +45,10 @@ private:
 	void WakeUpAllWorkers() const;
 
 	TaskWorkersPool			m_workerThreadsPool;
-	TaskWorkerInstancesHub	m_workerInstancesHub;
 	TaskFiberAllocator		m_taskFiberAllocator;
 	TaskAllocator			m_taskAllocator;
+	Dispatcher				m_dispatcher;
 	TaskWorkerInstance		m_mainThreadInstanceWorker;
-	btl::Atomic< uint32_t > m_taskDispacherCounter; //< [NOTE]: does it have to be atomic?
-	btl::Atomic< uint32_t > m_isActingAsTaskWorker;
-
 };
 
 //////////////////////////////////////////////////////////////////
