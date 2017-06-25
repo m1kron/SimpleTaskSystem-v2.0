@@ -13,17 +13,23 @@
 #endif // DEBUG_MODE
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// ASSERTS
-#define ASSERT( condition ) if ( !( condition ) ) { HandleAssert( #condition, __FILE__, __LINE__ ); }
-#define STATIC_ASSERT( condition, message ) static_assert( condition, message );
-
-///////////////////////////////////////////////////////////////////////////////////////
 // LOG
 #if defined( LOGS_ENABLED )
 #define LOG( ... ) Print( __VA_ARGS__ );
 #else
 #define LOG( ... );
 #endif
+
+///////////////////////////////////////////////////////////////////////////////////////
+// ASSERTS
+#define ASSERT( condition )																						\
+	if( !( condition ) )																						\
+	{																											\
+		LOG( "ASSERTION FAILED!\n Condition: %s\n File: %s\n Line %i", #condition, __FILE__, __LINE__ );		\
+		HandleAssert( #condition, __FILE__, __LINE__ );															\
+	}
+
+#define STATIC_ASSERT( condition, message ) static_assert( condition, message );
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // UTILITIES
