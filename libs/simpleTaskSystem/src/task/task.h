@@ -32,14 +32,15 @@ public:
 	// executed after all child tasks are done.
 	void AddParent( Task* parentTask );
 
-	// Returns parent task.
-	Task* GetParentTask() const;
-
 	// Set main task function.
 	void SetTaskFunction( TTaskFunctionPtr function );
 
 	// Returns storage pointer.
 	void* GetStoragePtr();
+
+	// Updates dependencies( parent_task ). Returns parent task if it is ready to
+	// be executed, nullptr otherwise.
+	Task* UpdateDependecies();
 
 	// Clears task.
 	void Clear();
@@ -51,6 +52,9 @@ public:
 	static const size_t STORAGE_SIZE = ( BTL_CACHE_LINE_SIZE - sizeof( TTaskFunctionPtr ) - sizeof( Task* ) - sizeof( btl::Atomic< uint32_t > ) );
 
 private:
+	// Returns parent task.
+	Task* GetParentTask() const;
+
 	TTaskFunctionPtr m_functionPtr;
 	Task* m_parentTask;
 	btl::Atomic< uint32_t > m_numberOfChildTasks; //< When 0, task is considered as finished.

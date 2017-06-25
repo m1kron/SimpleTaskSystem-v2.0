@@ -108,26 +108,14 @@ void TaskWorkerInstance::HandleCurrentTaskFiberSwitch()
 //////////////////////////////////////////////////////////////////////////////////
 void TaskWorkerInstance::OnFinishedTaskFiber( TaskFiber* fiber )
 {
-	WORKER_LOG( "Task is done." );
 	Task* finished_task = fiber->GetTask();
+	WORKER_LOG( "Task< %i > is done.",, finished_task->GetTaskID() );
 
 	// Check if task has any dependency - if has and it is ready, then submit it now.
-	if( Task* parent_of_finished_task = finished_task->GetParentTask() )
+	if( Task* parent_of_finished_task = finished_task->UpdateDependecies() )
 	{
-		WORKER_LOG( "Just-finished-task to the local queue." );
-		if( parent_of_finished_task->IsReadyToBeExecuted() )
-		{
-			WORKER_LOG( "Just-finished-task has a parent task ready to be executed, so adding it to the local pending queue." );
-			VERIFY_SUCCESS( AddTask( parent_of_finished_task ) ); //< Add task to local queue.
-		}
-		else
-		{
-			WORKER_LOG( "Just-finished-task has a parent task, but it cannot be executed now." );
-		}
-	}
-	else
-	{
-		WORKER_LOG( "Task does not have parent task." );
+		WORKER_LOG( "Just-finished-task< %i > has a parent task< %i > ready to be executed, so adding it to the local pending queue.", , finished_task->GetTaskID(), parent_of_finished_task->GetTaskID() );
+		VERIFY_SUCCESS( AddTask( parent_of_finished_task ) ); //< Add task to local queue.
 	}
 
 	// Clear task in fiber.
@@ -137,7 +125,7 @@ void TaskWorkerInstance::OnFinishedTaskFiber( TaskFiber* fiber )
 //////////////////////////////////////////////////////////////////////////////////
 void TaskWorkerInstance::OnSuspendedCurrrentTaskFiber()
 {
-	WORKER_LOG( "Current task fiber is suspended. Add it to suspended fiber queue and get a new one." );
+	WORKER_LOG( "Current task fiber with task< %i > is suspended. Add it to suspended fiber queue and get a new one.",, m_currentFiber->GetTask()->GetTaskID() );
 	if( TaskFiber* new_task_fiber = m_context.m_fiberAllocator->AllocateNewTaskFiber() )
 	{
 		SetupFiber( new_task_fiber );
@@ -174,7 +162,7 @@ bool TaskWorkerInstance::CheckAndExecuteSuspenedTaskFibers()
 			break;
 		}
 
-		WORKER_LOG( "Switching to suspended task fiber." );
+		WORKER_LOG( "Switching to suspended task fiber with task< %i >.",, current_suspended_task_fiber->GetTask()->GetTaskID() );
 		SwitchToTaskFiber( current_suspended_task_fiber );
 		if( HandleSuspendedTaskFiberSwitch( current_suspended_task_fiber ) )
 			break; // We have finished a task!
@@ -186,17 +174,17 @@ bool TaskWorkerInstance::CheckAndExecuteSuspenedTaskFibers()
 //////////////////////////////////////////////////////////////////////////////////
 bool TaskWorkerInstance::HandleSuspendedTaskFiberSwitch( TaskFiber* fiber )
 {
-	WORKER_LOG( "Switching back from so-far-suspended fiber." );
+	WORKER_LOG( "Switching back from so-far-suspended fiber with task< %i >.",, fiber->GetTask()->GetTaskID() );
 
 	switch( fiber->GetCurrentState() )
 	{
 	case TaskFiberState::Idle:
-		WORKER_LOG( "Suspended fiber is done now." );
+		WORKER_LOG( "Suspended fiber with task< %i > is done now.", , fiber->GetTask()->GetTaskID() );
 		OnFinishedTaskFiber( fiber );
 		m_context.m_fiberAllocator->ReleaseTaskFiber( fiber ); //< Release task fiber.
 		return true;
 	case TaskFiberState::Suspended:
-		WORKER_LOG( "Suspended fiber is still suspended." );
+		WORKER_LOG( "Suspended fiber with task< %i > is still suspended.", , fiber->GetTask()->GetTaskID() );
 		m_suspendedTaskFibers.PushBack( fiber ); //< Add this task fiber back to suspended queue.
 		return false;
 
@@ -210,11 +198,11 @@ bool TaskWorkerInstance::HandleSuspendedTaskFiberSwitch( TaskFiber* fiber )
 //////////////////////////////////////////////////////////////////////////////////
 void TaskWorkerInstance::ExecuteSingleTask( Task* task )
 {
-	WORKER_LOG( "Executing the task." );
+	WORKER_LOG( "Executing the task< %i >.",, task->GetTaskID() );
 	ASSERT( m_currentFiber );
 	ASSERT( m_currentFiber->GetCurrentState() == TaskFiberState::Idle );
 	m_currentFiber->SetTaskToExecute( task );
-	WORKER_LOG( "Switching to current fiber to execute task." );
+	WORKER_LOG( "Switching to current fiber to execute task< %i >.", , task->GetTaskID() );
 	SwitchToTaskFiber( m_currentFiber );
 	HandleCurrentTaskFiberSwitch();
 }
@@ -258,7 +246,7 @@ void TaskWorkerInstance::SetupFiber( TaskFiber* fiber )
 //////////////////////////////////////////////////////////////////////////////////
 bool TaskWorkerInstance::AddTask( Task* task )
 {
-	WORKER_LOG( "Added new task to local pending queue." );
+	WORKER_LOG( "Added new task< %i > to local pending queue.", , task->GetTaskID() );
 	return m_pendingTaskQueue.PushBack( task );
 }
 
