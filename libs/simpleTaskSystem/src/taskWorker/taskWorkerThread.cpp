@@ -40,11 +40,13 @@ void TaskWorkerThread::MainWorkerThreadLoop()
 		// Do all the tasks:
 		while( !m_shouldFinishWork )
 		{
-			bool executed = m_workerInstance.TryToExecuteSingleTask();
+			bool hasMoreWork = m_workerInstance.TryToExecuteSingleTask();
 
-			if( !executed )
+			if( !hasMoreWork )
 				break;
 		}
+
+		THREAD_LOG( "Goes to sleep." );
 	}
 }
 
