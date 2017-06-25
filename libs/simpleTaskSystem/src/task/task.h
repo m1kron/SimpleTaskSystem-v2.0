@@ -44,6 +44,9 @@ public:
 	// Clears task.
 	void Clear();
 
+	// Returns task id.
+	uint32_t GetTaskID() const;
+
 	// Max size of data that can be stored by task instance.
 	static const size_t STORAGE_SIZE = ( BTL_CACHE_LINE_SIZE - sizeof( TTaskFunctionPtr ) - sizeof( Task* ) - sizeof( btl::Atomic< uint32_t > ) );
 
@@ -113,6 +116,14 @@ inline void Task::Clear()
 	m_functionPtr = nullptr;
 	m_parentTask = nullptr;
 	m_numberOfChildTasks.Store( 0, btl::MemoryOrder::Release );
+}
+
+////////////////////////////////////////////////////////
+inline uint32_t Task::GetTaskID() const
+{
+	// Just use memory address.
+	uint64_t id = reinterpret_cast< uint64_t > ( this );
+	return (uint32_t)id; 
 }
 
 NAMESPACE_STS_END
