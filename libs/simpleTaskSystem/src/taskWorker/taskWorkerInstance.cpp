@@ -7,14 +7,14 @@
 NAMESPACE_STS_BEGIN
 
 #define WORKER_LOG( txt, ... )																					\
-	if ( m_context.m_id == 0 )	{ LOG( "[MAIN_WORKER_INSTANCE< %i >]: " txt, m_context.m_id __VA_ARGS__ );	}	\
+	if ( m_context.m_id == 0 )	{ LOG( "[HELPER_WORKER_INSTANCE< %i >]: " txt, m_context.m_id __VA_ARGS__ );	}	\
 	else { LOG( "[WORKER_INSTANCE_ID< %i >]: " txt, m_context.m_id __VA_ARGS__ );	}							\
 
 //////////////////////////////////////////////////////////////////////////////////
 bool TaskWorkerInstance::Initalize( const TaskWorkerInstanceContext& context )
 {
 	ASSERT( context.m_fiberAllocator );
-	ASSERT( context.m_taskManager );
+	ASSERT( context.m_taskSystem );
 	ASSERT( context.m_dispatcher );
 
 	m_context = context;
@@ -252,7 +252,7 @@ void TaskWorkerInstance::ReleaseFiber( TaskFiber* fiber )
 //////////////////////////////////////////////////////////////////////////////////
 void TaskWorkerInstance::SetupFiber( TaskFiber* fiber )
 {
-	fiber->Setup( m_thisFiberID, m_context.m_taskManager );
+	fiber->Setup( m_thisFiberID, m_context.m_taskSystem );
 }
 
 //////////////////////////////////////////////////////////////////////////////////

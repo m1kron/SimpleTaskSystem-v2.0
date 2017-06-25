@@ -27,14 +27,15 @@
     <ClInclude Include="include\globalApi.h" />
     <ClInclude Include="include\iTaskContext.h" />
     <ClInclude Include="include\iTaskHandle.h" />
-    <ClInclude Include="include\iTaskManager.h" />
+    <ClInclude Include="include\iTaskSystem.h" />
     <ClInclude Include="include\stsExportApi.h" />
     <ClInclude Include="include\tools\lambdaTask.h" />
     <ClInclude Include="include\tools\parallelFor.h" />
     <ClInclude Include="include\tools\taskBatch.h" />
+    <ClInclude Include="src\backend\backendTaskSystem.h" />
     <ClInclude Include="src\backend\dispatcher\dispatcher.h" />
     <ClInclude Include="src\common\common.h" />
-    <ClInclude Include="src\manager\taskManager.h" />
+    <ClInclude Include="src\frontend\frontendTaskSystem.h" />
     <ClInclude Include="src\precompiledHeader\precompiledHeader.h" />
     <ClInclude Include="src\structures\lockbased\lockBasedPtrQueue.h" />
     <ClInclude Include="src\structures\lockfree\lockfreePtrQueue.h" />
@@ -51,9 +52,10 @@
     <ClInclude Include="src\tools\positiveNumberHasher.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\backend\backendTaskSystem.cpp" />
     <ClCompile Include="src\backend\dispatcher\dispatcher.cpp" />
     <ClCompile Include="src\common\globalApiImpl.cpp" />
-    <ClCompile Include="src\manager\taskManager.cpp" />
+    <ClCompile Include="src\frontend\frontendTaskSystem.cpp" />
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

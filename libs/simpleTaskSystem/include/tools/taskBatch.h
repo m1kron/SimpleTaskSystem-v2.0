@@ -1,5 +1,5 @@
 #pragma once
-#include "..\iTaskManager.h"
+#include "..\iTaskSystem.h"
 #include <vector>
 
 namespace sts
@@ -14,7 +14,7 @@ namespace tools
 class TaskBatch
 {
 public:
-	TaskBatch( ITaskManager* manager );
+	TaskBatch( ITaskSystem* system_interface );
 	~TaskBatch();
 
 	// Adds task.
@@ -44,7 +44,7 @@ public:
 
 protected:
 	std::vector< const ITaskHandle* > m_taskBatch;
-	ITaskManager* m_taskManager;
+	ITaskSystem* m_taskSystem;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ protected:
 class TaskBatch_AutoRelease : public TaskBatch
 {
 public:
-	TaskBatch_AutoRelease( ITaskManager* manager );
+	TaskBatch_AutoRelease( ITaskSystem* system_interface );
 	~TaskBatch_AutoRelease();
 };
 
@@ -64,15 +64,15 @@ public:
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
-inline TaskBatch::TaskBatch( ITaskManager* manager )
-	: m_taskManager( manager )
+inline TaskBatch::TaskBatch( ITaskSystem* system_interface )
+	: m_taskSystem( system_interface )
 {
 }
 
 //////////////////////////////////////////////////////////////////////
 inline TaskBatch::~TaskBatch()
 {
-	m_taskManager = nullptr;
+	m_taskSystem = nullptr;
 }
 
 ///////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ inline bool TaskBatch::AreAllTaskFinished() const
 inline bool TaskBatch::SubmitAll()
 {
 	for( auto handle : m_taskBatch )
-		if ( !m_taskManager->SubmitTask( handle ) )
+		if ( !m_taskSystem->SubmitTask( handle ) )
 			return false;
 
 	return true;
@@ -146,14 +146,14 @@ inline bool TaskBatch::SubmitAll()
 inline void TaskBatch::ReleaseAllTasks()
 {
 	for( auto handle : m_taskBatch )
-		m_taskManager->ReleaseTask( handle );
+		m_taskSystem->ReleaseTask( handle );
 
 	m_taskBatch.clear();
 }
 
 ////////////////////////////////////////////////////////////
-inline TaskBatch_AutoRelease::TaskBatch_AutoRelease( ITaskManager* manager )
-	: TaskBatch( manager )
+inline TaskBatch_AutoRelease::TaskBatch_AutoRelease( ITaskSystem* system_interface )
+	: TaskBatch( system_interface )
 {
 }
 

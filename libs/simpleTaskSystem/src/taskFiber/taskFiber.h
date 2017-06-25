@@ -4,7 +4,7 @@
 NAMESPACE_STS_BEGIN
 
 class Task;
-class ITaskManager;
+class ITaskSystem;
 
 // Describes TaskWorkerFiver
 enum class TaskFiberState
@@ -20,9 +20,9 @@ BTL_ALIGNED( BTL_CACHE_LINE_SIZE ) class TaskFiber : public btl::FiberBase
 public:
 	TaskFiber();
 
-	// Setups fiber. Manager is needed to run a task. When task is done, 
+	// Setups fiber. System is needed to run a task. When task is done, 
 	// fiber will switch to parentFiberID.
-	void Setup( btl::FIBER_ID parent_fiber_id, ITaskManager* manager );
+	void Setup( btl::FIBER_ID parent_fiber_id, ITaskSystem* system );
 
 	// Sets task to execute by fiber.
 	void SetTaskToExecute( Task* task );
@@ -48,7 +48,7 @@ private:
 
 	TaskFiberState m_state;
 	Task* m_taskToExecute;
-	ITaskManager* m_taskManager;
+	ITaskSystem* m_systemInterface;
 	btl::FIBER_ID m_parentFiberID;
 };
 
@@ -59,10 +59,10 @@ private:
 ////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////
-inline void TaskFiber::Setup( btl::FIBER_ID parent_fiber_id, ITaskManager* manager )
+inline void TaskFiber::Setup( btl::FIBER_ID parent_fiber_id, ITaskSystem* system )
 {
 	m_parentFiberID = parent_fiber_id;
-	m_taskManager = manager;
+	m_systemInterface = system;
 }
 
 ////////////////////////////////////////////////////////////

@@ -1,24 +1,33 @@
 #include "precompiledHeader.h"
 #include "..\..\include\globalApi.h"
-#include "..\manager\taskManager.h"
+#include "..\backend\backendTaskSystem.h"
+#include "..\frontend\frontendTaskSystem.h"
 
 /////////////////////////////////////////////////////////////////
-STS_API sts::ITaskManager* CreateTaskSystem()
+STS_API sts::ITaskSystem* CreateTaskSystem()
 {
-	void* mem = _aligned_malloc( sizeof( sts::TaskManager ), BTL_CACHE_LINE_SIZE );
+	// TODO: prepare that all of this operations can fail!
+	void* backend_mem = _aligned_malloc( sizeof( sts::BackendTaskSystem ), BTL_CACHE_LINE_SIZE );
+	sts::BackendTaskSystem* backend = new ( backend_mem ) sts::BackendTaskSystem();
 
-	sts::TaskManager* manager = new ( mem ) sts::TaskManager();
-	manager->Initialize();
+	void* frontend_mem = _aligned_malloc( sizeof( sts::FrontendTaskSystem ), BTL_CACHE_LINE_SIZE );
+	sts::FrontendTaskSystem* frontend = new ( frontend_mem ) sts::FrontendTaskSystem();
+	
+	VERIFY_SUCCESS( frontend->Initialize( backend ) );
 
-	return manager;
+	return frontend;
 }
 
 //////////////////////////////////////////////////////////////////
-STS_API void DestroyTaskSystem( sts::ITaskManager* system )
+STS_API void DestroyTaskSystem( sts::ITaskSystem* system )
 {
-	sts::TaskManager* manager = static_cast< sts::TaskManager* >( system );
-	manager->Deinitialize();
-	manager->~TaskManager();
+	ASSERT( system );
 
-	_aligned_free( manager );
+	sts::FrontendTaskSystem* frontend = static_cast< sts::FrontendTaskSystem* >( system );
+	sts::BackendTaskSystem* backend = frontend->Deinitialize();
+
+	ASSERT( backend );
+
+	_aligned_free( frontend );
+	_aligned_free( backend );
 }

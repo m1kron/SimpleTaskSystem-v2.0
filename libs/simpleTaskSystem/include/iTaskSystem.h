@@ -4,12 +4,12 @@
 namespace sts
 {
 
-
-class ITaskManager
+// This is the main interface to the system.
+class ITaskSystem
 {
 public:
 
-	// Returns how many workers manager has.
+	// Returns how many workers system has.
 	virtual int GetWorkersCount() const = 0;
 
 	// Creates raw task, which has to be later submitted. 
@@ -40,7 +40,7 @@ protected:
 	// Converts from 'worker' back to 'main thread'.
 	virtual void ConvertWorkerToMainThread() = 0;
 
-	virtual ~ITaskManager() = 0;
+	virtual ~ITaskSystem() = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////
-inline const ITaskHandle* ITaskManager::CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* parent_task_handle )
+inline const ITaskHandle* ITaskSystem::CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* parent_task_handle )
 {
 	if( auto task_handle = CreateNewTask( parent_task_handle ) )
 	{
@@ -63,7 +63,7 @@ inline const ITaskHandle* ITaskManager::CreateNewTask( sts::TTaskFunctionPtr tas
 
 ////////////////////////////////////////////////////////////////////////////
 template<typename TCondition>
-inline bool ITaskManager::RunTasksUsingThisThreadUntil( const TCondition & condition )
+inline bool ITaskSystem::RunTasksUsingThisThreadUntil( const TCondition & condition )
 {
 	if( !ConvertMainThreadToWorker() )
 		return false;

@@ -1,0 +1,94 @@
+#include "precompiledHeader.h"
+#include "frontendTaskSystem.h"
+#include "..\backend\backendTaskSystem.h"
+
+NAMESPACE_STS_BEGIN
+
+#define SYSTEM_LOG( ... ) LOG( "[FRONTEND_SYSTEM]: " __VA_ARGS__ );
+
+// Implementation of dtor of ITaskSystem.
+ITaskSystem::~ITaskSystem() {}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+FrontendTaskSystem::FrontendTaskSystem()
+	: m_backend( nullptr )
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+FrontendTaskSystem::~FrontendTaskSystem()
+{
+	ASSERT( m_backend == nullptr );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+int FrontendTaskSystem::GetWorkersCount() const
+{
+	return m_backend->GetWorkersCount();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+const ITaskHandle* FrontendTaskSystem::CreateNewTask( const ITaskHandle* parent_task_handle )
+{
+	return m_backend->CreateNewTask( parent_task_handle );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+bool FrontendTaskSystem::SubmitTask( const ITaskHandle* task_handle )
+{
+	return m_backend->SubmitTask( task_handle );;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+void FrontendTaskSystem::ReleaseTask( const ITaskHandle* task_handle )
+{
+	m_backend->ReleaseTask( task_handle );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+void FrontendTaskSystem::TryToRunOneTask()
+{
+	bool hasMoreWorkToDo = m_helperInstanceWorker.TryToExecuteSingleTask();
+	if( !hasMoreWorkToDo )
+		btl::this_thread::SleepFor( 2 );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+bool FrontendTaskSystem::ConvertMainThreadToWorker()
+{
+	if( m_helperInstanceWorker.ConvertToFiber() )
+	{
+		SYSTEM_LOG( "Converting main thread to worker thread." );
+		return true;
+	}
+
+	SYSTEM_LOG( "Attempt to covnert main thread to worker thread Failed! Calling ConvertMainThreadToWorker from two different threads?" );
+
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+void FrontendTaskSystem::ConvertWorkerToMainThread()
+{
+	VERIFY_SUCCESS( m_helperInstanceWorker.ConvertToThread() );
+	SYSTEM_LOG( "Converting worker thread back to main thread." );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+bool FrontendTaskSystem::Initialize( BackendTaskSystem* backend_system )
+{
+	ASSERT( backend_system );
+	m_backend = backend_system;
+	return m_backend->Initialize( m_helperInstanceWorker, this );;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+BackendTaskSystem* FrontendTaskSystem::Deinitialize()
+{
+	m_backend->Deinitialize( m_helperInstanceWorker );
+	auto backend_ptr = m_backend;
+	m_backend = nullptr;
+	return backend_ptr;
+}
+
+NAMESPACE_STS_END

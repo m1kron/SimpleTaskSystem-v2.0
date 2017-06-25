@@ -3,24 +3,24 @@
 
 NAMESPACE_STS_BEGIN
 
-class ITaskManager;
+class ITaskSystem;
 class TaskFiber;
 
 // Implementation of ITaskContext.
 class TaskContext : public ITaskContext
 {
 public:
-	TaskContext( ITaskManager* manager, TaskFiber* task_fiber );
+	TaskContext( ITaskSystem* system_interface, TaskFiber* task_fiber );
 
 	// ITaskContext interface:
-	ITaskManager* GetTaskManager() const override;
+	ITaskSystem* GetTaskSystem() const override;
 	size_t GetThisTaskStorageSize() const override;
 	void* GetThisTaskStorage() const override;
 	void SuspendExecution() const override;
 	// ---
 
 private:
-	ITaskManager* m_taskManager;
+	ITaskSystem* m_taskSystem;
 	TaskFiber* m_taskFiber;
 };
 
@@ -31,16 +31,16 @@ private:
 ///////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////
-inline TaskContext::TaskContext( ITaskManager* manager, TaskFiber* task_fiber )
-	: m_taskManager( manager )
+inline TaskContext::TaskContext( ITaskSystem* system_interface, TaskFiber* task_fiber )
+	: m_taskSystem( system_interface )
 	, m_taskFiber( task_fiber )
 {
 }
 
 //////////////////////////////////////////////////////
-inline ITaskManager* TaskContext::GetTaskManager() const
+inline ITaskSystem* TaskContext::GetTaskSystem() const
 {
-	return m_taskManager;
+	return m_taskSystem;
 }
 
 NAMESPACE_STS_END

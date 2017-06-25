@@ -22,10 +22,10 @@ void TaskFiber::FiberFunction()
 		m_state = TaskFiberState::Running;
 
 		ASSERT( m_taskToExecute != nullptr );
-		ASSERT( m_taskManager != nullptr );
+		ASSERT( m_systemInterface != nullptr );
 		ASSERT( m_parentFiberID != INVALID_FIBER_ID );
 
-		TaskContext context( m_taskManager, this );
+		TaskContext context( m_systemInterface, this );
 
 		m_taskToExecute->Run( &context );
 		m_state = TaskFiberState::Idle;
@@ -37,7 +37,7 @@ void TaskFiber::FiberFunction()
 void TaskFiber::Reset()
 {
 	m_taskToExecute = nullptr;
-	m_taskManager = nullptr;
+	m_systemInterface = nullptr;
 	m_parentFiberID = INVALID_FIBER_ID;
 	m_state = TaskFiberState::Idle;
 }

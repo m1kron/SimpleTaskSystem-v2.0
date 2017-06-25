@@ -10,7 +10,7 @@ class Task;
 
 // Class represents TaskWorkerInstance, which is responsible for logic related to running task.
 // Implements every thing that is connected to that ( including stealing, fiber managment etc ).
-// Note that this class is used by task worker thread, as well as task manager to allow running 
+// Note that this class is used by task worker thread, as well as task system to allow running 
 // tasks from main thread.
 class TaskWorkerInstance
 {

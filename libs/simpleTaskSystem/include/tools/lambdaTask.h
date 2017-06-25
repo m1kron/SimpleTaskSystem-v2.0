@@ -1,5 +1,5 @@
 #pragma once
-#include "..\iTaskManager.h"
+#include "..\iTaskSystem.h"
 #include "..\..\..\commonLib\include\tools\existingBufferWrapper.h" //< HACK, but I will fix this later.
 
 namespace sts
@@ -12,10 +12,10 @@ namespace tools
 // Returns valid handle if success. Note, that lambda has to fit task storage ( sizeof (TLambda) <= task storage )
 //
 // Example:
-// FunctorTaskMaker( []() { for( int i = 0; i < 1000000; ++i ) { int k = 0; } }, task_manager, nullptr );
-// task_manager->SubmitTask( task_handle );
+// FunctorTaskMaker( []() { for( int i = 0; i < 1000000; ++i ) { int k = 0; } }, task_system_interface, nullptr );
+// task_system_interface->SubmitTask( task_handle );
 template< typename TLambda >
-const ITaskHandle* LambdaTaskMaker( const TLambda& funtor, ITaskManager* task_handle, const ITaskHandle* parent_task_handle );
+const ITaskHandle* LambdaTaskMaker( const TLambda& funtor, ITaskSystem* system_interface, const ITaskHandle* parent_task_handle );
 
 ////////////////////////////////////////////////////////
 //
@@ -48,10 +48,10 @@ void LambdaTaskFunction( const ITaskContext* context )
 
 ///////////////////////////////////////////////////////////
 template< typename TLambda >
-const ITaskHandle* LambdaTaskMaker( const TLambda& funtor, ITaskManager* manager, const ITaskHandle* parent_task_handle )
+const ITaskHandle* LambdaTaskMaker( const TLambda& funtor, ITaskSystem* system_interface, const ITaskHandle* parent_task_handle )
 {
 	//Function ptr is nullptr, cuz I will set it manually.
-	if( auto task_handle = manager->CreateNewTask( parent_task_handle ) )
+	if( auto task_handle = system_interface->CreateNewTask( parent_task_handle ) )
 	{
 		if( sizeof( TLambda ) <= task_handle->GetTaskStorageSize() )
 		{
@@ -64,7 +64,7 @@ const ITaskHandle* LambdaTaskMaker( const TLambda& funtor, ITaskManager* manager
 		}
 		else
 		{
-			manager->ReleaseTask( task_handle );
+			system_interface->ReleaseTask( task_handle );
 			return nullptr;
 		}
 	}

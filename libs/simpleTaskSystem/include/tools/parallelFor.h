@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "..\iTaskManager.h"
+#include "..\iTaskSystem.h"
 #include "taskBatch.h"
 #include "lambdaTask.h"
 
@@ -19,7 +19,7 @@ template< class Iterator, typename Functor >
 bool ParallelForEachUsingTasks( const Iterator& begin,			//< Begin iterator
 								const Iterator& end,			//< End iterator
 								const Functor& functor,			//< functor will called on every iterator between begin and end.
-								ITaskManager* manager );	//< task manager instance that will be used to deliver task functionality.
+								ITaskSystem* system_interface );	//< task system interface instance that will be used to deliver task functionality.
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -29,14 +29,14 @@ bool ParallelForEachUsingTasks( const Iterator& begin,			//< Begin iterator
 
 /////////////////////////////////////////////////////////////////////////////////////
 template< class Iterator, typename Functor >
-bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor& functor, ITaskManager* task_manager )
+bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor& functor, ITaskSystem* task_system_interface )
 {
-	uint32_t max_num_of_threads = task_manager->GetWorkersCount() + 1;
+	uint32_t max_num_of_threads = task_system_interface->GetWorkersCount() + 1;
 	auto con_size = std::distance( begin, end );
 	auto batch_size = ( con_size / max_num_of_threads );
 	Iterator last_it = end;
 
-	TaskBatch_AutoRelease batch( task_manager );
+	TaskBatch_AutoRelease batch( task_system_interface );
 	
 	// WARNING!
 	// This is needed only in debug mode, cuz in debug stl iterators are so big,
@@ -80,7 +80,7 @@ bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 		};
 #endif
 
-		if( auto handle = LambdaTaskMaker( func, task_manager, nullptr ) )
+		if( auto handle = LambdaTaskMaker( func, task_system_interface, nullptr ) )
 			batch.Add( handle );
 		else
 			return false;
@@ -94,7 +94,7 @@ bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 		functor( it );
 
 	// wait for rest to finish.
-	return task_manager->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+	return task_system_interface->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 }
 
 }

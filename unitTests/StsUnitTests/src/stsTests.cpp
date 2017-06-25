@@ -13,19 +13,19 @@ namespace helpers
 	class StaticTaskSystem
 	{
 	public:
-		StaticTaskSystem() { m_manager = CreateTaskSystem(); }
-		~StaticTaskSystem() { DestroyTaskSystem( m_manager ); }
+		StaticTaskSystem() { m_system = CreateTaskSystem(); }
+		~StaticTaskSystem() { DestroyTaskSystem( m_system ); }
 
-		sts::ITaskManager* GetTaskSystem() { return m_manager;  }
+		sts::ITaskSystem* GetTaskSystem() { return m_system;  }
 
-		static sts::ITaskManager* GetStaticTaskSystem()
+		static sts::ITaskSystem* GetStaticTaskSystem()
 		{
 			static StaticTaskSystem system;
 			return system.GetTaskSystem();
 		}
 
 	private:
-		sts::ITaskManager* m_manager;
+		sts::ITaskSystem* m_system;
 	};
 
 	//////////////////////////////////////////////////////////////////////
@@ -79,11 +79,11 @@ namespace helpers
 	template< int ChildsSize >
 	void TaskFunctionDynamicTree( const sts::ITaskContext* context )
 	{
-		sts::tools::TaskBatch_AutoRelease batch( context->GetTaskManager() );
+		sts::tools::TaskBatch_AutoRelease batch( context->GetTaskSystem() );
 
 		for( int i = 0; i < ChildsSize; ++i )
 		{
-			auto task_handle = context->GetTaskManager()->CreateNewTask( helpers::TaskFunctionFast, nullptr );
+			auto task_handle = context->GetTaskSystem()->CreateNewTask( helpers::TaskFunctionFast, nullptr );
 			helpers::WriteToTask< int >( task_handle, 0 );
 			batch.Add( task_handle );
 		}
@@ -180,62 +180,62 @@ namespace helpers
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleSingleTask )
 {
-	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
-	const sts::ITaskHandle* task_handle = manager->CreateNewTask( &helpers::TaskFunction, nullptr );
+	sts::ITaskSystem* system = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	const sts::ITaskHandle* task_handle = system->CreateNewTask( &helpers::TaskFunction, nullptr );
 
-	ASSERT_TRUE( manager->SubmitTask( task_handle ) );
-	ASSERT_TRUE( manager->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
+	ASSERT_TRUE( system->SubmitTask( task_handle ) );
+	ASSERT_TRUE( system->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
 
 	ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
 
-	manager->ReleaseTask( task_handle );
+	system->ReleaseTask( task_handle );
 }
 
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleSingleLambdaTask )
 {
-	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	sts::ITaskSystem* system = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	auto task_handle = sts::tools::LambdaTaskMaker( []( const sts::ITaskContext* )
 	{
 		int sum = 0;
 		for( int i = 0; i < 10000; ++i )
 			sum += i;
-	}, manager, nullptr );
+	}, system, nullptr );
 
-	ASSERT_TRUE( manager->SubmitTask( task_handle ) );
-	ASSERT_TRUE( manager->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
+	ASSERT_TRUE( system->SubmitTask( task_handle ) );
+	ASSERT_TRUE( system->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
 
-	manager->ReleaseTask( task_handle );
+	system->ReleaseTask( task_handle );
 }
 
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleChainTask )
 {
-	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
-	auto root_task_handle = manager->CreateNewTask( &helpers::TaskFunction, nullptr );
-	auto child_task_handle = manager->CreateNewTask( &helpers::TaskFunction, root_task_handle );
+	sts::ITaskSystem* system = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	auto root_task_handle = system->CreateNewTask( &helpers::TaskFunction, nullptr );
+	auto child_task_handle = system->CreateNewTask( &helpers::TaskFunction, root_task_handle );
 
-	ASSERT_TRUE( manager->SubmitTask( root_task_handle ) );
-	ASSERT_TRUE( manager->SubmitTask( child_task_handle ) );
-	ASSERT_TRUE( manager->RunTasksUsingThisThreadUntil( [ &root_task_handle ]() { return root_task_handle->IsFinished(); }  ) );
+	ASSERT_TRUE( system->SubmitTask( root_task_handle ) );
+	ASSERT_TRUE( system->SubmitTask( child_task_handle ) );
+	ASSERT_TRUE( system->RunTasksUsingThisThreadUntil( [ &root_task_handle ]() { return root_task_handle->IsFinished(); }  ) );
 
 	ASSERT_TRUE( helpers::ReadFromTask<int>( root_task_handle ) > 0 );
 	ASSERT_TRUE( helpers::ReadFromTask<int>( child_task_handle ) > 0 );
 
-	manager->ReleaseTask( root_task_handle );
-	manager->ReleaseTask( child_task_handle );
+	system->ReleaseTask( root_task_handle );
+	system->ReleaseTask( child_task_handle );
 }
 
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleFlatTree )
 {
-	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
-		sts::tools::TaskBatch_AutoRelease batch( manager );
+		sts::tools::TaskBatch_AutoRelease batch( system_interface );
 
 		for( int i = 0; i < 1000; ++i )
 		{
-			auto task_handle = manager->CreateNewTask( helpers::TaskFunctionFast, nullptr );
+			auto task_handle = system_interface->CreateNewTask( helpers::TaskFunctionFast, nullptr );
 			ASSERT_TRUE( task_handle != nullptr );
 			helpers::WriteToTask( task_handle, 0 );
 			batch.Add( task_handle );
@@ -243,7 +243,7 @@ TEST( STSTest, SimpleFlatTree )
 
 		ASSERT_TRUE( batch.SubmitAll() );
 
-		manager->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 
 		for( auto task_handle : batch )
 			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
@@ -253,16 +253,16 @@ TEST( STSTest, SimpleFlatTree )
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, SimpleDynamicTree )
 {
-	sts::ITaskManager* manager = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
-		sts::tools::TaskBatch_AutoRelease batch( manager );
+		sts::tools::TaskBatch_AutoRelease batch( system_interface );
 
-		auto task_handle = manager->CreateNewTask( helpers::TaskFunctionDynamicTree< 2 >, nullptr );
+		auto task_handle = system_interface->CreateNewTask( helpers::TaskFunctionDynamicTree< 2 >, nullptr );
 		batch.Add( task_handle );
 		helpers::WriteToTask( task_handle, 0 );
 
 		ASSERT_TRUE( batch.SubmitAll() );
-		manager->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 
 		for( auto task_handle : batch )
 			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) == helpers::SOME_CONST );

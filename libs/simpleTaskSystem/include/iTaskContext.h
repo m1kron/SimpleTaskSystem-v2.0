@@ -3,14 +3,14 @@
 namespace sts
 {
 
-class ITaskManager;
+class ITaskSystem;
 
 // Represents context of given task DURING ITS EXECUTION.
 class ITaskContext
 {
 public:
 	// Returns task manager.
-	virtual ITaskManager* GetTaskManager() const = 0;
+	virtual ITaskSystem* GetTaskSystem() const = 0;
 
 	// Returns size of task storage - see information on TaskHandle::GetTaskStorageSize().
 	virtual size_t GetThisTaskStorageSize() const = 0;

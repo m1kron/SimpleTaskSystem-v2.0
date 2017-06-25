@@ -13,9 +13,6 @@
     <Filter Include="src\common">
       <UniqueIdentifier>{4582a80e-28ef-4844-b19d-e25bc7ebfa92}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\manager">
-      <UniqueIdentifier>{5e1baa01-52b2-400a-826b-860850a48dae}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\structures">
       <UniqueIdentifier>{2e566997-9f8b-49c4-b6a1-974eb522e3aa}</UniqueIdentifier>
     </Filter>
@@ -46,6 +43,9 @@
     <Filter Include="src\backend\dispatcher">
       <UniqueIdentifier>{60bfd790-1865-48d8-9fba-83192cbf5572}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\frontend">
+      <UniqueIdentifier>{ff53730b-0b47-45e3-9fc7-c6adaa3e310d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\precompiledHeader\precompiledHeader.h">
@@ -53,9 +53,6 @@
     </ClInclude>
     <ClInclude Include="src\common\common.h">
       <Filter>src\common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\manager\taskManager.h">
-      <Filter>src\manager</Filter>
     </ClInclude>
     <ClInclude Include="src\structures\lockbased\lockBasedPtrQueue.h">
       <Filter>src\structures\lockbased</Filter>
@@ -93,9 +90,6 @@
     <ClInclude Include="include\iTaskContext.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\iTaskManager.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\globalApi.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -123,13 +117,19 @@
     <ClInclude Include="src\backend\dispatcher\dispatcher.h">
       <Filter>src\backend\dispatcher</Filter>
     </ClInclude>
+    <ClInclude Include="include\iTaskSystem.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\frontend\frontendTaskSystem.h">
+      <Filter>src\frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\backendTaskSystem.h">
+      <Filter>src\backend</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
       <Filter>src\precompiledHeader</Filter>
-    </ClCompile>
-    <ClCompile Include="src\manager\taskManager.cpp">
-      <Filter>src\manager</Filter>
     </ClCompile>
     <ClCompile Include="src\task\task.cpp">
       <Filter>src\task</Filter>
@@ -163,6 +163,12 @@
     </ClCompile>
     <ClCompile Include="src\backend\dispatcher\dispatcher.cpp">
       <Filter>src\backend\dispatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="src\frontend\frontendTaskSystem.cpp">
+      <Filter>src\frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\backendTaskSystem.cpp">
+      <Filter>src\backend</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
