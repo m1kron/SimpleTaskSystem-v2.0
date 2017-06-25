@@ -269,316 +269,209 @@ TEST( STSTest, SimpleDynamicTree )
 	}
 }
 
+///////////////////////////////////////////////////////////////////
+TEST( STSTest, 2lvlDynamicTree )
+{
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	{
+		sts::tools::TaskBatch_AutoRelease batch( system_interface );
 
-////////////////////////////////////////////////////////////////////////
-//TEST( STSTest, DynamicTaskTreeTest1 )
-//{
-//	sts::TaskManager manager;
-//	manager.Setup();
-//
-//	double numOfTries = 0;
-//	double accumulator = 0;
-//
-//	for( int iteration = 0; iteration < 100; ++iteration )
-//	{
-//		// This is arrray that we will work on.
-//		std::array< int, 200 > arrayToFill = { 0 };
-//
-//		// Create lambda that will process the array in parallel.
-//		auto array_functor = [ &arrayToFill ]( sts::TaskContext& context )
-//		{
-//			sts::TaskBatch_AutoRelease batch( context.GetTaskManager() );
-//
-//			for( unsigned i = 0; i < arrayToFill.size(); ++i )
-//			{
-//				// Create a task that will calculate single item.
-//				int item = arrayToFill[ i ];
-//				auto item_functor = [ item ]( sts::TaskContext& context )
-//				{
-//					int calculated_item = helpers::CalculateItem( item );
-//
-//					// Store item in data task data storage.
-//					ExistingBufferWrapperWriter writer( context.GetThisTask()->GetRawDataPtr(), context.GetThisTask()->GetDataSize() );
-//					writer.Write( calculated_item );
-//
-//				}; ///< end of item_functor
-//
-//				// Create new task using item_functor:
-//				sts::TaskHandle handle = context.GetTaskManager().CreateNewTask( item_functor );
-//				batch.Add( std::move( handle ) );
-//			}
-//
-//			// Submit whole batch.
-//			bool submitted = context.GetTaskManager().SubmitTaskBatch( batch );
-//			ASSERT_TRUE( submitted );
-//
-//			// Wait until whole batch is done.
-//			context.WaitFor( [ &batch ] { return batch.AreAllTaskFinished(); } );
-//
-//			// Get results from child tasks and calculate final sum:
-//			int final_sum = 0;
-//			for( unsigned i = 0; i < batch.GetSize(); ++i )
-//			{
-//				const sts::TaskHandle& handle = batch[ i ];
-//				int sum = 0;
-//				ExistingBufferWrapperReader read_buffer( handle->GetRawDataPtr(), handle->GetDataSize() );
-//				read_buffer.Read( sum );
-//
-//				// Fill array with apropriate results:
-//				arrayToFill[ i ] = sum;
-//				final_sum += sum;
-//			}
-//
-//			// Write final sum:
-//			ExistingBufferWrapperWriter writer( context.GetThisTask()->GetRawDataPtr(), context.GetThisTask()->GetDataSize() );
-//			writer.Write( final_sum );
-//
-//		}; ///< end of array_functor
-//
-//		// Create main task using array_functor:
-//		sts::TaskHandle root_task_handle = manager.CreateNewTask( array_functor );
-//
-//		// Submit main task..
-//		bool submitted = manager.SubmitTask( root_task_handle );
-//		ASSERT_TRUE( submitted );
-//
-//		// and help processing until main task is done:
-//		manager.RunTasksUsingThisThreadUntil( [ &root_task_handle ] { return root_task_handle->IsFinished(); } );
-//
-//		// Read the result:
-//		int sum = 0;
-//		ExistingBufferWrapperReader read_buffer( root_task_handle->GetRawDataPtr(), root_task_handle->GetDataSize() );
-//		read_buffer.Read( sum );
-//
-//		ASSERT_TRUE( sum == 10000000 );
-//
-//		// Release main task:
-//		manager.ReleaseTask( root_task_handle );
-//
-//		ASSERT_TRUE( manager.AreAllTasksReleased() );
-//	}
-//}
-//
-////////////////////////////////////////////////////////////////////////
-//TEST(STSTest, DynamicTaskTreeTest2)
-//{
-//	sts::TaskManager manager;
-//	manager.Setup();
-//	
-//	double numOfTries = 0;
-//	double accumulator = 0;
-//	
-//	for( int iteration = 0; iteration < 10; ++iteration )
-//	{
-//		auto functor = []( sts::TaskContext& context )
-//		{
-//			sts::TaskBatch_AutoRelease batch( context.GetTaskManager() );
-//	
-//			sts::TaskHandle parent_task_handle = context.GetTaskManager().CreateNewTask( &helpers::TaskFunctionFast );
-//			ASSERT_TRUE( parent_task_handle != sts::INVALID_TASK_HANDLE );
-//	
-//			for( unsigned i = 0; i < 100; ++i )
-//			{
-//				sts::TaskHandle handle = context.GetTaskManager().CreateNewTask( &helpers::TaskFunctionFast, parent_task_handle );
-//				ASSERT_TRUE( handle != sts::INVALID_TASK_HANDLE );
-//				batch.Add( std::move( handle ) );
-//			}
-//	
-//			batch.Add( std::move( parent_task_handle ) );
-//	
-//			bool submitted = context.GetTaskManager().SubmitTaskBatch( batch );
-//			ASSERT_TRUE( submitted );
-//	
-//			context.WaitFor( [ &batch ] { return batch.AreAllTaskFinished(); } );
-//	
-//			int final_sum = 0;
-//			for( const sts::TaskHandle& handle : batch )
-//			{
-//				int sum = 0;
-//				ExistingBufferWrapperReader read_buffer( handle->GetRawDataPtr(), handle->GetDataSize() );
-//				read_buffer.Read( sum );
-//	
-//				ASSERT_TRUE( sum == 50000 );
-//				ASSERT_TRUE( handle->IsFinished() );
-//	
-//				final_sum += sum;
-//			}	
-//	
-//			ExistingBufferWrapperWriter writer( context.GetThisTask()->GetRawDataPtr(), context.GetThisTask()->GetDataSize() );
-//			writer.Write( final_sum );
-//		};
-//		////////////////////////////////////////////////////////////////////
-//	
-//		{
-//			sts::TaskBatch_AutoRelease batch( manager );
-//	
-//			for( unsigned i = 0; i < 20; ++i )
-//			{
-//				sts::TaskHandle& handle = manager.CreateNewTask( functor );
-//				ASSERT_TRUE( handle != sts::INVALID_TASK_HANDLE );
-//				batch.Add( std::move( handle ) );
-//			}
-//	
-//			bool submitted = manager.SubmitTaskBatch( batch );
-//			ASSERT_TRUE( submitted );
-//	
-//			manager.RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
-//	
-//			for( const sts::TaskHandle& handle : batch )
-//			{
-//				int sum = 0;
-//				ExistingBufferWrapperReader read_buffer( handle->GetRawDataPtr(), handle->GetDataSize() );
-//				read_buffer.Read( sum );
-//	
-//				ASSERT_TRUE( sum == 5050000 );
-//				ASSERT_TRUE( handle->IsFinished() );
-//			}
-//		}
-//	
-//		ASSERT_TRUE( manager.AreAllTasksReleased() );
-//	}
-//
-//}
-//
-////////////////////////////////////////////////////////////////////////
-//TEST(STSTest, StaticTaskTreeTest)
-//{
-//	sts::TaskManager manager;
-//	manager.Setup();
-//	
-//	for( int iteration = 0; iteration < 50; ++iteration )
-//	{
-//		{
-//			sts::TaskHandle root_task_handle = manager.CreateNewTask( &helpers::TaskFunctionFast );
-//			ASSERT_TRUE( root_task_handle != sts::INVALID_TASK_HANDLE );
-//	
-//			sts::TaskBatch_AutoRelease batch( manager );
-//	
-//			// Build static tree:
-//			for( unsigned i = 0; i < 20; ++i )
-//			{
-//				sts::TaskHandle parent_handle_lvl2 = manager.CreateNewTask( &helpers::TaskFunctionFast, root_task_handle );
-//				ASSERT_TRUE( parent_handle_lvl2 != sts::INVALID_TASK_HANDLE );
-//	
-//				for( unsigned i = 0; i < 100; ++i )
-//				{
-//					sts::TaskHandle handle = manager.CreateNewTask( &helpers::TaskFunctionFast, parent_handle_lvl2 );
-//					ASSERT_TRUE( handle != sts::INVALID_TASK_HANDLE );
-//					batch.Add( std::move( handle ) );
-//				}
-//	
-//				batch.Add( std::move( parent_handle_lvl2 ) );
-//			}
-//	
-//			batch.Add( std::move( root_task_handle ) );
-//	
-//			bool submitted = manager.SubmitTaskBatch( batch );
-//			ASSERT_TRUE( submitted );
-//	
-//			manager.RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
-//	
-//			for( const sts::TaskHandle& handle : batch )
-//			{
-//				int sum = 0;
-//				ExistingBufferWrapperReader read_buffer( handle->GetRawDataPtr(), handle->GetDataSize() );
-//				read_buffer.Read( sum );
-//	
-//				ASSERT_TRUE( sum == 50000 );
-//				ASSERT_TRUE( handle->IsFinished() );
-//			}
-//		}
-//		ASSERT_TRUE( manager.AreAllTasksReleased() );
-//	}
-//}
+		for( int i = 0; i < 20; ++i )
+		{
+			auto task_handle = system_interface->CreateNewTask( helpers::TaskFunctionDynamicTree< 100 >, nullptr );
+			batch.Add( task_handle );
+			helpers::WriteToTask( task_handle, 0 );
+		}
 
+		ASSERT_TRUE( batch.SubmitAll() );
+		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 
-//#pragma region SYNTETIC_TEST_OF_TASK_STEALING
-//		//  for( int iteration = 0; iteration < 1000; ++iteration )
-//		//  {
-//		//PREPARE_PROFILING;
-//		//BEGIN_PROFILE_SECTION;
-//
-//		//sts::TaskWorkersPool workersPool;
-//		//sts::TaskAllocator allocator;
-//
-//		//workersPool.InitializePool( sts::tools::GetLogicalCoresCount() );
-//
-//		//sts::TaskHandle task_handle = allocator.AllocateNewTask();
-//		//task_handle->SetTaskFunction( &TaskFunction );
-//		//std::vector<sts::TaskHandle> tasks;
-//
-//		//for( unsigned i = 0; i < 20; ++i )
-//		//{
-//		//	tasks.push_back( allocator.AllocateNewTask() );
-//		//	tasks[ i ]->SetTaskFunction( &TaskFunction );
-//		//	tasks[ i ]->AddParent( task_handle );
-//	//}
-////for( unsigned i = 0; i < 20; ++i )
-////{
-//
-//		//	workersPool.GetTaskAt( 0 )->AddTask( tasks[ i ].operator->( ) );
-//
-//		//}
-//
-//		//// wake all threads:
-//		//unsigned workers_count = workersPool.GetPoolSize();
-//		//for( unsigned worker_id = 0; worker_id < workers_count; ++worker_id )
-//		//{
-//		//	workersPool.GetTaskAt( worker_id )->WakeUp();
-//		//}
-//
-//		//while( !task_handle->IsFinished() )
-//		//{
-//		//	sts::this_thread::YieldThread();
-//		//}
-//
-//		//int sum = 0;
-//		//ExistingBufferWrapperReader read_buffer( task_handle->GetRawDataPtr(), task_handle->GetDataSize() );
-//		//read_buffer.Read( sum );
-//		//ASSERT( sum == 5000000 );
-//
-//		//for( unsigned i = 0; i < tasks.size(); ++i )
-//		//{
-//		//	int sum = 0;
-//		//	ExistingBufferWrapperReader read_buffer( tasks[ i ]->GetRawDataPtr(), tasks[ i ]->GetDataSize() );
-//		//	read_buffer.Read( sum );
-//
-//		//	ASSERT( sum == 5000000 );
-//		//	ASSERT( tasks[ i ]->IsFinished() );
-//		//	allocator.ReleaseTask( tasks[ i ] );
-//		//}
-//
-//		//allocator.ReleaseTask( task_handle );
-//		//ASSERT( task_handle == sts::INVALID_TASK_HANDLE );
-//
-//		//// Finish workers:
-//		//// Singnal all worker that they should finish right now.
-//		//for( unsigned worker_id = 0; worker_id < workers_count; ++worker_id )
-//		//{
-//		//	workersPool.GetTaskAt( worker_id )->FinishWork();
-//		//}
-//
-//		//// We have to wait for threads to finish their work.
-//		//unsigned worker_id = 0;
-//		//while( worker_id < workers_count )
-//		//{
-//		//	// Check if thread has finish it's work.
-//		//	if( workersPool.GetTaskAt( worker_id )->HasFinishedWork() )
-//		//	{
-//		//		// Go to next thread.
-//		//		++worker_id;
-//		//	}
-//		//	else
-//		//	{
-//		//		// Yield exection to give worker threads processor time.
-//		//		sts::this_thread::YieldThread();
-//		//	}
-//		//}
-//
-//		//workersPool.ReleasePool();
-//
-//		//END_PROFILE_SECTION("Section done in time ");
-//
-//		//std::cout << "Stealing tasks test " << iteration << " succeeded" << std::endl;
-//  //  }
-//#pragma endregion SYNTETIC_TEST_OF_TASK_STEALING
+		for( auto task_handle : batch )
+			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) == helpers::SOME_CONST );
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+TEST( STSTest, DynamicTaskTreeTestWithLambdas )
+{
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
+
+	// This is arrray that we will work on.
+	std::array< int, 200 > arrayToFill = { 0 };
+
+	// Create lambda that will process the array in parallel.
+	auto root_lambda = [ &arrayToFill ]( const sts::ITaskContext* context )
+	{
+		sts::tools::TaskBatch_AutoRelease batch( context->GetTaskSystem() );
+
+		for( unsigned i = 0; i < arrayToFill.size(); ++i )
+		{
+			// Create a task that will calculate single item.
+			int item = arrayToFill[ i ];
+			auto child_lambda_functor = [ item ]( const sts::ITaskContext* context )
+			{
+				int calculated_item = helpers::CalculateItem( item );
+
+				// Store item in data task data storage.
+				ExistingBufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+				writer.Write( calculated_item );
+
+			}; ///< end of child_lambda_functor
+
+			// Create new task using item_functor:
+			const sts::ITaskHandle* handle = sts::tools::LambdaTaskMaker( child_lambda_functor, context->GetTaskSystem(), nullptr );
+			batch.Add( handle );
+		}
+
+		// Submit whole batch.
+		bool submitted = batch.SubmitAll();
+
+		// Wait until whole batch is done.
+		context->WaitFor( [ &batch ] { return batch.AreAllTaskFinished(); } );
+
+		// Get results from child tasks and calculate final sum:
+		int final_sum = 0;
+		for( unsigned i = 0; i < batch.GetSize(); ++i )
+		{
+			const sts::ITaskHandle* handle = batch[ i ];
+			int sum = helpers::ReadFromTask<int>( handle );
+
+			// Fill array with apropriate results:
+			arrayToFill[ i ] = sum;
+			final_sum += sum;
+		}
+
+		// Write final sum:
+		// NOTE: I am aware that I am overriding lambda here, but i am not going to touch any ot its stuff anymore..
+		ExistingBufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+		writer.Write( final_sum );
+
+	}; ///< end of root_lambda
+
+	// Create main task using array_functor:
+	auto root_task_handle = sts::tools::LambdaTaskMaker( root_lambda, system_interface, nullptr );
+
+	// Submit main task..
+	bool submitted = system_interface->SubmitTask( root_task_handle );
+	ASSERT_TRUE( submitted );
+
+	// and help processing until main task is done:
+	system_interface->RunTasksUsingThisThreadUntil( [ &root_task_handle ] { return root_task_handle->IsFinished(); } );
+
+	// Read the result:
+	ASSERT_TRUE( helpers::ReadFromTask<int>( root_task_handle ) == 10000000 );
+
+	// Release main task:
+	system_interface->ReleaseTask( root_task_handle );
+}
+
+//////////////////////////////////////////////////////////////////////
+TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
+{
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	
+	double numOfTries = 0;
+	double accumulator = 0;
+	
+	for( int iteration = 0; iteration < 10; ++iteration )
+	{
+		auto functor = []( const sts::ITaskContext* context )
+		{
+			sts::tools::TaskBatch_AutoRelease batch( context->GetTaskSystem() );
+	
+			auto parent_task_handle = context->GetTaskSystem()->CreateNewTask( &helpers::TaskFunctionFast, nullptr );
+	
+			for( unsigned i = 0; i < 100; ++i )
+			{
+				auto handle = context->GetTaskSystem()->CreateNewTask( &helpers::TaskFunctionFast, parent_task_handle );
+				batch.Add( handle );
+			}
+	
+			batch.Add( parent_task_handle );
+	
+			bool submitted = batch.SubmitAll();
+	
+			context->WaitFor( [ &batch ] { return batch.AreAllTaskFinished(); } );
+	
+			int final_sum = 0;
+			for( auto handle : batch )
+			{
+				int sum = helpers::ReadFromTask<int>( handle );
+				final_sum += sum;
+			}	
+	
+			ExistingBufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+			writer.Write( final_sum );
+		}; //< end of functor
+		////////////////////////////////////////////////////////////////////
+	
+		{
+			sts::tools::TaskBatch_AutoRelease batch( system_interface );
+	
+			for( unsigned i = 0; i < 20; ++i )
+			{
+				auto handle = sts::tools::LambdaTaskMaker( functor, system_interface, nullptr );
+				ASSERT_TRUE( handle != nullptr );
+				batch.Add( handle );
+			}
+	
+			bool submitted = batch.SubmitAll();
+			ASSERT_TRUE( submitted );
+	
+			system_interface->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+	
+			for( auto handle : batch )
+			{
+				auto bla = helpers::ReadFromTask<int>( handle );
+				ASSERT_TRUE( helpers::ReadFromTask<int>( handle ) == 8080000 );
+				ASSERT_TRUE( handle->IsFinished() );
+			}
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+TEST(STSTest, StaticTaskTreeTest)
+{
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	
+	for( int iteration = 0; iteration < 10; ++iteration )
+	{
+		{
+			sts::tools::TaskBatch_AutoRelease batch( system_interface );
+
+			auto root_task_handle = system_interface->CreateNewTask( &helpers::TaskFunctionFast, nullptr );
+			ASSERT_TRUE( root_task_handle != nullptr );
+	
+			// Build static tree:
+			for( unsigned i = 0; i < 20; ++i )
+			{
+				auto parent_handle_lvl2 = system_interface->CreateNewTask( &helpers::TaskFunctionFast, root_task_handle );
+				ASSERT_TRUE( parent_handle_lvl2 != nullptr );
+	
+				for( unsigned i = 0; i < 100; ++i )
+				{
+					auto handle = system_interface->CreateNewTask( &helpers::TaskFunctionFast, parent_handle_lvl2 );
+					ASSERT_TRUE( handle != nullptr );
+					batch.Add( handle );
+				}
+	
+				batch.Add( parent_handle_lvl2 );
+			}
+	
+			batch.Add( root_task_handle );
+	
+			bool submitted = batch.SubmitAll();
+			ASSERT_TRUE( submitted );
+	
+			system_interface->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+	
+			for( auto handle : batch )
+			{
+				auto bla = helpers::ReadFromTask<int>( handle );
+				ASSERT_TRUE( helpers::ReadFromTask<int>( handle ) == 80000 );
+				ASSERT_TRUE( handle->IsFinished() );
+			}
+		}
+	}
+}
