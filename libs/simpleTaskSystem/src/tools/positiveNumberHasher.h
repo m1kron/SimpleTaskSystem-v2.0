@@ -1,9 +1,12 @@
 #pragma once
 
+NAMESPACE_STS_BEGIN
 // Performs hashing of positive integral numbers. Prime number have to be *much* bigger than max_number.
-// Returns hashed number from number_to_hash.
-template < uint32_t MaxNumber, uint32_t PrimeNumber = 2654435761 >
-uint32_t CalcHashedNumber( uint32_t number_to_hash )
+// Returns hashed number clamped to [ 0, max_number ].
+template < uint32_t PrimeNumber = 2654435761 >
+uint32_t CalcHashedNumberClamped( uint32_t number_to_hash, uint32_t max_number )
 {
-	return ( ( number_to_hash * PrimeNumber ) ) % MaxNumber;
+	return ( ( number_to_hash * PrimeNumber ) ) % max_number;
 }
+
+NAMESPACE_BTL_END
