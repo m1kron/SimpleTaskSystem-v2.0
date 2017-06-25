@@ -7,17 +7,25 @@ class HighResolutionTimer
 public:
 	HighResolutionTimer();
 
-	void Reset();
+	// Start timer.
 	void Start();
-	void Stop();
+
+	// Resets timer.
+	void Reset();
+	
+	// Returns elapsed time since start in miliseconds.
 	double ElapsedTimeInMiliseconds();
+
+	// Returns elapsed time since start in seconds.
 	double ElapsedTimeInSeconds();
 
 private:
-	static uint64_t s_Frequency;
+	// Returns current timestamp.
+	uint64_t GetTimeStamp();
 
-	uint64_t m_StartStamp;
-	uint64_t m_StopStamp;
+	static uint64_t s_frequency;
+
+	uint64_t m_startStamp;
 };
 
 ///////////////////////////////////////////////////////
