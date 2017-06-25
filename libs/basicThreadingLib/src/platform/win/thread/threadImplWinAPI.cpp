@@ -41,7 +41,7 @@ DWORD WINAPI ThreadFunction( LPVOID lpParam )
 //////////////////////////////////////////////////////
 ThreadImpl::ThreadImpl()
 	: m_threadHandle( NULL )
-	, m_id( 0 )
+	, m_id( INVALID_THREAD_ID )
 {
 }
 

@@ -9,6 +9,7 @@ class ThreadBase;
 NAMESPACE_PLATFORM_API_BEGIN
 
 typedef DWORD THREAD_ID;
+#define INVALID_THREAD_ID 0
 
 ////////////////////////////////////////////////////////////////
 void YieldThread();
