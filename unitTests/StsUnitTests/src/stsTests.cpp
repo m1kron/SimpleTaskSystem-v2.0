@@ -3,7 +3,6 @@
 #include "..\..\libs\simpleTaskSystem\include\globalApi.h"
 #include "..\..\libs\simpleTaskSystem\include\tools\taskBatch.h"
 #include "..\..\libs\simpleTaskSystem\include\tools\lambdaTask.h"
-#include "..\..\libs\commonLib\include\tools\bufferWrapper.h"
 #include "..\..\libs\commonLib\include\timer\timerMacros.h"
 #include "..\..\libs\basicThreadingLib\include\atomic\atomic.h"
 #include "..\..\libs\basicThreadingLib\include\thread\thisThreadHelpers.h"
@@ -64,8 +63,7 @@ namespace helpers
 		for( int i = 0; i < 10000000; ++i )
 			sum += ( i % 5 ) / 2;
 
-		BufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-		writeBuffer.Write( sum );
+		sts::tools::TaskStorageWriter( context ).WriteSafe( sum );
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -75,8 +73,7 @@ namespace helpers
 		for( int i = 0; i < 100000; ++i )
 			sum += ( i % 5 ) / 2;
 
-		BufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-		writeBuffer.Write( sum );
+		sts::tools::TaskStorageWriter( context ).WriteSafe( sum );
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -107,10 +104,7 @@ namespace helpers
 		}
 
 		if( ok )
-		{
-			BufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-			writeBuffer.Write( SOME_CONST );
-		}
+			sts::tools::TaskStorageWriter( context ).WriteSafe( SOME_CONST );
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -123,61 +117,18 @@ namespace helpers
 		return sum;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	void CalcualteItemAndWriteToArray( const sts::ITaskContext* context )
-	{
-		std::array<int, 200>* array_ptr = nullptr;
-		int my_index = -1;
-
-		// Read needed parameters.
-		BufferWrapperReader reader( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-		reader.Read( array_ptr );
-		reader.Read( my_index );
-
-		// Calculate item:
-		int new_item = CalculateItem( ( *array_ptr )[ my_index ] );
-
-		// and write it back to array:
-		( *array_ptr )[ my_index ] = new_item;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	void ArraySummer( const sts::ITaskContext* context )
-	{
-		std::array<int, 200>* array_ptr = nullptr;
-
-		// Read the array.
-		BufferWrapperReader reader( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-		reader.Read( array_ptr );
-
-		// Calculate sum.
-		int sum = 0;
-		for( size_t i = 0; i < array_ptr->size(); ++i )
-		{
-			sum += ( *array_ptr )[ i ];
-		}
-
-		// Write result.
-		BufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-		writeBuffer.Write( sum );
-	}
-
 	////////////////////////////////////////////////////////////////////////////
 	template< typename T >
 	T ReadFromTask( const sts::ITaskHandle* handle )
 	{
-		BufferWrapperReader reader( handle->GetTaskStorage(), handle->GetTaskStorageSize() );
-		T val;
-		reader.Read( val );
-		return val;
+		return sts::tools::TaskStorageReader( handle ).Read< T >();
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	template< typename T >
 	void WriteToTask( const sts::ITaskHandle* handle, const T& val )
 	{
-		BufferWrapperWriter writeBuffer( handle->GetTaskStorage(), handle->GetTaskStorageSize() );
-		writeBuffer.Write( val );
+		sts::tools::TaskStorageWriter( handle ).WriteSafe( val );
 	}
 }
 
@@ -317,8 +268,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 				int calculated_item = helpers::CalculateItem( item );
 
 				// Store item in data task data storage.
-				BufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-				writer.Write( calculated_item );
+				sts::tools::TaskStorageWriter( context ).WriteSafe( calculated_item );
 
 			}; ///< end of child_lambda_functor
 
@@ -347,8 +297,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 
 		// Write final sum:
 		// NOTE: I am aware that I am overriding lambda here, but i am not going to touch any ot its stuff anymore..
-		BufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-		writer.Write( final_sum );
+		sts::tools::TaskStorageWriter( context ).WriteSafe( final_sum );
 
 	}; ///< end of root_lambda
 
@@ -404,8 +353,8 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 				final_sum += sum;
 			}	
 	
-			BufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
-			writer.Write( final_sum );
+			sts::tools::TaskStorageWriter( context ).WriteSafe( final_sum );
+
 		}; //< end of functor
 		////////////////////////////////////////////////////////////////////
 	

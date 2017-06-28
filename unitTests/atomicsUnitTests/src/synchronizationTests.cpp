@@ -29,7 +29,6 @@ namespace helpers
 		thread2.SetFunctorAndStartThread( [ &m_lock, &timer ]
 		{
 			btl::LockGuard< TMutex > guard( m_lock );
-			timer.Stop();
 		} );
 
 		thread1.Join();
