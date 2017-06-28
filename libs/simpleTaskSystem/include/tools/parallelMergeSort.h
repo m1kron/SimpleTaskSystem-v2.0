@@ -130,7 +130,7 @@ bool ParallelMergeSort( TContainer& container, ITaskSystem* system_interface )
 	const size_t MAX_RANGE = container.size() / ( size_t )( system_interface->GetWorkersCount() );
 
 	// 2. Prepare working space.
-	auto working_container = contaTContaineriner;
+	auto working_container = container;
 
 	// 3. Setup task.
 	TSortRange range{ &container, &working_container, 0, container.size(), MAX_RANGE };
