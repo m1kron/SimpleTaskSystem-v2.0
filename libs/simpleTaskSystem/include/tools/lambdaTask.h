@@ -1,6 +1,6 @@
 #pragma once
 #include "..\iTaskSystem.h"
-#include "..\..\..\commonLib\include\tools\existingBufferWrapper.h" //< HACK, but I will fix this later.
+#include "..\..\..\commonLib\include\tools\bufferWrapper.h" //< HACK, but I will fix this later.
 
 namespace sts
 {
@@ -37,7 +37,7 @@ void LambdaTaskFunction( const ITaskContext* context )
 
 	Temp temp;
 
-	ExistingBufferWrapperReader readBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+	BufferWrapperReader readBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 	readBuffer.Read( temp );
 
 	// Cast to functor type.
@@ -57,7 +57,7 @@ const ITaskHandle* LambdaTaskMaker( const TLambda& funtor, ITaskSystem* system_i
 		{
 			task_handle->SetTaskFunction( &LambdaTaskFunction< TLambda > );
 
-			ExistingBufferWrapperWriter writeBuffer( task_handle->GetTaskStorage(), task_handle->GetTaskStorageSize() );
+			BufferWrapperWriter writeBuffer( task_handle->GetTaskStorage(), task_handle->GetTaskStorageSize() );
 			writeBuffer.Write( funtor );
 
 			return task_handle;

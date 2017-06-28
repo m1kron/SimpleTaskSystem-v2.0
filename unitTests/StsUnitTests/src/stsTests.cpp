@@ -3,7 +3,7 @@
 #include "..\..\libs\simpleTaskSystem\include\globalApi.h"
 #include "..\..\libs\simpleTaskSystem\include\tools\taskBatch.h"
 #include "..\..\libs\simpleTaskSystem\include\tools\lambdaTask.h"
-#include "..\..\libs\commonLib\include\tools\existingBufferWrapper.h"
+#include "..\..\libs\commonLib\include\tools\bufferWrapper.h"
 #include "..\..\libs\commonLib\include\timer\timerMacros.h"
 #include "..\..\libs\basicThreadingLib\include\atomic\atomic.h"
 #include "..\..\libs\basicThreadingLib\include\thread\thisThreadHelpers.h"
@@ -64,7 +64,7 @@ namespace helpers
 		for( int i = 0; i < 10000000; ++i )
 			sum += ( i % 5 ) / 2;
 
-		ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+		BufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writeBuffer.Write( sum );
 	}
 
@@ -75,7 +75,7 @@ namespace helpers
 		for( int i = 0; i < 100000; ++i )
 			sum += ( i % 5 ) / 2;
 
-		ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+		BufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writeBuffer.Write( sum );
 	}
 
@@ -108,7 +108,7 @@ namespace helpers
 
 		if( ok )
 		{
-			ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+			BufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 			writeBuffer.Write( SOME_CONST );
 		}
 	}
@@ -130,7 +130,7 @@ namespace helpers
 		int my_index = -1;
 
 		// Read needed parameters.
-		ExistingBufferWrapperReader reader( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+		BufferWrapperReader reader( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		reader.Read( array_ptr );
 		reader.Read( my_index );
 
@@ -147,7 +147,7 @@ namespace helpers
 		std::array<int, 200>* array_ptr = nullptr;
 
 		// Read the array.
-		ExistingBufferWrapperReader reader( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+		BufferWrapperReader reader( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		reader.Read( array_ptr );
 
 		// Calculate sum.
@@ -158,7 +158,7 @@ namespace helpers
 		}
 
 		// Write result.
-		ExistingBufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+		BufferWrapperWriter writeBuffer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writeBuffer.Write( sum );
 	}
 
@@ -166,7 +166,7 @@ namespace helpers
 	template< typename T >
 	T ReadFromTask( const sts::ITaskHandle* handle )
 	{
-		ExistingBufferWrapperReader reader( handle->GetTaskStorage(), handle->GetTaskStorageSize() );
+		BufferWrapperReader reader( handle->GetTaskStorage(), handle->GetTaskStorageSize() );
 		T val;
 		reader.Read( val );
 		return val;
@@ -176,7 +176,7 @@ namespace helpers
 	template< typename T >
 	void WriteToTask( const sts::ITaskHandle* handle, const T& val )
 	{
-		ExistingBufferWrapperWriter writeBuffer( handle->GetTaskStorage(), handle->GetTaskStorageSize() );
+		BufferWrapperWriter writeBuffer( handle->GetTaskStorage(), handle->GetTaskStorageSize() );
 		writeBuffer.Write( val );
 	}
 }
@@ -317,7 +317,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 				int calculated_item = helpers::CalculateItem( item );
 
 				// Store item in data task data storage.
-				ExistingBufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+				BufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 				writer.Write( calculated_item );
 
 			}; ///< end of child_lambda_functor
@@ -347,7 +347,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 
 		// Write final sum:
 		// NOTE: I am aware that I am overriding lambda here, but i am not going to touch any ot its stuff anymore..
-		ExistingBufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+		BufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 		writer.Write( final_sum );
 
 	}; ///< end of root_lambda
@@ -404,7 +404,7 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 				final_sum += sum;
 			}	
 	
-			ExistingBufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
+			BufferWrapperWriter writer( context->GetThisTaskStorage(), context->GetThisTaskStorageSize() );
 			writer.Write( final_sum );
 		}; //< end of functor
 		////////////////////////////////////////////////////////////////////

@@ -30,9 +30,6 @@
     <ClInclude Include="include\types.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\tools\existingBufferWrapper.h">
-      <Filter>include\tools</Filter>
-    </ClInclude>
     <ClInclude Include="include\tools\print.h">
       <Filter>include\tools</Filter>
     </ClInclude>
@@ -49,6 +46,9 @@
       <Filter>include\compileTimeTools</Filter>
     </ClInclude>
     <ClInclude Include="include\tools\assertHandler.h">
+      <Filter>include\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tools\bufferWrapper.h">
       <Filter>include\tools</Filter>
     </ClInclude>
   </ItemGroup>

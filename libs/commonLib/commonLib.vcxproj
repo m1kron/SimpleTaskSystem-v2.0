@@ -24,7 +24,7 @@
     <ClInclude Include="include\timer\highResolutionTimer.h" />
     <ClInclude Include="include\timer\timerMacros.h" />
     <ClInclude Include="include\tools\assertHandler.h" />
-    <ClInclude Include="include\tools\existingBufferWrapper.h" />
+    <ClInclude Include="include\tools\bufferWrapper.h" />
     <ClInclude Include="include\tools\print.h" />
     <ClInclude Include="include\tools\tools.h" />
     <ClInclude Include="include\types.h" />
