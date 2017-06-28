@@ -48,9 +48,6 @@
     <ClInclude Include="include\tools\assertHandler.h">
       <Filter>include\tools</Filter>
     </ClInclude>
-    <ClInclude Include="include\tools\bufferWrapper.h">
-      <Filter>include\tools</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\tools\print.cpp">
