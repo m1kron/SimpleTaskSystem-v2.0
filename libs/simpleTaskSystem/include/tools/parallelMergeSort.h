@@ -135,11 +135,18 @@ bool ParallelMergeSort( TContainer& container, ITaskSystem* system_interface )
 	// 3. Setup task.
 	TSortRange range{ &container, &working_container, 0, container.size(), MAX_RANGE };
 	auto handle = system_interface->CreateNewTask( sts_helpers::MergeSortTaskFunction< TContainer >, nullptr );
+
+	if( !handle )
+		return false;
+
 	TaskStorageWriter( handle ).WriteSafe( range );
 
 	// 4. Submit and wait until done.
-	system_interface->SubmitTask( handle );
-	system_interface->RunTasksUsingThisThreadUntil( [ handle ]() { return handle->IsFinished(); } );
+	if( !system_interface->SubmitTask( handle ) )
+		return false;
+	if( !system_interface->RunTasksUsingThisThreadUntil( [ handle ]() { return handle->IsFinished(); } ) )
+		return false;
+
 	auto final_range = TaskStorageReader( handle ).Read< TSortRange >();
 	system_interface->ReleaseTask( handle );
 

@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include "..\iTaskSystem.h"
 #include "taskBatch.h"
 #include "lambdaTask.h"
@@ -16,10 +15,10 @@ namespace tools
 // [NOTE]: this is very simple implementation of parallelFor ( it assumes it takes similar time to process each iterator ).
 // Better implementation would keep spliting range until very small one and execute them. 
 template< class Iterator, typename Functor >
-bool ParallelForEachUsingTasks( const Iterator& begin,			//< Begin iterator
-								const Iterator& end,			//< End iterator
-								const Functor& functor,			//< functor will called on every iterator between begin and end.
-								ITaskSystem* system_interface );	//< task system interface instance that will be used to deliver task functionality.
+bool ParallelForEach(	const Iterator& begin,				//< Begin iterator
+						const Iterator& end,				//< End iterator
+						const Functor& functor,				//< functor will called on every iterator between begin and end.
+						ITaskSystem* system_interface );	//< task system interface instance that will be used to deliver task functionality.
 
 //////////////////////////////////////////////////////////////////////////
 //
