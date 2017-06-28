@@ -75,6 +75,9 @@
     <ClCompile Include="src\task\taskContext.cpp" />
     <ClCompile Include="src\task\taskHandle.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{391E031B-8570-4BFE-9BE2-4CF390A836D3}</ProjectGuid>
     <RootNamespace>ThreadLib</RootNamespace>

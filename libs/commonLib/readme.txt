@@ -1,8 +1,8 @@
 
 //////////////////////////////////////
-//									//
-//	commonLib - COMMON LIBRARY		//
-//									//
+//                                  //
+//  commonLib - COMMON LIBRARY      //
+//                                  //
 //////////////////////////////////////
 
 This lib contains some common stuff used by others projects ( like assert etc ).

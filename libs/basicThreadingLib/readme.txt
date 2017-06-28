@@ -1,8 +1,8 @@
 
 //////////////////////////////////////////////
-//											//
-//		BSL - BASIC THREADING LIBRARY		//
-//											//
+//                                          //
+//      BSL - BASIC THREADING LIBRARY       //
+//                                          //
 //////////////////////////////////////////////
 
 This library contains implementation of basic threading stuff - including thread implementation
