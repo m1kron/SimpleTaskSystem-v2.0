@@ -25,15 +25,21 @@ bool TaskWorkerInstance::Initalize( const TaskWorkerInstanceContext& context )
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-bool TaskWorkerInstance::ConvertToFiber()
+bool TaskWorkerInstance::ConvertToWorkerInstance()
 {
-	if( IsConvertedToFiber() )
+	if( IsConvertedToWorkerInstance() )
 	{
 		ASSERT( false );
 		return false; //< Already converted to fiber!!
 	}
 
-	m_thisFiberID = btl::this_fiber::ConvertThreadToFiber();
+	if( !btl::this_fiber::IsThreadConvertedToFiber() )
+	{
+		btl::this_fiber::ConvertThreadToFiber(); //< Conver to fiber only if thread is not already converted ( e.g. user can also use  fibers! );
+		m_convertedToFiberByThisWorkerInstance = true;
+	}
+
+	m_thisFiberID = btl::this_fiber::GetFiberID();
 	SetupFiber( m_currentFiber );
 	m_convertedThreadID = btl::this_thread::GetThreadID();
 	m_convertedFlag.Store( 1, btl::MemoryOrder::Release );
@@ -41,15 +47,17 @@ bool TaskWorkerInstance::ConvertToFiber()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-bool TaskWorkerInstance::ConvertToThread()
+bool TaskWorkerInstance::ConvertToNormalThread()
 {
-	if( !IsConvertedToFiber() )
+	if( !IsConvertedToWorkerInstance() )
 	{
 		ASSERT( false );
 		return false; //< Was not coverted to fiber!!
 	}
 
-	btl::this_fiber::ConvertFiberToThread();
+	if ( m_convertedToFiberByThisWorkerInstance )
+		btl::this_fiber::ConvertFiberToThread(); // Convert to thread only if this instance has converted this thread.
+
 	m_thisFiberID = INVALID_FIBER_ID;
 	m_convertedThreadID = INVALID_THREAD_ID;
 	m_convertedFlag.Store( 0, btl::MemoryOrder::Release );

@@ -146,7 +146,7 @@ TaskWorkerInstance* Dispatcher::FindWorkerInstanceWithThreadID( btl::THREAD_ID t
 
 	// 2. Chcek not alwyas converted instances:
 	for( auto instance : m_helpersInstances )
-		if( instance->IsConvertedToFiber() && instance->GetThreadID() == thread_id )
+		if( instance->IsConvertedToWorkerInstance() && instance->GetThreadID() == thread_id )
 			return instance;
 
 	return nullptr;

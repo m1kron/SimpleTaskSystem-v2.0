@@ -8,13 +8,13 @@ NAMESPACE_STS_BEGIN
 ///////////////////////////////////////////////////////////
 void TaskWorkerThread::ThreadFunction()
 {
-	VERIFY_SUCCESS( m_workerInstance.ConvertToFiber() );
+	VERIFY_SUCCESS( m_workerInstance.ConvertToWorkerInstance() );
 	THREAD_LOG( "Starting main loop." );
 
 	MainWorkerThreadLoop();
 
 	THREAD_LOG( "Main loop ended." );
-	VERIFY_SUCCESS( m_workerInstance.ConvertToThread() );
+	VERIFY_SUCCESS( m_workerInstance.ConvertToNormalThread() );
 	VERIFY_SUCCESS( m_workerInstance.Deinitalize() );
 }
 

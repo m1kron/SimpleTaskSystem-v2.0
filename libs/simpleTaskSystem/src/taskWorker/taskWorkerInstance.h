@@ -24,14 +24,14 @@ public:
 	// Initlalizes. Returns true if success.
 	bool Deinitalize();
 
-	// Converts thread to fiber. Returns true if success.
-	bool ConvertToFiber();
+	// Converts thread to worker instance. Returns true if success.
+	bool ConvertToWorkerInstance();
 
-	// Returns true if thread is already converted to fiber.
-	bool IsConvertedToFiber() const;
+	// Returns true if thread is already converted to worker instance.
+	bool IsConvertedToWorkerInstance() const;
 
-	// Converts fiber back to thread. Returns true if success.
-	bool ConvertToThread();
+	// Converts worker instance back to thread. Returns true if success.
+	bool ConvertToNormalThread();
 
 	// Adds task to pending execution queue. Returns true if success.
 	bool AddTask( Task* task );
@@ -45,6 +45,9 @@ public:
 
 	// Returns this instance id.
 	uint32_t GetInstanceID() const;
+
+	// Returns true if this instance has a work to do ( pending tasks or suspended fibers ).
+	bool HasWorkToDo() const;
 
 	// Flushes all pending and suspened tasks by moving them to other worker instances.
 	void FlushAllPendingAndSuspendedTasks();
@@ -99,6 +102,7 @@ private:
 	LockBasedPtrQueue< Task, TASK_POOL_SIZE > m_pendingTaskQueue;
 	TaskWorkerInstanceContext m_context;
 	TaskFiber* m_currentFiber;
+	bool m_convertedToFiberByThisWorkerInstance;
 	btl::Atomic< uint32_t > m_convertedFlag;
 	btl::FIBER_ID m_thisFiberID;
 	btl::THREAD_ID m_convertedThreadID;
@@ -115,6 +119,7 @@ inline TaskWorkerInstance::TaskWorkerInstance()
 	: m_currentFiber( nullptr )
 	, m_thisFiberID( INVALID_FIBER_ID )
 	, m_convertedThreadID( INVALID_THREAD_ID )
+	, m_convertedToFiberByThisWorkerInstance( false )
 {
 }
 
@@ -131,7 +136,7 @@ inline bool TaskWorkerInstance::Deinitalize()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-inline bool TaskWorkerInstance::IsConvertedToFiber() const
+inline bool TaskWorkerInstance::IsConvertedToWorkerInstance() const
 {
 	auto val = m_convertedFlag.Load( btl::MemoryOrder::Acquire );
 	return val == 1 && m_thisFiberID != INVALID_FIBER_ID;
@@ -153,6 +158,12 @@ inline btl::THREAD_ID TaskWorkerInstance::GetThreadID() const
 inline uint32_t TaskWorkerInstance::GetInstanceID() const
 {
 	return m_context.m_id;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+inline bool TaskWorkerInstance::HasWorkToDo() const
+{
+	return m_suspendedTaskFibers.GetCurrentSize() > 0 || m_pendingTaskQueue.GetCurrentSize() > 0;
 }
 
 NAMESPACE_STS_END

@@ -56,7 +56,7 @@ void FrontendTaskSystem::TryToRunOneTask()
 ////////////////////////////////////////////////////////////////////////////////////////////////
 bool FrontendTaskSystem::ConvertMainThreadToWorker()
 {
-	if( m_helperInstanceWorker.ConvertToFiber() )
+	if( m_helperInstanceWorker.ConvertToWorkerInstance() )
 	{
 		SYSTEM_LOG( "Converting main thread to helper worker instance." );
 		return true;
@@ -70,7 +70,7 @@ bool FrontendTaskSystem::ConvertMainThreadToWorker()
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void FrontendTaskSystem::ConvertWorkerToMainThread()
 {
-	VERIFY_SUCCESS( m_helperInstanceWorker.ConvertToThread() );
+	VERIFY_SUCCESS( m_helperInstanceWorker.ConvertToNormalThread() );
 	m_helperInstanceWorker.FlushAllPendingAndSuspendedTasks();
 	SYSTEM_LOG( "Converted from helper worker instance back to normal thread again." );
 }
