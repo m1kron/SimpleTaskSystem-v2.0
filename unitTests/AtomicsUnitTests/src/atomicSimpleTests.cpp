@@ -2,16 +2,6 @@
 #include "..\..\libs\basicThreadingLib\include\atomic\atomic.h"
 #include "..\..\libs\basicThreadingLib\include\thread\functorThread.h"
 
-
-//////////////////////////////////////////////////////////////////////
-TEST( STSCommonLib, CompileTimeUtilsTest )
-{
-	STATIC_ASSERT( IsPowerOf2<2048>::value == 1, "IsPowerOf2 does not work!" );
-	STATIC_ASSERT( IsPowerOf2<2049>::value == 0, "IsPowerOf2 does not work!" );
-	STATIC_ASSERT( IsPowerOf2<128>::value == 1, "IsPowerOf2 does not work!" );
-	STATIC_ASSERT( IsPowerOf2<130>::value == 0, "IsPowerOf2 does not work!" );
-}
-
 ////////////////////////////////////////////////////////////
 TEST( AtomicUnitTests, SimpleArithmeticTest )
 {
