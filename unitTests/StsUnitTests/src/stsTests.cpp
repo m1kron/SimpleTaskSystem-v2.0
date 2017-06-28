@@ -438,7 +438,7 @@ TEST( STSTest, FlushingSuspendedTasks )
 	{
 		sts::tools::TaskBatch_AutoRelease batch( system_interface );
 
-		for( int i = 0; i < 128; ++i )
+		for( int i = 0; i < 64; ++i )
 		{
 			auto lambda = [&fence ]( const sts::ITaskContext* context )
 			{
