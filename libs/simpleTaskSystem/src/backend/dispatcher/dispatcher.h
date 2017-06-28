@@ -26,6 +26,12 @@ public:
 	// Primary instance is alway available and dispatcher can count on that.
 	uint32_t Register( TaskWorkerInstance* instance, bool primary_instance );
 
+	// Sets function to weak up primary worker threads. OK, this is kind of hack:
+	// my idea was that there is sth like worker instance and this dispatcher only bothers about that.
+	// Worker instance can work on dedicated thread or on any thread that can be transfomed to worker instacnce.
+	// Unfourtanetly, dedicted threads have to be weak up, otherwise they won't start process work. 
+	void SetWakeUpAllPrimaryWorkersFunction( const std::function< void() >& wakeUpAll );
+
 	// Unregisters all instances.
 	void UnregisterAll();
 
@@ -44,6 +50,9 @@ public:
 private:
 	friend class TaskWorkerInstance;
 
+	// Wakes up all primary worker instances.
+	void WakeUpAllPrimaryWorkerInstances();
+
 	// Dispatches task to primary intances only.
 	bool DispatchTaskToPrimaryInstances( Task* task );
 
@@ -57,6 +66,7 @@ private:
 	std::vector< TaskWorkerInstance* > m_helpersInstances;
 	std::vector< TaskWorkerInstance* > m_primaryInstances;
 	std::vector< TaskWorkerInstance* > m_allRegisteredInstances;
+	std::function< void() > m_wakeUpAllPrimaryWorkerInstancesFunc;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -79,6 +89,18 @@ inline Dispatcher::~Dispatcher()
 inline uint32_t Dispatcher::GetRegisteredInstancesCount() const
 {
 	return ( uint32_t )m_allRegisteredInstances.size();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+inline void Dispatcher::SetWakeUpAllPrimaryWorkersFunction( const std::function<void()>& wakeUpAll )
+{
+	m_wakeUpAllPrimaryWorkerInstancesFunc = wakeUpAll;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+inline void Dispatcher::WakeUpAllPrimaryWorkerInstances()
+{
+	m_wakeUpAllPrimaryWorkerInstancesFunc();
 }
 
 NAMESPACE_STS_END

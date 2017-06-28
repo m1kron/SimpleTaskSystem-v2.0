@@ -7,7 +7,7 @@
 
 NAMESPACE_STS_BEGIN
 
-#define DISPATCHER_LOG( ... ) LOG( "[DISPATCHER]: " __VA_ARGS__ );
+#define DISPATCHER_LOG( ... ) //LOG( "[DISPATCHER]: " __VA_ARGS__ );
 
 /////////////////////////////////////////////////////////////////////////////
 uint32_t Dispatcher::Register( TaskWorkerInstance* instance, bool primary_instance )
@@ -44,6 +44,7 @@ bool Dispatcher::DispatchTask( Task* task )
 		if( instance->AddTask( task ) )
 		{
 			DISPATCHER_LOG( "DispatchTask() called from worker instance with %i, added task< %i > to that instance.", instance->GetInstanceID(), task->GetTaskID() );
+			WakeUpAllPrimaryWorkerInstances();
 			return true;
 		}
 		else
@@ -81,6 +82,7 @@ bool Dispatcher::RedispatchSuspendedTaskFiber( TaskFiber* suspended_task_fiber )
 		if( instance->TakeOwnershipOfSuspendedTaskFiber( suspended_task_fiber ) )
 		{
 			DISPATCHER_LOG( "Suspended task fiber with task< %i > was added to worker instance %i.", taskID, instance->GetInstanceID() );
+			WakeUpAllPrimaryWorkerInstances();
 			return true;
 		}
 	}
@@ -104,6 +106,7 @@ bool Dispatcher::DispatchTaskToPrimaryInstances( Task* task )
 		if( instance->AddTask( task ) )
 		{
 			DISPATCHER_LOG( "Added task< %i > to worker instance %i.", task->GetTaskID(), instance->GetInstanceID() );
+			WakeUpAllPrimaryWorkerInstances();
 			return true; // Finally, task has been added.
 		}
 	}

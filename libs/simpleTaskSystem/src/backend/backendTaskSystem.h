@@ -38,7 +38,7 @@ public:
 
 private:
 	// Wake ups all worker threads;
-	void WakeUpAllWorkers() const;
+	void WakeUpAllWorkerThreads() const;
 
 	TaskWorkersPool			m_workerThreadsPool;
 	TaskFiberAllocator		m_taskFiberAllocator;

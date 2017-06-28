@@ -15,6 +15,8 @@ bool BackendTaskSystem::Initialize( TaskWorkerInstance& helper_instance, ITaskSy
 
 	SYSTEM_LOG( "Initalizing with %i worker threads.", num_cores );
 
+	m_dispatcher.SetWakeUpAllPrimaryWorkersFunction( [ this ]() { WakeUpAllWorkerThreads(); } );
+
 	// Init main worker instance.
 	auto idx = m_dispatcher.Register( &helper_instance, false );
 	VERIFY_SUCCESS( helper_instance.Initalize( { system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
@@ -59,30 +61,20 @@ bool BackendTaskSystem::SubmitTask( const ITaskHandle* task_handle )
 	ASSERT( handle );
 
 	auto task = handle->GetTask();
-
 	if( task->IsReadyToBeExecuted() )
-	{
-		if( m_dispatcher.DispatchTask( task ) )
-			WakeUpAllWorkers();
-		else
-			return false; // < task is ready to be executed, but dispatcher has failed to dispatch it.
-	}
+		return m_dispatcher.DispatchTask( task );
 	else
-	{
 		SYSTEM_LOG( "Task< %i > is not ready to be executed now, will be added and executed later.", task->GetTaskID() );
-	}
 	
 	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-void BackendTaskSystem::WakeUpAllWorkers() const
+void BackendTaskSystem::WakeUpAllWorkerThreads() const
 {
 	uint32_t workers_count = GetWorkersCount();
 	for( uint32_t worker_id = 0; worker_id < workers_count; ++worker_id )
-	{
 		m_workerThreadsPool.GetWorkerAt( worker_id )->WakeUp();
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
