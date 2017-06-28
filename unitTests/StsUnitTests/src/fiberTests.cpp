@@ -63,7 +63,11 @@ TEST( FiberTests, FiberSwitching )
 			fibers[ i - 1 ]->m_nextFiber = fiber;
 	}
 
+	ASSERT_FALSE( btl::this_fiber::IsThreadConvertedToFiber() );
+
 	btl::FIBER_ID thisThreadFiberID = btl::this_fiber::ConvertThreadToFiber();
+
+	ASSERT_TRUE( btl::this_fiber::IsThreadConvertedToFiber() );
 
 	helpers::TestFiber* first = fibers[ 0 ];
 	first->m_prevID = thisThreadFiberID;
@@ -80,4 +84,8 @@ TEST( FiberTests, FiberSwitching )
 		delete fiber;
 
 	fibers.clear();
+
+	auto bla = btl::this_fiber::GetFiberID();
+
+	ASSERT_FALSE( btl::this_fiber::IsThreadConvertedToFiber() );
 }
