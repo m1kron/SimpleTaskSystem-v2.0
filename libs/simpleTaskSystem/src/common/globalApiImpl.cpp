@@ -28,6 +28,8 @@ STS_API void DestroyTaskSystem( sts::ITaskSystem* system )
 
 	ASSERT( backend );
 
+	frontend->~FrontendTaskSystem();
+	backend->~BackendTaskSystem();
 	_aligned_free( frontend );
 	_aligned_free( backend );
 }
