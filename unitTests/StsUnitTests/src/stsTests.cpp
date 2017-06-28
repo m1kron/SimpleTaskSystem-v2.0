@@ -7,6 +7,7 @@
 #include "..\..\libs\commonLib\include\timer\timerMacros.h"
 #include "..\..\libs\basicThreadingLib\include\atomic\atomic.h"
 #include "..\..\libs\basicThreadingLib\include\thread\thisThreadHelpers.h"
+#include "..\..\libs\commonLib\include\tools\print.h"
 
 namespace helpers
 {
@@ -482,17 +483,17 @@ TEST(STSTest, StaticTaskTreeTest)
 ///////////////////////////////////////////////////////////////////
 TEST( STSTest, FlushingSuspendedTasks )
 {
-	btl::Atomic< int > atomic;
+	btl::Atomic< int > fence;
 
 	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
 		sts::tools::TaskBatch_AutoRelease batch( system_interface );
 
-		for( int i = 0; i < 20; ++i )
+		for( int i = 0; i < 128; ++i )
 		{
-			auto lambda = [&atomic]( const sts::ITaskContext* context )
+			auto lambda = [&fence ]( const sts::ITaskContext* context )
 			{
-				context->WaitFor( [ &atomic ]() { return atomic.Load( btl::MemoryOrder::Acquire ) == 1; } );
+				context->WaitFor( [ &fence ]() { return fence.Load( btl::MemoryOrder::Acquire ) == 1; } );
 			};
 
 			auto handle = sts::tools::LambdaTaskMaker( lambda, system_interface, nullptr );
@@ -505,10 +506,8 @@ TEST( STSTest, FlushingSuspendedTasks )
 		ASSERT_TRUE( batch.SubmitAll() );
 		system_interface->RunTasksUsingThisThreadUntil( [ &timer ]() { return timer.ElapsedTimeInSeconds() > 1.0; } );
 
-		atomic.Store( 1, btl::MemoryOrder::Release );
-
+		fence.Store( 1, btl::MemoryOrder::Release );
 		btl::this_thread::SleepFor( 1000 );
-
-		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished();  } );
 	}
 }
