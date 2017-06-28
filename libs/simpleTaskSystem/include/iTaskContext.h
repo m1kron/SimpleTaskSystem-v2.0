@@ -18,8 +18,8 @@ public:
 	// Returns pointer to the storage - see information on TaskHandle::GetTaskStorage().
 	virtual void* GetThisTaskStorage() const = 0;
 
-	// Wait until given condition is satisfied, blocks exeution of this task.
-	template< class TCondtion > void WaitFor( const TCondtion& condition ) const;
+	// Suspends a task represented by this context until given condition is satisfied.
+	template< class TCondtion > void SuspendUntil( const TCondtion& condition ) const;
 
 protected:
 	// Called when condition is not yet satisfied.
@@ -35,7 +35,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////
 
 template<class TCondtion>
-inline void ITaskContext::WaitFor( const TCondtion& condition ) const
+inline void ITaskContext::SuspendUntil( const TCondtion& condition ) const
 {
 	while( !condition() )
 		SuspendExecution();

@@ -94,7 +94,7 @@ namespace helpers
 
 		batch.SubmitAll();
 
-		context->WaitFor( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+		context->SuspendUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 
 		bool ok = true;
 		for( auto task_handle : batch )
@@ -331,7 +331,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 		bool submitted = batch.SubmitAll();
 
 		// Wait until whole batch is done.
-		context->WaitFor( [ &batch ] { return batch.AreAllTaskFinished(); } );
+		context->SuspendUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 
 		// Get results from child tasks and calculate final sum:
 		int final_sum = 0;
@@ -395,7 +395,7 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 	
 			bool submitted = batch.SubmitAll();
 	
-			context->WaitFor( [ &batch ] { return batch.AreAllTaskFinished(); } );
+			context->SuspendUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 	
 			int final_sum = 0;
 			for( auto handle : batch )
@@ -493,7 +493,7 @@ TEST( STSTest, FlushingSuspendedTasks )
 		{
 			auto lambda = [&fence ]( const sts::ITaskContext* context )
 			{
-				context->WaitFor( [ &fence ]() { return fence.Load( btl::MemoryOrder::Acquire ) == 1; } );
+				context->SuspendUntil( [ &fence ]() { return fence.Load( btl::MemoryOrder::Acquire ) == 1; } );
 			};
 
 			auto handle = sts::tools::LambdaTaskMaker( lambda, system_interface, nullptr );
