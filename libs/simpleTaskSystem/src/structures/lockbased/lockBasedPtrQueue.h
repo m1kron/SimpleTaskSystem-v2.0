@@ -36,6 +36,9 @@ private:
 	// Helper function to calculate modulo SIZE of the queue from counter.
 	uint32_t CounterToIndex( uint32_t counter ) const;
 
+	// Returns size of the queue. This is not thread safe.
+	uint32_t GetCurrentSize_NotThreadSafe() const;
+
 	// -----------------------------------------
 	typedef btl::LockGuard< TLockPrimitive > TLockGuard;
 
@@ -79,7 +82,7 @@ template < class T, uint32_t SIZE, class TLockPrimitive >
 inline T* LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PopFront()
 {
 	TLockGuard guard( m_lock );
-	if( m_readCounter < m_writeCounter )
+	if( GetCurrentSize_NotThreadSafe() > 0 )
 		return m_queue[ CounterToIndex( m_readCounter++ ) ];
 
 	return nullptr;
@@ -90,7 +93,7 @@ template < class T, uint32_t SIZE, class TLockPrimitive >
 inline T* LockBasedPtrQueue<T, SIZE, TLockPrimitive>::PopBack()
 {
 	TLockGuard guard( m_lock );
-	if ( m_writeCounter > m_readCounter )
+	if ( GetCurrentSize_NotThreadSafe() > 0 )
 		return m_queue[ CounterToIndex( --m_writeCounter ) ];
 
 	return nullptr;
@@ -101,7 +104,7 @@ template < class T, uint32_t SIZE, class TLockPrimitive >
 inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::GetCurrentSize() const
 {
 	TLockGuard guard( m_lock );
-	return m_writeCounter - m_readCounter;
+	return GetCurrentSize_NotThreadSafe();
 }
 
 //////////////////////////////////////////////////////////////
@@ -111,10 +114,18 @@ inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::GetMaxSize() const
 	return SIZE;
 }
 
+//////////////////////////////////////////////////////////////
 template < class T, uint32_t SIZE, class TLockPrimitive >
 inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::CounterToIndex( uint32_t counter ) const
 {
 	return counter & ( SIZE - 1 );
+}
+
+//////////////////////////////////////////////////////////////
+template<class T, uint32_t SIZE, class TLockPrimitive>
+inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::GetCurrentSize_NotThreadSafe() const
+{
+	return m_writeCounter - m_readCounter;
 }
 
 NAMESPACE_STS_END
