@@ -126,6 +126,15 @@
     <ClInclude Include="src\backend\backendTaskSystem.h">
       <Filter>src\backend</Filter>
     </ClInclude>
+    <ClInclude Include="include\tools\bufferWrapper.h">
+      <Filter>include\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tools\parallelMergeSort.h">
+      <Filter>include\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tools\taskStorageBuffer.h">
+      <Filter>include\tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">

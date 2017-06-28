@@ -29,9 +29,12 @@
     <ClInclude Include="include\iTaskHandle.h" />
     <ClInclude Include="include\iTaskSystem.h" />
     <ClInclude Include="include\stsExportApi.h" />
+    <ClInclude Include="include\tools\bufferWrapper.h" />
     <ClInclude Include="include\tools\lambdaTask.h" />
     <ClInclude Include="include\tools\parallelFor.h" />
+    <ClInclude Include="include\tools\parallelMergeSort.h" />
     <ClInclude Include="include\tools\taskBatch.h" />
+    <ClInclude Include="include\tools\taskStorageBuffer.h" />
     <ClInclude Include="src\backend\backendTaskSystem.h" />
     <ClInclude Include="src\backend\dispatcher\dispatcher.h" />
     <ClInclude Include="src\common\common.h" />
