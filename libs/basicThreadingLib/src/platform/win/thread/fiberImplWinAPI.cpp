@@ -2,6 +2,11 @@
 #include "..\..\..\..\include\thread\fiber.h"
 #include "..\..\..\..\..\commonLib\include\macros.h"
 
+#define HANDLE_WIN_ERROR()							\
+		auto error = ::GetLastError();				\
+		LOG( "[WIN_API_ERROR]: %i", error );		\
+		ASSERT( false );
+
 NAMESPACE_BTL_BEGIN
 NAMESPACE_PLATFORM_API_BEGIN
 
@@ -22,11 +27,7 @@ bool ConvertFiberToThread()
 {
 	auto ret = ::ConvertFiberToThread();
 
-	if( !ret )
-	{
-		auto error = ::GetLastError();
-		ASSERT( false );
-	}
+	if( !ret ) { HANDLE_WIN_ERROR(); }
 
 	return ret;
 }
@@ -36,13 +37,19 @@ FIBER_ID ConvertThreadToFiber( void* params )
 {
 	auto id = ::ConvertThreadToFiber( params );
 
-	if( id == INVALID_FIBER_ID )
-	{
-		auto error = ::GetLastError();
-		ASSERT( false );
-	}
-
+	if( id == INVALID_FIBER_ID ) { HANDLE_WIN_ERROR(); }
 	return id;
+}
+
+//////////////////////////////////////////////////////
+bool IsThreadConvertedToFiber()
+{
+	// This is not documented on MSDN, but seems to be working.
+	// More info: http://crystalclearsoftware.com/soc/coroutine/coroutine/fibers.html
+	static const FIBER_ID MAGIC_FIBER_CONSTANT = ( FIBER_ID )0x1E00;
+	
+	auto ret = ::GetCurrentFiber();
+	return (ret != MAGIC_FIBER_CONSTANT) && (ret != INVALID_FIBER_ID);
 }
 
 //////////////////////////////////////////////////////
@@ -74,7 +81,8 @@ FiberImpl::~FiberImpl()
 void FiberImpl::CreateFiber( FiberBase* fiber, uint32_t stackSize )
 {
 	m_id = ::CreateFiber( stackSize, FiberFunction, fiber );
-	ASSERT( m_id != INVALID_FIBER_ID );
+
+	if( m_id == INVALID_FIBER_ID ) { HANDLE_WIN_ERROR(); }
 }
 
 ///////////////////////////////////////////////////

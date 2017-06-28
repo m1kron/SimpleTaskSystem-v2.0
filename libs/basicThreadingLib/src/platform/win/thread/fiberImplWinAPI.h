@@ -17,6 +17,7 @@ void SwitchToFiber( FIBER_ID );
 FIBER_ID GetCurrentFiberID();
 bool ConvertFiberToThread();
 FIBER_ID ConvertThreadToFiber( void* params );
+bool IsThreadConvertedToFiber();
 
 ////////////////////////////////////////////////////
 class FiberImpl

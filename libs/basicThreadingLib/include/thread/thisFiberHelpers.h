@@ -22,6 +22,9 @@ bool ConvertFiberToThread();
 // Convert thread to fibers( allows to switch to another fiber ).
 FIBER_ID ConvertThreadToFiber( void* params = nullptr );
 
+// Returns true if thread is already converted to fiber.
+bool IsThreadConvertedToFiber();
+
 ////////////////////////////////////////////////////////////////////////
 //
 // IMPLEMENTATION:
@@ -50,6 +53,12 @@ inline bool ConvertFiberToThread()
 inline FIBER_ID ConvertThreadToFiber( void* params )
 {
 	return PlatformAPI::ConvertThreadToFiber( params );
+}
+
+///////////////////////////////////////////////////////////
+inline bool IsThreadConvertedToFiber()
+{
+	return PlatformAPI::IsThreadConvertedToFiber();
 }
 
 }
