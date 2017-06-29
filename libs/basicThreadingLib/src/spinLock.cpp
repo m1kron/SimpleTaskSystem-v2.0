@@ -16,7 +16,7 @@ SpinLock::~SpinLock()
 //////////////////////////////////////////////////////////////////
 void SpinLock::Lock()
 {
-	unsigned i = 0;
+	uint32_t i = 0;
 	while( true )
 	{
 		if( TryToLock() )

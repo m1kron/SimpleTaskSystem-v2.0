@@ -1,4 +1,5 @@
 #pragma once
+#include "sts_types.h"
 
 namespace sts
 {
@@ -13,7 +14,7 @@ public:
 	virtual ITaskSystem* GetTaskSystem() const = 0;
 
 	// Returns size of task storage - see information on TaskHandle::GetTaskStorageSize().
-	virtual size_t GetThisTaskStorageSize() const = 0;
+	virtual uint32_t GetThisTaskStorageSize() const = 0;
 
 	// Returns pointer to the storage - see information on TaskHandle::GetTaskStorage().
 	virtual void* GetThisTaskStorage() const = 0;

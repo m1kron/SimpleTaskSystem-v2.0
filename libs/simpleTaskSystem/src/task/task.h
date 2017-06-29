@@ -17,7 +17,7 @@ public:
 
 	// Returns size of the storage of the task.
 	// TODO: constexpr..
-	static const size_t GetStorageSize();
+	static const uint32_t GetStorageSize();
 
 	// Main task function called by task worker.
 	void Run( ITaskContext* context );

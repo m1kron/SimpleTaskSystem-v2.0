@@ -29,6 +29,7 @@
     <ClInclude Include="include\iTaskHandle.h" />
     <ClInclude Include="include\iTaskSystem.h" />
     <ClInclude Include="include\stsExportApi.h" />
+    <ClInclude Include="include\sts_types.h" />
     <ClInclude Include="include\tools\bufferWrapper.h" />
     <ClInclude Include="include\tools\lambdaTask.h" />
     <ClInclude Include="include\tools\parallelFor.h" />

@@ -14,7 +14,7 @@ public:
 
 	// ITaskContext interface:
 	ITaskSystem* GetTaskSystem() const override;
-	size_t GetThisTaskStorageSize() const override;
+	uint32_t GetThisTaskStorageSize() const override;
 	void* GetThisTaskStorage() const override;
 	void SuspendExecution() const override;
 	// ---

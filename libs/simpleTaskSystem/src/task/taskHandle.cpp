@@ -26,7 +26,7 @@ bool TaskHandle::IsFinished() const
 }
 
 ///////////////////////////////////////////////////////////////////
-size_t TaskHandle::GetTaskStorageSize() const
+uint32_t TaskHandle::GetTaskStorageSize() const
 {
 	return m_task->GetStorageSize();
 }

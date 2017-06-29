@@ -16,7 +16,7 @@ Task::Task()
 }
 
 ///////////////////////////////////////////////////////
-const size_t Task::GetStorageSize()
+const uint32_t Task::GetStorageSize()
 {
 	return STORAGE_SIZE;
 }

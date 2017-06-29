@@ -22,7 +22,7 @@ FrontendTaskSystem::~FrontendTaskSystem()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-int FrontendTaskSystem::GetWorkersCount() const
+uint32_t FrontendTaskSystem::GetWorkersCount() const
 {
 	return m_backend->GetWorkersCount();
 }

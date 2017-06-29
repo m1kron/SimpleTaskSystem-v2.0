@@ -17,7 +17,7 @@ void YieldThread();
 THREAD_ID GetThreadID();
 
 // Sleeps on calling thread by specified amount of time in miliseconds.
-void SleepFor( unsigned miliseconds );
+void SleepFor( uint32_t miliseconds );
 
 ///////////////////////////////////////////////////////////
 //
@@ -38,7 +38,7 @@ inline THREAD_ID GetThreadID()
 }
 
 ///////////////////////////////////////////////////////////
-inline void SleepFor( unsigned miliseconds )
+inline void SleepFor( uint32_t miliseconds )
 {
 	PlatformAPI::SleepFor( miliseconds );
 }

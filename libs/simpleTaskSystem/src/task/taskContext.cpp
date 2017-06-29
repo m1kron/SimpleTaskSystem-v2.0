@@ -9,7 +9,7 @@ NAMESPACE_STS_BEGIN
 ITaskContext::~ITaskContext() {}
 
 //////////////////////////////////////////////////////
-size_t TaskContext::GetThisTaskStorageSize() const
+uint32_t TaskContext::GetThisTaskStorageSize() const
 {
 	return m_taskFiber->GetTask()->GetStorageSize();
 }

@@ -29,7 +29,7 @@ public:
 	void SetTaskFunction( TTaskFunctionPtr function ) const override;
 	void AddParent( const ITaskHandle* parentTaskHandle ) const override;
 	bool IsFinished() const override;
-	size_t GetTaskStorageSize() const override;
+	uint32_t GetTaskStorageSize() const override;
 	void* GetTaskStorage() const override;
 	// ---
 private:

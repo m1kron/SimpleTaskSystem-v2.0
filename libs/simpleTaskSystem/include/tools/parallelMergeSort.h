@@ -69,7 +69,7 @@ void MergeSortTaskFunction( const sts::ITaskContext* context )
 	// 2. If current range is less then max_range, use sequential sorting algorithm and return.
 	if( range.m_range <= range.m_maxRange )
 	{
-		std::sort( range.GetBeginIt(), range.GetEndIt(), std::less<int>() );
+		std::sort( range.GetBeginIt(), range.GetEndIt() );
 		range.m_levels++;
 		TaskStorageWriter( context ).WriteSafe( range );
 		return;
@@ -109,7 +109,7 @@ void MergeSortTaskFunction( const sts::ITaskContext* context )
 	context->GetTaskSystem()->ReleaseTask( right_range_task );
 
 	// 10. Merge two subranges into one. Subranges are always in child task's container and we are always merging them into child task's tempContainer.
-	std::merge( left_range.GetBeginIt(), left_range.GetEndIt(), right_range.GetBeginIt(), right_range.GetEndIt(), left_range.GetInserter(), std::less<int>() );
+	std::merge( left_range.GetBeginIt(), left_range.GetEndIt(), right_range.GetBeginIt(), right_range.GetEndIt(), left_range.GetInserter() );
 
 	// 10. Write final result - swap containers.
 	range.m_container = left_range.m_tempContainer;

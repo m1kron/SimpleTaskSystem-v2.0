@@ -15,7 +15,7 @@ public:
 	~FrontendTaskSystem();
 
 	// ITaskSystem interface:
-	int GetWorkersCount() const override;
+	uint32_t GetWorkersCount() const override;
 	const ITaskHandle* CreateNewTask( const ITaskHandle* parent_task_handle ) override;
 	bool SubmitTask( const ITaskHandle* task_handle ) override;
 	void ReleaseTask( const ITaskHandle* task_handle ) override;

@@ -30,7 +30,7 @@ public:
 	void Wait();
 
 	// Blocks thread until event is in signaled state or specified time in miliseconds has elapsed.
-	void WaitFor( unsigned miliseconds );
+	void WaitFor( uint32_t miliseconds );
 
 	// Returns platform native handle.
 	EVENT_NATIVE_HANDLE GetNativeHandle();
@@ -67,7 +67,7 @@ inline void ManualResetEvent::Wait()
 }
 
 ///////////////////////////////////////////////////////////s
-inline void ManualResetEvent::WaitFor( unsigned miliseconds )
+inline void ManualResetEvent::WaitFor( uint32_t miliseconds )
 {
 	__base::WaitFor( miliseconds );
 }

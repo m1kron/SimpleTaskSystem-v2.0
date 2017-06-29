@@ -3,12 +3,12 @@
 #include <windows.h>
 #include <stdio.h>
 
-void HandleAssert( const char* condition, const char* info, const char* file, int line )
+void HandleAssert( const char* condition, const char* info, const char* file, int32_t line )
 {
 	char buffer[ 2048 ];
 	PrintToBuffer( buffer, 2048, "Info: %s\nCondition: %s\nLine: %i\nFile: %s", info, condition, line, file );
 
-	int msgboxID = MessageBoxA(
+	int32_t msgboxID = MessageBoxA(
 		NULL,
 		buffer,
 		"ASSERTION FAILED!",

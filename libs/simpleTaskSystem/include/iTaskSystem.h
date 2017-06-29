@@ -10,7 +10,7 @@ class ITaskSystem
 public:
 
 	// Returns how many workers system has.
-	virtual int GetWorkersCount() const = 0;
+	virtual uint32_t GetWorkersCount() const = 0;
 
 	// Creates raw task, which has to be later submitted. 
 	virtual const ITaskHandle* CreateNewTask( const ITaskHandle* parent_task_handle ) = 0;

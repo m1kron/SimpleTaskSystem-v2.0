@@ -55,13 +55,13 @@ public:
 // Main template atomic implementation, 
 // selects base implementation for given size and platform.
 // Only specializations compiles.
-template < class T, int size = sizeof( T )>
+template < class T, uint32_t size = sizeof( T )>
 class Atomic
 {
 };
 
 // Specialization for 32 bit atomics.
-template < class T>
+template < class T >
 class Atomic< T, 4 > : public AtomicBase< T, PlatformAPI::Atomic32Impl >
 {
 };

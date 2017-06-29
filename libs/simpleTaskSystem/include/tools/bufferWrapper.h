@@ -1,5 +1,6 @@
 #pragma once
 #include <cstring>
+#include "..\sts_types.h"
 
 namespace sts
 {
@@ -11,26 +12,26 @@ namespace tools
 class BufferWrapperBase
 {
 public:
-	BufferWrapperBase( void* existing_buffer, size_t buffer_size );
+	BufferWrapperBase( void* existing_buffer, uint32_t buffer_size );
 
 	// Copies memory to buffer of given size. Returs true if success.
 	// If success, increases current offset from begining.
-	bool WriteToBuffer( const void* from_buffer, size_t size );
+	bool WriteToBuffer( const void* from_buffer, uint32_t size );
 
 	// Copies memory from buffer to out_to_buffer. Returs true if success.
 	// If success, increases current offset from begining.
-	bool ReadFromBuffer( void* out_to_buffer, size_t size );
+	bool ReadFromBuffer( void* out_to_buffer, uint32_t size );
 
 	// Get size of existing buffer.
-	size_t GetSize() const;
+	uint32_t GetSize() const;
 
 	// Returns size of currently stored data in existing buffer.
-	size_t GetCurrentOffset() const;
+	uint32_t GetCurrentOffset() const;
 
 private:
 	void* m_existingBuffer;
-	size_t m_bufferSize;
-	size_t m_currentOffset;
+	uint32_t m_bufferSize;
+	uint32_t m_currentOffset;
 };
 
 ////////////////////////////////////////////////////////////
@@ -38,7 +39,7 @@ private:
 class BufferWrapperWriter : private BufferWrapperBase
 {
 public:
-	BufferWrapperWriter( void* existing_buffer, size_t existing_buffer_size );
+	BufferWrapperWriter( void* existing_buffer, uint32_t existing_buffer_size );
 
 	// Writes data to buffer. Returns true if success.
 	template< typename T > bool WriteSafe( const T& data );
@@ -52,7 +53,7 @@ public:
 class BufferWrapperReader : private BufferWrapperBase
 {
 public:
-	BufferWrapperReader( void* existing_buffer, size_t existing_buffer_size );
+	BufferWrapperReader( void* existing_buffer, uint32_t existing_buffer_size );
 
 	// Read data from buffer. Returns true if success.
 	template< typename T > bool ReadSafe( T& out_data );
@@ -68,14 +69,14 @@ public:
 //////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////
-inline BufferWrapperBase::BufferWrapperBase( void* existing_buffer, size_t buffer_size )
+inline BufferWrapperBase::BufferWrapperBase( void* existing_buffer, uint32_t buffer_size )
 	: m_existingBuffer( existing_buffer )
 	, m_bufferSize( buffer_size )
 	, m_currentOffset( 0 )
 {}
 
 //////////////////////////////////////////////////////////
-inline bool BufferWrapperBase::WriteToBuffer( const void* from_buffer, size_t size )
+inline bool BufferWrapperBase::WriteToBuffer( const void* from_buffer, uint32_t size )
 {
 	if( m_currentOffset + size <= m_bufferSize )
 	{
@@ -88,7 +89,7 @@ inline bool BufferWrapperBase::WriteToBuffer( const void* from_buffer, size_t si
 }
 
 //////////////////////////////////////////////////////////
-inline bool BufferWrapperBase::ReadFromBuffer( void* out_to_buffer, size_t size )
+inline bool BufferWrapperBase::ReadFromBuffer( void* out_to_buffer, uint32_t size )
 {
 	if( m_currentOffset + size <= m_bufferSize )
 	{
@@ -101,13 +102,13 @@ inline bool BufferWrapperBase::ReadFromBuffer( void* out_to_buffer, size_t size 
 }
 
 /////////////////////////////////////////////////////////
-inline size_t BufferWrapperBase::GetSize() const
+inline uint32_t BufferWrapperBase::GetSize() const
 {
 	return m_bufferSize;
 }
 
 //////////////////////////////////////////////////////////
-inline size_t BufferWrapperBase::GetCurrentOffset() const
+inline uint32_t BufferWrapperBase::GetCurrentOffset() const
 {
 	return m_currentOffset;
 }
@@ -117,7 +118,7 @@ inline size_t BufferWrapperBase::GetCurrentOffset() const
 // BufferWrapperWriter INLINES:
 //
 //////////////////////////////////////////////////////////
-inline BufferWrapperWriter::BufferWrapperWriter( void* existing_buffer, size_t existing_buffer_size )
+inline BufferWrapperWriter::BufferWrapperWriter( void* existing_buffer, uint32_t existing_buffer_size )
 	: BufferWrapperBase( existing_buffer, existing_buffer_size )
 {}
 
@@ -133,7 +134,7 @@ inline bool BufferWrapperWriter::WriteSafe( const T& data )
 // BufferWrapperReader INLINES:
 //
 //////////////////////////////////////////////////////////
-inline BufferWrapperReader::BufferWrapperReader( void* existing_buffer, size_t existing_buffer_size )
+inline BufferWrapperReader::BufferWrapperReader( void* existing_buffer, uint32_t existing_buffer_size )
 	: BufferWrapperBase( existing_buffer, existing_buffer_size )
 {
 }

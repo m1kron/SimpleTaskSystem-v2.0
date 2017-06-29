@@ -7,7 +7,7 @@ NAMESPACE_STS_BEGIN
 TaskFiberAllocator::TaskFiberAllocator()
 {
 	// Add all fibers to free list.
-	for( int i = 0; i < TASK_FIBER_POOL_SIZE; ++i )
+	for( uint32_t i = 0; i < TASK_FIBER_POOL_SIZE; ++i )
 	{
 		VERIFY_SUCCESS( m_freeList.PushBack( &m_fiberPool[ i ] ) );
 	}

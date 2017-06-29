@@ -27,7 +27,7 @@ public:
 	// and after the task is done - read it from that storage.
 	// Adding to this storage does not required any synchronization.
 	// If you need more memory then this storage, you have to allocated it on your own.
-	virtual size_t GetTaskStorageSize() const = 0;
+	virtual uint32_t GetTaskStorageSize() const = 0;
 
 	// Returns pointer to the storage. WARNING! Do not put more data then GetTaskStorageSize()!
 	virtual void* GetTaskStorage() const = 0;

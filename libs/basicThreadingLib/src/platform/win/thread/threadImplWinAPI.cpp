@@ -17,7 +17,7 @@ THREAD_ID GetThreadID()
 }
 
 //////////////////////////////////////////////////////
-void SleepFor( unsigned miliseconds )
+void SleepFor( uint32_t miliseconds )
 {
 	::Sleep( miliseconds );
 }

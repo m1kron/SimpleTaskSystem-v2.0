@@ -20,7 +20,7 @@ protected:
 	void ResetEvent();
 	bool IsEventSet();
 	void Wait();
-	void WaitFor( unsigned miliseconds );
+	void WaitFor( uint32_t miliseconds );
 
 	EVENT_NATIVE_HANDLE GetNativeHandle();
 

@@ -1,10 +1,11 @@
 #pragma once
 #include "..\macros.h"
+#include "..\types.h"
 #include "..\compileTimeTools\isPowerOf2.h"
 
 
 // Returns true if ptr has specified alignment.
-template< unsigned Alignment > bool IsAligned( const void* ptr );
+template< uint32_t Alignment > bool IsAligned( const void* ptr );
 
 ////////////////////////////////////////////////////////////////
 //
@@ -12,7 +13,7 @@ template< unsigned Alignment > bool IsAligned( const void* ptr );
 //
 ////////////////////////////////////////////////////////////////
 
-template< unsigned Alignment > inline bool IsAligned( const void* ptr )
+template< uint32_t Alignment > inline bool IsAligned( const void* ptr )
 {
 	STATIC_ASSERT( IsPowerOf2< Alignment >::value, "Alignment has to be power of 2" );
 

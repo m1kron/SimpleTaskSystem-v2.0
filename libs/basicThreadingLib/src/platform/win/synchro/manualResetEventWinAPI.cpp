@@ -63,7 +63,7 @@ void ManualResetEventImpl::Wait()
 }
 
 //////////////////////////////////////////////////////////
-void ManualResetEventImpl::WaitFor( unsigned miliseconds )
+void ManualResetEventImpl::WaitFor( uint32_t miliseconds )
 {
 	DWORD ret = ::WaitForSingleObject( m_eventHandle, miliseconds );
 	if( ret == WAIT_FAILED ) { WIN_ERROR_HANDLER(); }
