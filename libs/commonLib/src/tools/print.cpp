@@ -2,7 +2,17 @@
 #include <windows.h>
 #include <stdio.h>
 
-void Print( const char *format, ... )
+//////////////////////////////////////////////////////////////////////////////////
+void PrintToBuffer( char* buffer, size_t buffer_size, const char* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	vsprintf_s( buffer, buffer_size, format, args );
+	va_end( args );
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+void PrintToDebugOutput( const char *format, ... )
 {
 	va_list args;
 	va_start( args, format );

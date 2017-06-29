@@ -1,11 +1,12 @@
 #include "..\..\include\tools\assertHandler.h"
+#include "..\..\include\tools\print.h"
 #include <windows.h>
 #include <stdio.h>
 
-void HandleAssert( const char* info, const char* file, int line )
+void HandleAssert( const char* condition, const char* info, const char* file, int line )
 {
 	char buffer[ 2048 ];
-	sprintf_s( buffer, "Condition: %s\nLine: %i\nFile: %s", info, line, file );
+	PrintToBuffer( buffer, 2048, "Info: %s\nCondition: %s\nLine: %i\nFile: %s", info, condition, line, file );
 
 	int msgboxID = MessageBoxA(
 		NULL,

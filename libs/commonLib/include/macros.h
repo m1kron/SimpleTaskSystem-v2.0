@@ -15,18 +15,20 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 // LOG
 #if defined( LOGS_ENABLED )
-#define LOG( ... ) Print( __VA_ARGS__ );
+#define LOG( ... ) PrintToDebugOutput( __VA_ARGS__ );
 #else
 #define LOG( ... );
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // ASSERTS
-#define ASSERT( condition )																						\
+#define ASSERT( condition, ... )																				\
 	if( !( condition ) )																						\
 	{																											\
 		LOG( "ASSERTION FAILED!\n Condition: %s\n File: %s\n Line %i", #condition, __FILE__, __LINE__ );		\
-		HandleAssert( #condition, __FILE__, __LINE__ );															\
+		char buffer[ 2048 ];																					\
+		PrintToBuffer( buffer, 2048, "" __VA_ARGS__ );															\
+		HandleAssert( #condition, buffer, __FILE__, __LINE__ );													\
 	}
 
 #define STATIC_ASSERT( condition, message ) static_assert( condition, message );
