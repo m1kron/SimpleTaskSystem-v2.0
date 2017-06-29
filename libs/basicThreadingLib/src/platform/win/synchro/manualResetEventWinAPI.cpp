@@ -1,5 +1,4 @@
 #include "manualResetEventWinAPI.h"
-#include "..\..\..\..\..\commonLib\include\macros.h"
 
 NAMESPACE_BTL_BEGIN
 NAMESPACE_PLATFORM_API_BEGIN
@@ -16,13 +15,13 @@ ManualResetEventImpl::ManualResetEventImpl()
 		NULL                // object name
 		); 
 
-	ASSERT( m_eventHandle != NULL );
+	if( m_eventHandle == NULL ) { WIN_ERROR_HANDLER(); }
 }
 
 //////////////////////////////////////////////////////////
 ManualResetEventImpl::~ManualResetEventImpl()
 {
-	::CloseHandle( m_eventHandle );
+	if( !::CloseHandle( m_eventHandle ) ) { WIN_ERROR_HANDLER(); }
 	m_eventHandle = NULL;
 }
 
@@ -38,16 +37,14 @@ ManualResetEventImpl::ManualResetEventImpl( ManualResetEventImpl&& oth_event )
 //////////////////////////////////////////////////////////
 void ManualResetEventImpl::SetEvent()
 {
-	BOOL ret = ::SetEvent( m_eventHandle );
-	ASSERT( ret != 0 );
+	if ( !::SetEvent( m_eventHandle ) ) { WIN_ERROR_HANDLER(); }
 	m_isEventSet = true;
 }
 
 //////////////////////////////////////////////////////////
 void ManualResetEventImpl::ResetEvent()
 {
-	BOOL ret = ::ResetEvent( m_eventHandle );
-	ASSERT( ret != 0 );
+	if( !::ResetEvent( m_eventHandle ) ) { WIN_ERROR_HANDLER(); }
 	m_isEventSet = false;
 }
 
@@ -61,6 +58,7 @@ bool ManualResetEventImpl::IsEventSet()
 void ManualResetEventImpl::Wait()
 {
 	DWORD ret = ::WaitForSingleObject( m_eventHandle, INFINITE );
+	if( ret == WAIT_FAILED ) { WIN_ERROR_HANDLER(); }
 	ASSERT( ret == WAIT_OBJECT_0 );
 }
 
@@ -68,7 +66,7 @@ void ManualResetEventImpl::Wait()
 void ManualResetEventImpl::WaitFor( unsigned miliseconds )
 {
 	DWORD ret = ::WaitForSingleObject( m_eventHandle, miliseconds );
-	ASSERT( ret != WAIT_FAILED );
+	if( ret == WAIT_FAILED ) { WIN_ERROR_HANDLER(); }
 }
 
 //////////////////////////////////////////////////////////

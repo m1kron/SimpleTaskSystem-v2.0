@@ -1,5 +1,4 @@
 #include "toolsWinAPI.h"
-#include <windows.h>
 
 NAMESPACE_BTL_BEGIN
 NAMESPACE_PLATFORM_API_BEGIN

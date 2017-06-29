@@ -1,11 +1,5 @@
 #include "fiberImplWinAPI.h"
 #include "..\..\..\..\include\thread\fiber.h"
-#include "..\..\..\..\..\commonLib\include\macros.h"
-
-#define HANDLE_WIN_ERROR()							\
-		auto error = ::GetLastError();				\
-		LOG( "[WIN_API_ERROR]: %i", error );		\
-		ASSERT( false );
 
 NAMESPACE_BTL_BEGIN
 NAMESPACE_PLATFORM_API_BEGIN
@@ -27,7 +21,7 @@ bool ConvertFiberToThread()
 {
 	auto ret = ::ConvertFiberToThread();
 
-	if( !ret ) { HANDLE_WIN_ERROR(); }
+	if( !ret ) { WIN_ERROR_HANDLER(); }
 
 	return ret;
 }
@@ -37,7 +31,7 @@ FIBER_ID ConvertThreadToFiber( void* params )
 {
 	auto id = ::ConvertThreadToFiber( params );
 
-	if( id == INVALID_FIBER_ID ) { HANDLE_WIN_ERROR(); }
+	if( id == INVALID_FIBER_ID ) { WIN_ERROR_HANDLER(); }
 	return id;
 }
 
@@ -82,7 +76,7 @@ void FiberImpl::CreateFiber( FiberBase* fiber, uint32_t stackSize )
 {
 	m_id = ::CreateFiber( stackSize, FiberFunction, fiber );
 
-	if( m_id == INVALID_FIBER_ID ) { HANDLE_WIN_ERROR(); }
+	if( m_id == INVALID_FIBER_ID ) { WIN_ERROR_HANDLER(); }
 }
 
 ///////////////////////////////////////////////////

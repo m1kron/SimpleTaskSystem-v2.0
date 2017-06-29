@@ -1,8 +1,7 @@
 #pragma once
-#include "..\..\platformApi.h"
+#include "..\winPlatformCommon.h"
 #include "..\..\..\..\include\atomic\memoryOrder.h"
 #include "..\..\..\..\..\commonLib\include\tools\tools.h"
-#include <windows.h>
 #include <intrin.h>
 
 NAMESPACE_BTL_BEGIN

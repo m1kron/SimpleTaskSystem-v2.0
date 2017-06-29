@@ -1,6 +1,5 @@
 #pragma once
-#include "..\..\platformApi.h"
-#include <windows.h>
+#include "..\winPlatformCommon.h"
 
 NAMESPACE_BTL_BEGIN
 NAMESPACE_PLATFORM_API_BEGIN
@@ -35,7 +34,10 @@ void ConditionVariableImpl::Wait( PCRITICAL_SECTION mutex, Predicate& predicate 
 {
 	while( !predicate() )
 	{
-		::SleepConditionVariableCS( &m_conditionVariable, mutex, INFINITE );
+		if( !::SleepConditionVariableCS( &m_conditionVariable, mutex, INFINITE ) )
+		{
+			WIN_ERROR_HANDLER();
+		}
 	}
 }
 

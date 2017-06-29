@@ -1,7 +1,6 @@
 #pragma once
-#include "..\..\platformApi.h"
+#include "..\winPlatformCommon.h"
 #include "..\..\..\..\..\commonLib\include\types.h"
-#include <windows.h>
 
 NAMESPACE_BTL_BEGIN
 

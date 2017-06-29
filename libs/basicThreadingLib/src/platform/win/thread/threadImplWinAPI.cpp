@@ -1,6 +1,5 @@
 #include "threadImplWinAPI.h"
 #include "..\..\..\..\include\thread\thread.h"
-#include "..\..\..\..\..\commonLib\include\macros.h"
 
 NAMESPACE_BTL_BEGIN
 NAMESPACE_PLATFORM_API_BEGIN
@@ -21,12 +20,6 @@ THREAD_ID GetThreadID()
 void SleepFor( unsigned miliseconds )
 {
 	::Sleep( miliseconds );
-}
-
-//////////////////////////////////////////////////////
-void ConvertToFiber( void* params )
-{
-	::ConvertThreadToFiber( params );
 }
 
 //////////////////////////////////////////////////////
@@ -55,7 +48,7 @@ ThreadImpl::ThreadImpl( ThreadImpl&& other )
 ///////////////////////////////////////////////////
 ThreadImpl::~ThreadImpl()
 {
-	::CloseHandle( m_threadHandle );
+	if( m_threadHandle != NULL && !::CloseHandle( m_threadHandle ) ) { WIN_ERROR_HANDLER(); }
 }
 
 ///////////////////////////////////////////////////
@@ -69,20 +62,22 @@ void ThreadImpl::StartThread( ThreadBase* thread )
 		0,                      // use default creation flags 
 		&m_id );				// returns the thread identifier 
 
-	ASSERT( m_threadHandle != NULL );
+	if( m_threadHandle == NULL ) { WIN_ERROR_HANDLER(); }
 }
 
 ///////////////////////////////////////////////////
 void ThreadImpl::Join()
 {
 	DWORD ret = ::WaitForSingleObject( m_threadHandle, INFINITE );
+	if ( ret == WAIT_FAILED ) { WIN_ERROR_HANDLER(); }
+
 	ASSERT( ret == WAIT_OBJECT_0 );
 }
 
 ///////////////////////////////////////////////////
 void ThreadImpl::Detach()
 {
-	::CloseHandle( m_threadHandle );
+	if( !::CloseHandle( m_threadHandle ) ) { WIN_ERROR_HANDLER(); }
 	m_threadHandle = NULL;
 }
 
@@ -101,6 +96,7 @@ typedef struct tagTHREADNAME_INFO
 	DWORD dwFlags; // reserved for future use, must be zero
 } THREADNAME_INFO;
 
+////////////////////////////////////////////////////
 void ThreadImpl::SetThreadName( const char* thread_name )
 {
 	THREADNAME_INFO info;

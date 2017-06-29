@@ -50,6 +50,7 @@
     <ClInclude Include="src\platform\win\thread\fiberImplWinAPI.h" />
     <ClInclude Include="src\platform\win\thread\threadImplWinAPI.h" />
     <ClInclude Include="src\platform\win\tools\toolsWinAPI.h" />
+    <ClInclude Include="src\platform\win\winPlatformCommon.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\platform\win\synchro\conditionVariableImplWinAPI.cpp" />

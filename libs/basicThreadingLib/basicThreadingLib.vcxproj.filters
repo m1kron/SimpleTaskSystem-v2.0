@@ -132,6 +132,9 @@
     <ClInclude Include="include\btlApi.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="src\platform\win\winPlatformCommon.h">
+      <Filter>src\platform\win</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\platform\win\synchro\conditionVariableImplWinAPI.cpp">
