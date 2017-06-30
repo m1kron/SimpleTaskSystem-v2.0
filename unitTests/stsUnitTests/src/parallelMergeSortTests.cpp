@@ -27,7 +27,7 @@ TEST( STSParallelMergeSortTest, SortSequential )
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-TEST( STSParallelMergeSortTest, Small )
+TEST( STSParallelMergeSortTest, SortParallel )
 {
 	sts::ITaskSystem* system = CreateTaskSystem();
 
