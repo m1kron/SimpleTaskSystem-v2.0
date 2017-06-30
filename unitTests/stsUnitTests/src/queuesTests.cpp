@@ -2,8 +2,8 @@
 // HACKY TEST, CUZ queus won't be a part of public interface of sts!
 
 #include "..\..\libs\simpleTaskSystem\src\common\common.h"
-#include "..\..\libs\simpleTaskSystem\src\structures\lockbased\lockBasedPtrQueue.h"
-#include "..\..\libs\simpleTaskSystem\src\structures\lockfree\lockfreePtrQueue.h"
+#include "..\..\libs\simpleTaskSystem\src\common\structures\lockbased\lockBasedPtrQueue.h"
+#include "..\..\libs\simpleTaskSystem\src\common\structures\lockfree\lockfreePtrQueue.h"
 
 #include "..\..\libs\basicThreadingLib\include\thread\functorThread.h"
 #include "..\..\libs\basicThreadingLib\include\synchro\mutex.h"

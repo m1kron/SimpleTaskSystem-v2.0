@@ -1,6 +1,6 @@
 #pragma once
-#include "..\..\include\iTaskHandle.h"
-#include "..\..\..\basicThreadingLib\include\atomic\atomic.h"
+#include "..\..\..\include\iTaskHandle.h"
+#include "..\..\..\..\basicThreadingLib\include\atomic\atomic.h"
 
 NAMESPACE_STS_BEGIN
 

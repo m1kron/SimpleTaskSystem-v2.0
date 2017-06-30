@@ -5,7 +5,6 @@ NAMESPACE_STS_BEGIN
 class Dispatcher;
 class ITaskSystem;
 class TaskFiberAllocator;
-class TaskFiber;
 
 // Contains necessary context for task worker instance.
 struct TaskWorkerInstanceContext

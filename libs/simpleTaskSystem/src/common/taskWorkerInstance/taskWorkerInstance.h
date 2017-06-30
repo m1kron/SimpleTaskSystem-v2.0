@@ -1,12 +1,13 @@
 #pragma once
 #include "taskWorkerInstanceContext.h"
 #include "..\structures\lockbased\lockBasedPtrQueue.h"
-#include "..\..\..\basicThreadingLib\include\thread\thisFiberHelpers.h"
-#include "..\..\..\basicThreadingLib\include\thread\thisThreadHelpers.h"
+#include "..\..\..\..\basicThreadingLib\include\thread\thisFiberHelpers.h"
+#include "..\..\..\..\basicThreadingLib\include\thread\thisThreadHelpers.h"
 
 NAMESPACE_STS_BEGIN
 
 class Task;
+class TaskFiber;
 
 // Class represents TaskWorkerInstance, which is responsible for logic related to running task.
 // Implements every thing that is connected to that ( including stealing, fiber managment etc ).

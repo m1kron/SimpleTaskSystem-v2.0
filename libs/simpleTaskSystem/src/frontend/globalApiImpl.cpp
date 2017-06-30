@@ -1,7 +1,7 @@
 #include "precompiledHeader.h"
 #include "..\..\include\globalApi.h"
 #include "..\backend\backendTaskSystem.h"
-#include "..\frontend\frontendTaskSystem.h"
+#include "frontendTaskSystem.h"
 
 /////////////////////////////////////////////////////////////////
 STS_API sts::ITaskSystem* CreateTaskSystem()

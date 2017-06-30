@@ -1,9 +1,9 @@
 #include "precompiledHeader.h"
 #include "dispatcher.h"
-#include "..\..\task\task.h"
-#include "..\..\taskWorker\taskWorkerInstance.h"
-#include "..\..\tools\positiveNumberHasher.h"
+#include "..\task\task.h"
 #include "..\taskFiber\taskFiber.h"
+#include "..\..\common\taskWorkerInstance\taskWorkerInstance.h"
+#include "..\..\common\tools\positiveNumberHasher.h"
 
 NAMESPACE_STS_BEGIN
 

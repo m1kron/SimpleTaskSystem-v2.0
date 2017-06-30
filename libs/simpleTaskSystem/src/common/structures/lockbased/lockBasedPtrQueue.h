@@ -1,6 +1,6 @@
 #pragma once
-#include "..\..\..\..\basicThreadingLib\include\synchro\spinLock.h"
-#include "..\..\..\..\basicThreadingLib\include\synchro\lockGuards.h"
+#include "..\..\..\..\..\basicThreadingLib\include\synchro\spinLock.h"
+#include "..\..\..\..\..\basicThreadingLib\include\synchro\lockGuards.h"
 
 NAMESPACE_STS_BEGIN
 

@@ -1,6 +1,5 @@
 #include "precompiledHeader.h"
 #include "taskAllocator.h"
-#include "..\tools\positiveNumberHasher.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -38,13 +37,6 @@ void TaskAllocator::ReleaseTask( const ITaskHandle* task_handle )
 
 	// Add to free list.
 	VERIFY_SUCCESS( m_freelist.PushBack( handle ) );
-}
-
-////////////////////////////////////////////////////
-void TaskAllocator::ReleaseAllTasks()
-{
-	for( uint32_t i = 0; i < TASK_POOL_SIZE; ++i )
-		m_taskPool[ i ].Clear();
 }
 
 ////////////////////////////////////////////////////

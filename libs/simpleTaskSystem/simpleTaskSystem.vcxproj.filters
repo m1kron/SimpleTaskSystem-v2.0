@@ -13,27 +13,6 @@
     <Filter Include="src\common">
       <UniqueIdentifier>{4582a80e-28ef-4844-b19d-e25bc7ebfa92}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\structures">
-      <UniqueIdentifier>{2e566997-9f8b-49c4-b6a1-974eb522e3aa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\structures\lockbased">
-      <UniqueIdentifier>{956ce7eb-2c81-49c3-9a43-6c49b53b894f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\structures\lockfree">
-      <UniqueIdentifier>{d0ae19e5-f3e1-4915-92c3-da9157889e0f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\task">
-      <UniqueIdentifier>{01418461-ceab-4e94-8698-8864b9dae16b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\taskFiber">
-      <UniqueIdentifier>{504261f3-435c-4e23-91e6-ea392c7c9ec9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\taskWorker">
-      <UniqueIdentifier>{808ae0b0-f94a-4788-a9a4-357a35f86456}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\tools">
-      <UniqueIdentifier>{dec32279-7723-435a-a4ca-a5e2b4c2f224}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\tools">
       <UniqueIdentifier>{e5dff130-9e71-41aa-a05b-4ae0e5456d39}</UniqueIdentifier>
     </Filter>
@@ -46,6 +25,30 @@
     <Filter Include="src\frontend">
       <UniqueIdentifier>{ff53730b-0b47-45e3-9fc7-c6adaa3e310d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\common\structures">
+      <UniqueIdentifier>{1b8833a2-6396-4621-9671-e1c8f27a53e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common\structures\lockfree">
+      <UniqueIdentifier>{e3a1be97-4323-4499-a595-2ebe9a77481d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common\structures\lockbased">
+      <UniqueIdentifier>{89329e2e-4747-4f7a-a745-15cf3bc12c2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common\taskWorkerInstance">
+      <UniqueIdentifier>{fe39ce55-0bb1-4336-903e-176485a4128d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common\tools">
+      <UniqueIdentifier>{dda3d785-6cda-46b9-863c-988969c9f214}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\backend\task">
+      <UniqueIdentifier>{65a0a263-f7da-442a-b4ba-29f00bc62191}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\backend\taskFiber">
+      <UniqueIdentifier>{782c31ef-8e33-4a8a-8ab4-e26cd24f6295}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\backend\taskWorkerThread">
+      <UniqueIdentifier>{e384d973-45e4-40bc-8c0c-52c4e55a5afe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\precompiledHeader\precompiledHeader.h">
@@ -53,36 +56,6 @@
     </ClInclude>
     <ClInclude Include="src\common\common.h">
       <Filter>src\common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\structures\lockbased\lockBasedPtrQueue.h">
-      <Filter>src\structures\lockbased</Filter>
-    </ClInclude>
-    <ClInclude Include="src\structures\lockfree\lockfreePtrQueue.h">
-      <Filter>src\structures\lockfree</Filter>
-    </ClInclude>
-    <ClInclude Include="src\task\task.h">
-      <Filter>src\task</Filter>
-    </ClInclude>
-    <ClInclude Include="src\task\taskAllocator.h">
-      <Filter>src\task</Filter>
-    </ClInclude>
-    <ClInclude Include="src\task\taskContext.h">
-      <Filter>src\task</Filter>
-    </ClInclude>
-    <ClInclude Include="src\task\taskHandle.h">
-      <Filter>src\task</Filter>
-    </ClInclude>
-    <ClInclude Include="src\taskFiber\taskFiber.h">
-      <Filter>src\taskFiber</Filter>
-    </ClInclude>
-    <ClInclude Include="src\taskFiber\taskFiberAllocator.h">
-      <Filter>src\taskFiber</Filter>
-    </ClInclude>
-    <ClInclude Include="src\taskWorker\taskWorkersPool.h">
-      <Filter>src\taskWorker</Filter>
-    </ClInclude>
-    <ClInclude Include="src\tools\positiveNumberHasher.h">
-      <Filter>src\tools</Filter>
     </ClInclude>
     <ClInclude Include="include\iTaskHandle.h">
       <Filter>include</Filter>
@@ -104,15 +77,6 @@
     </ClInclude>
     <ClInclude Include="include\stsExportApi.h">
       <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\taskWorker\taskWorkerThread.h">
-      <Filter>src\taskWorker</Filter>
-    </ClInclude>
-    <ClInclude Include="src\taskWorker\taskWorkerInstance.h">
-      <Filter>src\taskWorker</Filter>
-    </ClInclude>
-    <ClInclude Include="src\taskWorker\taskWorkerInstanceContext.h">
-      <Filter>src\taskWorker</Filter>
     </ClInclude>
     <ClInclude Include="src\backend\dispatcher\dispatcher.h">
       <Filter>src\backend\dispatcher</Filter>
@@ -138,40 +102,49 @@
     <ClInclude Include="include\sts_types.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="src\common\structures\lockfree\lockfreePtrQueue.h">
+      <Filter>src\common\structures\lockfree</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\structures\lockbased\lockBasedPtrQueue.h">
+      <Filter>src\common\structures\lockbased</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\taskWorkerInstance\taskWorkerInstance.h">
+      <Filter>src\common\taskWorkerInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\taskWorkerInstance\taskWorkerInstanceContext.h">
+      <Filter>src\common\taskWorkerInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\tools\positiveNumberHasher.h">
+      <Filter>src\common\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\task\task.h">
+      <Filter>src\backend\task</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\task\taskAllocator.h">
+      <Filter>src\backend\task</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\task\taskContext.h">
+      <Filter>src\backend\task</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\task\taskHandle.h">
+      <Filter>src\backend\task</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\taskFiber\taskFiber.h">
+      <Filter>src\backend\taskFiber</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\taskFiber\taskFiberAllocator.h">
+      <Filter>src\backend\taskFiber</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\taskWorkerThread\taskWorkerThread.h">
+      <Filter>src\backend\taskWorkerThread</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backend\taskWorkerThread\taskWorkerThreadPool.h">
+      <Filter>src\backend\taskWorkerThread</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
       <Filter>src\precompiledHeader</Filter>
-    </ClCompile>
-    <ClCompile Include="src\task\task.cpp">
-      <Filter>src\task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\task\taskAllocator.cpp">
-      <Filter>src\task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\taskFiber\taskFiber.cpp">
-      <Filter>src\taskFiber</Filter>
-    </ClCompile>
-    <ClCompile Include="src\taskFiber\taskFiberAllocator.cpp">
-      <Filter>src\taskFiber</Filter>
-    </ClCompile>
-    <ClCompile Include="src\taskWorker\taskWorkersPool.cpp">
-      <Filter>src\taskWorker</Filter>
-    </ClCompile>
-    <ClCompile Include="src\task\taskHandle.cpp">
-      <Filter>src\task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\task\taskContext.cpp">
-      <Filter>src\task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\common\globalApiImpl.cpp">
-      <Filter>src\common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\taskWorker\taskWorkerThread.cpp">
-      <Filter>src\taskWorker</Filter>
-    </ClCompile>
-    <ClCompile Include="src\taskWorker\taskWorkerInstance.cpp">
-      <Filter>src\taskWorker</Filter>
     </ClCompile>
     <ClCompile Include="src\backend\dispatcher\dispatcher.cpp">
       <Filter>src\backend\dispatcher</Filter>
@@ -181,6 +154,36 @@
     </ClCompile>
     <ClCompile Include="src\backend\backendTaskSystem.cpp">
       <Filter>src\backend</Filter>
+    </ClCompile>
+    <ClCompile Include="src\frontend\globalApiImpl.cpp">
+      <Filter>src\frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\taskWorkerInstance\taskWorkerInstance.cpp">
+      <Filter>src\common\taskWorkerInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\task\task.cpp">
+      <Filter>src\backend\task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\task\taskAllocator.cpp">
+      <Filter>src\backend\task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\task\taskContext.cpp">
+      <Filter>src\backend\task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\task\taskHandle.cpp">
+      <Filter>src\backend\task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\taskFiber\taskFiber.cpp">
+      <Filter>src\backend\taskFiber</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\taskFiber\taskFiberAllocator.cpp">
+      <Filter>src\backend\taskFiber</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\taskWorkerThread\taskWorkerThread.cpp">
+      <Filter>src\backend\taskWorkerThread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backend\taskWorkerThread\taskWorkerThreadPool.cpp">
+      <Filter>src\backend\taskWorkerThread</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

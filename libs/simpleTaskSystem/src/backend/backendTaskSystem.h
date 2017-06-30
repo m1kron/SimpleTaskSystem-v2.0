@@ -1,8 +1,8 @@
 #pragma once
-#include "..\task\taskAllocator.h"
-#include "..\taskWorker\taskWorkersPool.h"
-#include "..\taskFiber\taskFiberAllocator.h"
-#include "..\backend\dispatcher\dispatcher.h"
+#include "task\taskAllocator.h"
+#include "taskWorkerThread\taskWorkerThreadPool.h"
+#include "taskFiber\taskFiberAllocator.h"
+#include "dispatcher\dispatcher.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -37,7 +37,7 @@ public:
 	uint32_t GetWorkersCount() const;
 
 private:
-	// Wake ups all worker threads;
+	// Wake ups all worker threads.
 	void WakeUpAllWorkerThreads() const;
 
 	TaskWorkersPool			m_workerThreadsPool;

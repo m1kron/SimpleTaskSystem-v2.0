@@ -38,43 +38,43 @@
     <ClInclude Include="include\tools\taskStorageBuffer.h" />
     <ClInclude Include="src\backend\backendTaskSystem.h" />
     <ClInclude Include="src\backend\dispatcher\dispatcher.h" />
+    <ClInclude Include="src\backend\taskFiber\taskFiber.h" />
+    <ClInclude Include="src\backend\taskFiber\taskFiberAllocator.h" />
+    <ClInclude Include="src\backend\taskWorkerThread\taskWorkerThread.h" />
+    <ClInclude Include="src\backend\taskWorkerThread\taskWorkerThreadPool.h" />
+    <ClInclude Include="src\backend\task\task.h" />
+    <ClInclude Include="src\backend\task\taskAllocator.h" />
+    <ClInclude Include="src\backend\task\taskContext.h" />
+    <ClInclude Include="src\backend\task\taskHandle.h" />
     <ClInclude Include="src\common\common.h" />
+    <ClInclude Include="src\common\structures\lockbased\lockBasedPtrQueue.h" />
+    <ClInclude Include="src\common\structures\lockfree\lockfreePtrQueue.h" />
+    <ClInclude Include="src\common\taskWorkerInstance\taskWorkerInstance.h" />
+    <ClInclude Include="src\common\taskWorkerInstance\taskWorkerInstanceContext.h" />
+    <ClInclude Include="src\common\tools\positiveNumberHasher.h" />
     <ClInclude Include="src\frontend\frontendTaskSystem.h" />
     <ClInclude Include="src\precompiledHeader\precompiledHeader.h" />
-    <ClInclude Include="src\structures\lockbased\lockBasedPtrQueue.h" />
-    <ClInclude Include="src\structures\lockfree\lockfreePtrQueue.h" />
-    <ClInclude Include="src\taskFiber\taskFiber.h" />
-    <ClInclude Include="src\taskFiber\taskFiberAllocator.h" />
-    <ClInclude Include="src\taskWorker\taskWorkerInstance.h" />
-    <ClInclude Include="src\taskWorker\taskWorkerInstanceContext.h" />
-    <ClInclude Include="src\taskWorker\taskWorkerThread.h" />
-    <ClInclude Include="src\taskWorker\taskWorkersPool.h" />
-    <ClInclude Include="src\task\task.h" />
-    <ClInclude Include="src\task\taskAllocator.h" />
-    <ClInclude Include="src\task\taskContext.h" />
-    <ClInclude Include="src\task\taskHandle.h" />
-    <ClInclude Include="src\tools\positiveNumberHasher.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\backend\backendTaskSystem.cpp" />
     <ClCompile Include="src\backend\dispatcher\dispatcher.cpp" />
-    <ClCompile Include="src\common\globalApiImpl.cpp" />
+    <ClCompile Include="src\backend\taskFiber\taskFiber.cpp" />
+    <ClCompile Include="src\backend\taskFiber\taskFiberAllocator.cpp" />
+    <ClCompile Include="src\backend\taskWorkerThread\taskWorkerThread.cpp" />
+    <ClCompile Include="src\backend\taskWorkerThread\taskWorkerThreadPool.cpp" />
+    <ClCompile Include="src\backend\task\task.cpp" />
+    <ClCompile Include="src\backend\task\taskAllocator.cpp" />
+    <ClCompile Include="src\backend\task\taskContext.cpp" />
+    <ClCompile Include="src\backend\task\taskHandle.cpp" />
+    <ClCompile Include="src\common\taskWorkerInstance\taskWorkerInstance.cpp" />
     <ClCompile Include="src\frontend\frontendTaskSystem.cpp" />
+    <ClCompile Include="src\frontend\globalApiImpl.cpp" />
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\taskFiber\taskFiber.cpp" />
-    <ClCompile Include="src\taskFiber\taskFiberAllocator.cpp" />
-    <ClCompile Include="src\taskWorker\taskWorkerInstance.cpp" />
-    <ClCompile Include="src\taskWorker\taskWorkerThread.cpp" />
-    <ClCompile Include="src\taskWorker\taskWorkersPool.cpp" />
-    <ClCompile Include="src\task\task.cpp" />
-    <ClCompile Include="src\task\taskAllocator.cpp" />
-    <ClCompile Include="src\task\taskContext.cpp" />
-    <ClCompile Include="src\task\taskHandle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />

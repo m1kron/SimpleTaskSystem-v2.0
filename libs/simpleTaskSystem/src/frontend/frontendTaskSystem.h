@@ -1,6 +1,6 @@
 #pragma once
 #include "..\..\include\iTaskSystem.h"
-#include "..\taskWorker\taskWorkerInstance.h"
+#include "..\common\taskWorkerInstance\taskWorkerInstance.h"
 
 NAMESPACE_STS_BEGIN
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "task.h"
 #include "taskHandle.h"
-#include "..\structures\lockfree\lockfreePtrQueue.h"
+#include "..\..\common\structures\lockfree\lockfreePtrQueue.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -18,9 +18,6 @@ public:
 
 	// Release task back to pool, lock free method.
 	void ReleaseTask( const ITaskHandle* task );
-
-	// Releases all tasks.
-	void ReleaseAllTasks();
 
 	// Returns true if all tasks are released.
 	bool AreAllTasksReleased() const;

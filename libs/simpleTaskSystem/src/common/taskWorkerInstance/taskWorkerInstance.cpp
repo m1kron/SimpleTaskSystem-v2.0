@@ -1,14 +1,14 @@
 #include "precompiledHeader.h"
 #include "taskWorkerInstance.h"
-#include "..\backend\dispatcher\dispatcher.h"
-#include "..\taskFiber\taskFiberAllocator.h"
-#include "..\task\task.h"
+#include "..\..\backend\dispatcher\dispatcher.h"
+#include "..\..\backend\taskFiber\taskFiberAllocator.h"
+#include "..\..\backend\task\task.h"
 
 NAMESPACE_STS_BEGIN
 
-#define WORKER_LOG( txt, ... )																					\
+#define WORKER_LOG( txt, ... )																						\
 	if ( m_context.m_id == 0 )	{ LOG( "[HELPER_WORKER_INSTANCE< %i >]: " txt, m_context.m_id __VA_ARGS__ );	}	\
-	else { LOG( "[WORKER_INSTANCE_ID< %i >]: " txt, m_context.m_id __VA_ARGS__ );	}							\
+	else { LOG( "[WORKER_INSTANCE_ID< %i >]: " txt, m_context.m_id __VA_ARGS__ );	}								\
 
 //////////////////////////////////////////////////////////////////////////////////
 bool TaskWorkerInstance::Initalize( const TaskWorkerInstanceContext& context )

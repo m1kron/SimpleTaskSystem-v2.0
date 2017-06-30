@@ -1,7 +1,7 @@
 #pragma once
-#include "taskWorkerInstance.h"
-#include "..\..\..\basicThreadingLib\include\synchro\manualResetEvent.h"
-#include "..\..\..\basicThreadingLib\include\thread\Thread.h"
+#include "..\..\common\taskWorkerInstance\taskWorkerInstance.h"
+#include "..\..\..\..\basicThreadingLib\include\synchro\manualResetEvent.h"
+#include "..\..\..\..\basicThreadingLib\include\thread\Thread.h"
 
 NAMESPACE_STS_BEGIN
 

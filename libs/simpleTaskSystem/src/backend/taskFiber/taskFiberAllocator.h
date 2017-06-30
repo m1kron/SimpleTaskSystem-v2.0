@@ -1,6 +1,6 @@
 #pragma once
 #include "taskFiber.h"
-#include "..\structures\lockfree\lockfreePtrQueue.h"
+#include "..\..\common\structures\lockfree\lockfreePtrQueue.h"
 
 NAMESPACE_STS_BEGIN
 
