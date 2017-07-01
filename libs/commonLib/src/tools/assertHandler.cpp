@@ -1,7 +1,6 @@
 #include "..\..\include\tools\assertHandler.h"
 #include "..\..\include\tools\print.h"
 #include <windows.h>
-#include <stdio.h>
 
 void HandleAssert( const char* condition, const char* info, const char* file, int32_t line )
 {
@@ -20,8 +19,8 @@ void HandleAssert( const char* condition, const char* info, const char* file, in
 	case IDABORT:
 		ExitProcess( -1 );
 		break;
-	case IDTRYAGAIN:
-		DebugBreak();
+	case IDRETRY:
+		__debugbreak();
 		break;
 	case IDIGNORE:
 		// TODO: add code
