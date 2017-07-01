@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "..\iTaskSystem.h"
 #include "taskStorageBuffer.h"
+#include "taskBatch.h"
 
 namespace sts
 {
@@ -76,8 +77,9 @@ void MergeSortTaskFunction( const sts::ITaskContext* context )
 	}
 
 	// 3. Otherwise we have to recursively split into two ranges:
-	auto left_range_task = context->GetTaskSystem()->CreateNewTask( MergeSortTaskFunction< TContainer >, nullptr );
-	auto right_range_task = context->GetTaskSystem()->CreateNewTask( MergeSortTaskFunction< TContainer >, nullptr );
+	TaskBatch< 2 > batch( context->GetTaskSystem() ); //< for auto releasing task if return;
+	batch.Add( context->GetTaskSystem()->CreateNewTask( MergeSortTaskFunction< TContainer >, nullptr ) );
+	batch.Add( context->GetTaskSystem()->CreateNewTask( MergeSortTaskFunction< TContainer >, nullptr ) );
 
 	// 4. Calculate half range
 	const auto HALF_RANGE = range.m_range / 2;
@@ -85,30 +87,25 @@ void MergeSortTaskFunction( const sts::ITaskContext* context )
 		// 5. Setup ranges for tasks.
 		auto left_range = range;
 		left_range.m_range = HALF_RANGE;
-		TaskStorageWriter( left_range_task ).WriteSafe( left_range );
+		TaskStorageWriter( batch[ 0 ] ).WriteSafe( left_range );
 
 		auto right_range = range;
 		right_range.m_range = range.m_range - HALF_RANGE;
 		right_range.m_startIdx = range.m_startIdx + HALF_RANGE;
-		TaskStorageWriter( right_range_task ).WriteSafe( right_range );
+		TaskStorageWriter( batch[ 1 ] ).WriteSafe( right_range );
 	}
 
 	// 6. Submit the tasks.
-	context->GetTaskSystem()->SubmitTask( left_range_task );
-	context->GetTaskSystem()->SubmitTask( right_range_task );
+	batch.SubmitAll();
 
 	// 7. Wait for tasks to finish.
-	context->SuspendUntil( [ right_range_task, left_range_task ]() {return right_range_task->IsFinished() && left_range_task->IsFinished(); } );
+	context->SuspendUntil( [ &batch ](){ return batch.AreAllTaskFinished(); } );
 
 	// 8. Get results from tasks - range.m_container contains sorted subrange.
-	auto left_range = TaskStorageReader( left_range_task ).Read< TSortRange >();
-	auto right_range = TaskStorageReader( right_range_task ).Read< TSortRange >();
+	auto left_range = TaskStorageReader( batch[ 0 ] ).Read< TSortRange >();
+	auto right_range = TaskStorageReader( batch[ 1 ] ).Read< TSortRange >();
 
-	// 9. Release tasks.
-	context->GetTaskSystem()->ReleaseTask( left_range_task );
-	context->GetTaskSystem()->ReleaseTask( right_range_task );
-
-	// 10. Merge two subranges into one. Subranges are always in child task's container and we are always merging them into child task's tempContainer.
+	// 9. Merge two subranges into one. Subranges are always in child task's container and we are always merging them into child task's tempContainer.
 	std::merge( left_range.GetBeginIt(), left_range.GetEndIt(), right_range.GetBeginIt(), right_range.GetEndIt(), left_range.GetInserter() );
 
 	// 10. Write final result - swap containers.
@@ -134,21 +131,20 @@ bool ParallelMergeSort( TContainer& container, ITaskSystem* system_interface )
 
 	// 3. Setup task.
 	TSortRange range{ &container, &working_container, 0, container.size(), MAX_RANGE };
-	auto handle = system_interface->CreateNewTask( sts_helpers::MergeSortTaskFunction< TContainer >, nullptr );
 
-	if( !handle )
+	TaskBatch< 1 > batch( system_interface ); //< for auto releasing task if return;
+	if( !batch.Add( system_interface->CreateNewTask( sts_helpers::MergeSortTaskFunction< TContainer >, nullptr ) ) )
 		return false;
 
-	TaskStorageWriter( handle ).WriteSafe( range );
+	TaskStorageWriter( batch[ 0 ] ).WriteSafe( range );
 
 	// 4. Submit and wait until done.
-	if( !system_interface->SubmitTask( handle ) )
+	if( !batch.SubmitAll() )
 		return false;
-	if( !system_interface->RunTasksUsingThisThreadUntil( [ handle ]() { return handle->IsFinished(); } ) )
+	if( !system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } ) )
 		return false;
 
-	auto final_range = TaskStorageReader( handle ).Read< TSortRange >();
-	system_interface->ReleaseTask( handle );
+	auto final_range = TaskStorageReader( batch[ 0 ] ).Read< TSortRange >();
 
 	// 5. If working_container contains result, copy it to container.
 	if( ( final_range.m_levels & 1 ) == 0 )

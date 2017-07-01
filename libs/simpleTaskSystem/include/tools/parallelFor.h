@@ -35,7 +35,12 @@ bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 	auto batch_size = ( con_size / max_num_of_threads );
 	Iterator last_it = end;
 
-	TaskBatch_AutoRelease batch( task_system_interface );
+	static const unsigned MAX_WORKERS = 64;
+
+	if( MAX_WORKERS < max_num_of_threads )
+		return false; // or use some dynamic memory implementation.
+
+	TaskBatch< MAX_WORKERS > batch( task_system_interface );
 	
 	// WARNING!
 	// This is needed only in debug mode, cuz in debug stl iterators are so big,

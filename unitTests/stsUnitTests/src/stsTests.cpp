@@ -77,12 +77,12 @@ namespace helpers
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	template< int ChildsSize >
+	template< int CHILDS_SIZE >
 	void TaskFunctionDynamicTree( const sts::ITaskContext* context )
 	{
-		sts::tools::TaskBatch_AutoRelease batch( context->GetTaskSystem() );
+		sts::tools::TaskBatch< CHILDS_SIZE > batch( context->GetTaskSystem() );
 
-		for( int i = 0; i < ChildsSize; ++i )
+		for( int i = 0; i < CHILDS_SIZE; ++i )
 		{
 			auto task_handle = context->GetTaskSystem()->CreateNewTask( helpers::TaskFunctionFast, nullptr );
 			helpers::WriteToTask< int >( task_handle, 0 );
@@ -140,7 +140,6 @@ TEST( STSTest, SimpleSingleTask )
 
 	ASSERT_TRUE( system->SubmitTask( task_handle ) );
 	ASSERT_TRUE( system->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
-
 	ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
 
 	system->ReleaseTask( task_handle );
@@ -186,7 +185,7 @@ TEST( STSTest, SimpleFlatTree )
 {
 	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
-		sts::tools::TaskBatch_AutoRelease batch( system_interface );
+		sts::tools::TaskBatch< 1000 > batch( system_interface );
 
 		for( int i = 0; i < 1000; ++i )
 		{
@@ -210,7 +209,7 @@ TEST( STSTest, SimpleDynamicTree )
 {
 	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
-		sts::tools::TaskBatch_AutoRelease batch( system_interface );
+		sts::tools::TaskBatch< 1 > batch( system_interface );
 
 		auto task_handle = system_interface->CreateNewTask( helpers::TaskFunctionDynamicTree< 2 >, nullptr );
 		batch.Add( task_handle );
@@ -229,7 +228,7 @@ TEST( STSTest, 2lvlDynamicTree )
 {
 	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
-		sts::tools::TaskBatch_AutoRelease batch( system_interface );
+		sts::tools::TaskBatch< 20 > batch( system_interface );
 
 		for( int i = 0; i < 20; ++i )
 		{
@@ -257,7 +256,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 	// Create lambda that will process the array in parallel.
 	auto root_lambda = [ &arrayToFill ]( const sts::ITaskContext* context )
 	{
-		sts::tools::TaskBatch_AutoRelease batch( context->GetTaskSystem() );
+		sts::tools::TaskBatch< 205 >  batch( context->GetTaskSystem() );
 
 		for( unsigned i = 0; i < arrayToFill.size(); ++i )
 		{
@@ -330,7 +329,7 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 	{
 		auto functor = []( const sts::ITaskContext* context )
 		{
-			sts::tools::TaskBatch_AutoRelease batch( context->GetTaskSystem() );
+			sts::tools::TaskBatch< 110 > batch( context->GetTaskSystem() );
 	
 			auto parent_task_handle = context->GetTaskSystem()->CreateNewTask( &helpers::TaskFunctionFast, nullptr );
 	
@@ -359,7 +358,7 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 		////////////////////////////////////////////////////////////////////
 	
 		{
-			sts::tools::TaskBatch_AutoRelease batch( system_interface );
+			sts::tools::TaskBatch< 20 > batch( system_interface );
 	
 			for( unsigned i = 0; i < 20; ++i )
 			{
@@ -390,41 +389,39 @@ TEST(STSTest, StaticTaskTreeTest)
 	
 	for( int iteration = 0; iteration < 10; ++iteration )
 	{
-		{
-			sts::tools::TaskBatch_AutoRelease batch( system_interface );
+		sts::tools::TaskBatch< 2040 > batch( system_interface );
 
-			auto root_task_handle = system_interface->CreateNewTask( &helpers::TaskFunctionFast, nullptr );
-			ASSERT_TRUE( root_task_handle != nullptr );
+		auto root_task_handle = system_interface->CreateNewTask( &helpers::TaskFunctionFast, nullptr );
+		ASSERT_TRUE( root_task_handle != nullptr );
 	
-			// Build static tree:
-			for( unsigned i = 0; i < 20; ++i )
+		// Build static tree:
+		for( unsigned i = 0; i < 20; ++i )
+		{
+			auto parent_handle_lvl2 = system_interface->CreateNewTask( &helpers::TaskFunctionFast, root_task_handle );
+			ASSERT_TRUE( parent_handle_lvl2 != nullptr );
+	
+			for( unsigned i = 0; i < 100; ++i )
 			{
-				auto parent_handle_lvl2 = system_interface->CreateNewTask( &helpers::TaskFunctionFast, root_task_handle );
-				ASSERT_TRUE( parent_handle_lvl2 != nullptr );
-	
-				for( unsigned i = 0; i < 100; ++i )
-				{
-					auto handle = system_interface->CreateNewTask( &helpers::TaskFunctionFast, parent_handle_lvl2 );
-					ASSERT_TRUE( handle != nullptr );
-					batch.Add( handle );
-				}
-	
-				batch.Add( parent_handle_lvl2 );
+				auto handle = system_interface->CreateNewTask( &helpers::TaskFunctionFast, parent_handle_lvl2 );
+				ASSERT_TRUE( handle != nullptr );
+				batch.Add( handle );
 			}
 	
-			batch.Add( root_task_handle );
+			batch.Add( parent_handle_lvl2 );
+		}
 	
-			bool submitted = batch.SubmitAll();
-			ASSERT_TRUE( submitted );
+		batch.Add( root_task_handle );
 	
-			system_interface->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+		bool submitted = batch.SubmitAll();
+		ASSERT_TRUE( submitted );
 	
-			for( auto handle : batch )
-			{
-				auto bla = helpers::ReadFromTask<int>( handle );
-				ASSERT_TRUE( helpers::ReadFromTask<int>( handle ) == 80000 );
-				ASSERT_TRUE( handle->IsFinished() );
-			}
+		system_interface->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+	
+		for( auto handle : batch )
+		{
+			auto bla = helpers::ReadFromTask<int>( handle );
+			ASSERT_TRUE( helpers::ReadFromTask<int>( handle ) == 80000 );
+			ASSERT_TRUE( handle->IsFinished() );
 		}
 	}
 }
@@ -436,9 +433,11 @@ TEST( STSTest, FlushingSuspendedTasks )
 
 	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
 	{
-		sts::tools::TaskBatch_AutoRelease batch( system_interface );
+		static const int TASK_SIZE = 64;
 
-		for( int i = 0; i < 64; ++i )
+		sts::tools::TaskBatch< TASK_SIZE > batch( system_interface );
+
+		for( int i = 0; i < TASK_SIZE; ++i )
 		{
 			auto lambda = [&fence ]( const sts::ITaskContext* context )
 			{
