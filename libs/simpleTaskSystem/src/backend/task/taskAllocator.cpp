@@ -9,7 +9,9 @@ TaskAllocator::TaskAllocator()
 	// Setup and add to free list.
 	for( uint32_t i = 0; i < TASK_POOL_SIZE; ++i )
 	{
-		m_taskHandlePool[ i ].AssociateTask( &m_taskPool[ i ] );
+		Task& task = m_taskPool[ i ];
+		task.Setup( (TASK_ID)i );
+		m_taskHandlePool[ i ].AssociateTask( &task );
 		VERIFY_SUCCESS( m_freelist.PushBack( &m_taskHandlePool[ i ] ) );
 	}
 }
@@ -43,6 +45,13 @@ void TaskAllocator::ReleaseTask( const ITaskHandle* task_handle )
 bool TaskAllocator::AreAllTasksReleased() const
 {
 	return m_freelist.GetCurrentSize() == m_freelist.GetMaxSize();;
+}
+
+////////////////////////////////////////////////////
+Task* TaskAllocator::TaskIDToTask( TASK_ID id )
+{
+	ASSERT( id != INVALID_TASK_ID );
+	return &m_taskPool[ id ];
 }
 
 ////////////////////////////////////////////////////

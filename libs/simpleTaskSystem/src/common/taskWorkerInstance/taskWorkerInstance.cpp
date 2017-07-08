@@ -120,10 +120,17 @@ void TaskWorkerInstance::OnFinishedTaskFiber( TaskFiber* fiber )
 	WORKER_LOG( "Task< %i > is done.",, finished_task->GetTaskID() );
 
 	// Check if task has any dependency - if has and it is ready, then submit it now.
-	if( Task* parent_of_finished_task = finished_task->UpdateDependecies() )
+	TReadyToBeExecutedArray array { nullptr };
+	if( finished_task->UpdateDependecies( m_context.m_alloator, array ) )
 	{
-		WORKER_LOG( "Just-finished-task< %i > has a parent task< %i > ready to be executed, so adding it to the local pending queue.", , finished_task->GetTaskID(), parent_of_finished_task->GetTaskID() );
-		VERIFY_SUCCESS( AddTask( parent_of_finished_task ) ); //< Add task to local queue.
+		for( Task* ready_to_be_executed : array )
+		{
+			if( ready_to_be_executed )
+			{
+				WORKER_LOG( "Just-finished-task< %i > has a dependant task< %i > ready to be executed, so adding it to the local pending queue.", , finished_task->GetTaskID(), ready_to_be_executed->GetTaskID() );
+				VERIFY_SUCCESS( AddTask( ready_to_be_executed ) ); //< Add task to local queue.
+			}
+		}
 	}
 
 	// Clear task in fiber.

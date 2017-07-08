@@ -27,7 +27,7 @@ public:
 
 	// ITaskHandle interface:
 	void SetTaskFunction( TTaskFunctionPtr function ) const override;
-	void AddParent( const ITaskHandle* parentTaskHandle ) const override;
+	void AddDependants( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 ) const override;
 	bool IsFinished() const override;
 	uint32_t GetTaskStorageSize() const override;
 	void* GetTaskStorage() const override;

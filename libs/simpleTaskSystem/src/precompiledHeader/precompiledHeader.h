@@ -9,5 +9,6 @@
 #include "..\common\common.h"
 
 #include <vector>
+#include <array>
 #include <memory>
 #include <functional>

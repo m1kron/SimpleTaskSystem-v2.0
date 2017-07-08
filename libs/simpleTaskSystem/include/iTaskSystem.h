@@ -13,7 +13,7 @@ public:
 	virtual uint32_t GetWorkersCount() const = 0;
 
 	// Creates raw task, which has to be later submitted. 
-	virtual const ITaskHandle* CreateNewTask( const ITaskHandle* parent_task_handle ) = 0;
+	virtual const ITaskHandle* CreateNewTask( const ITaskHandle* dependant1, const ITaskHandle* dependant2 = nullptr, const ITaskHandle* dependant3 = nullptr ) = 0;
 
 	// Submits and dispatches task to workers. Returns false in case of fail. Since now task is considered
 	// to be executed, so any changes until ITaskHandle::IsFinished() returns true are not permitted.
@@ -28,7 +28,7 @@ public:
 	template< typename TCondition > bool RunTasksUsingThisThreadUntil( const TCondition& condition );
 
 	// Creates a tasks and set task_function at the same time.
-	const ITaskHandle* CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* parent_task_handle );
+	const ITaskHandle* CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* dependant1, const ITaskHandle* dependant2 = nullptr, const ITaskHandle* dependant3 = nullptr );
 
 protected:
 	// Tries to steal and process one task. Blocking function.
@@ -50,9 +50,9 @@ protected:
 ////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////
-inline const ITaskHandle* ITaskSystem::CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* parent_task_handle )
+inline const ITaskHandle* ITaskSystem::CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 )
 {
-	if( auto task_handle = CreateNewTask( parent_task_handle ) )
+	if( auto task_handle = CreateNewTask( dependant1, dependant2, dependant3 ) )
 	{
 		task_handle->SetTaskFunction( task_function );
 		return task_handle;

@@ -19,7 +19,7 @@ bool BackendTaskSystem::Initialize( TaskWorkerInstance& helper_instance, ITaskSy
 
 	// Init main worker instance.
 	auto idx = m_dispatcher.Register( &helper_instance, false );
-	VERIFY_SUCCESS( helper_instance.Initalize( { system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
+	VERIFY_SUCCESS( helper_instance.Initalize( { &m_taskAllocator, system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
 
 	// Heuristic: create num_cores - 1 working threads:
 	m_workerThreadsPool.InitializePool( num_cores );
@@ -30,7 +30,7 @@ bool BackendTaskSystem::Initialize( TaskWorkerInstance& helper_instance, ITaskSy
 		TaskWorkerThread* workerThread = m_workerThreadsPool.GetWorkerAt( i );
 		
 		auto idx = m_dispatcher.Register( workerThread->GetWorkerInstance(), true );
-		VERIFY_SUCCESS( workerThread->Start( { system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
+		VERIFY_SUCCESS( workerThread->Start( { &m_taskAllocator, system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
 	}
 	
 	return true;
@@ -78,15 +78,14 @@ void BackendTaskSystem::WakeUpAllWorkerThreads() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-const ITaskHandle* BackendTaskSystem::CreateNewTask( const ITaskHandle* parent_task_handle )
+const ITaskHandle* BackendTaskSystem::CreateNewTask( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 )
 {
 	const ITaskHandle* new_task_handle = m_taskAllocator.AllocateNewTask();
 
 	if( new_task_handle == nullptr )
 		return nullptr;
 
-	if( parent_task_handle != nullptr )
-		new_task_handle->AddParent( parent_task_handle );
+	new_task_handle->AddDependants( dependant1, dependant2, dependant3 );
 
 	return new_task_handle;
 }

@@ -16,7 +16,7 @@ public:
 
 	// ITaskSystem interface:
 	uint32_t GetWorkersCount() const override;
-	const ITaskHandle* CreateNewTask( const ITaskHandle* parent_task_handle ) override;
+	const ITaskHandle* CreateNewTask( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 ) override;
 	bool SubmitTask( const ITaskHandle* task_handle ) override;
 	void ReleaseTask( const ITaskHandle* task_handle ) override;
 	void TryToRunOneTask() override;

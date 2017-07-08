@@ -22,6 +22,9 @@ public:
 	// Returns true if all tasks are released.
 	bool AreAllTasksReleased() const;
 
+	// Maps id to Task instance. TEMPORARY HERE!
+	Task* TaskIDToTask( TASK_ID id );
+
 	// Returns size of task pool.
 	static uint32_t GetTaskPoolSize();
 

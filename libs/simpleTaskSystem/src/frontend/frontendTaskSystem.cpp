@@ -28,9 +28,9 @@ uint32_t FrontendTaskSystem::GetWorkersCount() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-const ITaskHandle* FrontendTaskSystem::CreateNewTask( const ITaskHandle* parent_task_handle )
+const ITaskHandle* FrontendTaskSystem::CreateNewTask( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 )
 {
-	return m_backend->CreateNewTask( parent_task_handle );
+	return m_backend->CreateNewTask( dependant1, dependant2, dependant3 );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

@@ -14,9 +14,15 @@ void TaskHandle::SetTaskFunction( TTaskFunctionPtr function ) const
 }
 
 ///////////////////////////////////////////////////////////////////
-void TaskHandle::AddParent( const ITaskHandle* parentTaskHandle ) const
+void TaskHandle::AddDependants( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 ) const
 {
-	m_task->AddParent( static_cast< const TaskHandle* >( parentTaskHandle )->m_task );
+	// TODO: if this get bigger either use variadic templates or simple array of ptrs.
+
+	Task* dependant_task1 = dependant1 != nullptr ? AsTaskHandle( dependant1 )->GetTask() : nullptr;
+	Task* dependant_task2 = dependant2 != nullptr ? AsTaskHandle( dependant2 )->GetTask() : nullptr;
+	Task* dependant_task3 = dependant3 != nullptr ? AsTaskHandle( dependant3 )->GetTask() : nullptr;
+
+	m_task->AddDependantTasks( dependant_task1, dependant_task2, dependant_task3 );
 }
 
 ///////////////////////////////////////////////////////////////////

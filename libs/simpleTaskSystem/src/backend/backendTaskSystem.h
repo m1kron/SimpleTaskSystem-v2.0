@@ -22,7 +22,7 @@ public:
 	void Deinitialize( TaskWorkerInstance& helper_instance );
 
 	// Creates new tasks.
-	const ITaskHandle* CreateNewTask( const ITaskHandle* parent_task_handle );
+	const ITaskHandle* CreateNewTask( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 );
 
 	// Releases tasks.
 	void ReleaseTask( const ITaskHandle* task_handle );

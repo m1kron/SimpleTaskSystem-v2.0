@@ -15,8 +15,8 @@ public:
 	// Set main task function.
 	virtual void SetTaskFunction( TTaskFunctionPtr function ) const = 0;
 
-	// Specifies parent of this task handle.
-	virtual void AddParent( const ITaskHandle* parentTaskHandle ) const = 0;
+	// Specifies dependant task handles of this task handle. All dependant tasks will be executed after this tasks finish execution.
+	virtual void AddDependants( const ITaskHandle* dependant1, const ITaskHandle* dependant2 = nullptr, const ITaskHandle* dependant3 = nullptr ) const = 0;
 
 	// Returns true if task is executed.
 	virtual bool IsFinished() const = 0;

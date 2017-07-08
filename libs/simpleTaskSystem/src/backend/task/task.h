@@ -5,6 +5,12 @@
 NAMESPACE_STS_BEGIN
 
 class ITaskContext;
+class TaskAllocator;
+
+typedef uint16_t TASK_ID;
+#define INVALID_TASK_ID 0xFFFF
+
+typedef std::array< class Task*, 3 > TReadyToBeExecutedArray;
 
 /////////////////////////////////////////////////////////
 // Task respresent basic unit of execution in the system.
@@ -28,9 +34,8 @@ public:
 	// Returns true if task can be executed right now.
 	bool IsReadyToBeExecuted() const;
 
-	// Marks this task as a child of parent task. Parent task will be
-	// executed after all child tasks are done.
-	void AddParent( Task* parentTask );
+	// Adds dependant tasks, all will be executed after this task is done.
+	void AddDependantTasks( Task* dependant1, Task* dependant2, Task* dependant3 );
 
 	// Set main task function.
 	void SetTaskFunction( TTaskFunctionPtr function );
@@ -40,23 +45,27 @@ public:
 
 	// Updates dependencies( parent_task ). Returns parent task if it is ready to
 	// be executed, nullptr otherwise.
-	Task* UpdateDependecies();
+	bool UpdateDependecies( TaskAllocator* allocator, TReadyToBeExecutedArray& out_ready_to_be_executed );
 
 	// Clears task.
 	void Clear();
 
 	// Returns task id.
-	uint32_t GetTaskID() const;
+	TASK_ID GetTaskID() const;
 
 	// Max size of data that can be stored by task instance.
-	static const size_t STORAGE_SIZE = ( BTL_CACHE_LINE_SIZE - sizeof( TTaskFunctionPtr ) - sizeof( Task* ) - sizeof( btl::Atomic< uint32_t > ) );
+	static const size_t STORAGE_SIZE = ( BTL_CACHE_LINE_SIZE - sizeof( TTaskFunctionPtr ) - sizeof( TASK_ID ) * 4 - sizeof( btl::Atomic< uint32_t > ) );
 
 private:
-	// Returns parent task.
-	Task* GetParentTask() const;
+	typedef TASK_ID TDependantTasksArray[ 3 ];
+	friend class TaskAllocator;
+
+	// Setups this task.
+	void Setup( TASK_ID id );
 
 	TTaskFunctionPtr m_functionPtr;
-	Task* m_parentTask;
+	TDependantTasksArray m_dependants;
+	TASK_ID m_id;
 	btl::Atomic< uint32_t > m_numberOfChildTasks; //< When 0, task is considered as finished.
 
 	char m_storage[ STORAGE_SIZE ];
@@ -91,19 +100,10 @@ inline void Task::SetTaskFunction( TTaskFunctionPtr function )
 }
 
 ////////////////////////////////////////////////////////
-inline void Task::AddParent( Task* parentTask )
+inline void Task::Setup( TASK_ID id )
 {
-	ASSERT( parentTask != nullptr );
-	ASSERT( m_parentTask == nullptr );
-
-	m_parentTask = parentTask;
-	m_parentTask->m_numberOfChildTasks.Increment();
-}
-
-////////////////////////////////////////////////////////
-inline Task* Task::GetParentTask() const
-{
-	return m_parentTask;
+	ASSERT( id != INVALID_TASK_ID );
+	m_id = id;
 }
 
 ////////////////////////////////////////////////////////
@@ -118,16 +118,16 @@ inline void Task::Clear()
 	ASSERT( m_numberOfChildTasks.Load( btl::MemoryOrder::Relaxed ) == 0 );
 
 	m_functionPtr = nullptr;
-	m_parentTask = nullptr;
+	m_dependants[ 0 ] = INVALID_TASK_ID;
+	m_dependants[ 1 ] = INVALID_TASK_ID;
+	m_dependants[ 2 ] = INVALID_TASK_ID;
 	m_numberOfChildTasks.Store( 0, btl::MemoryOrder::Release );
 }
 
 ////////////////////////////////////////////////////////
-inline uint32_t Task::GetTaskID() const
+inline TASK_ID Task::GetTaskID() const
 {
-	// Just use memory address.
-	uint64_t id = reinterpret_cast< uint64_t > ( this );
-	return (uint32_t)id; 
+	return m_id; 
 }
 
 NAMESPACE_STS_END
