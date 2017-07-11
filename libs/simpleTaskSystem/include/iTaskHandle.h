@@ -4,8 +4,13 @@
 namespace sts
 {
 
-// Archetype of the function that task can run.
-typedef void( *TTaskFunctionPtr ) ( const ITaskContext* task_context );
+// Archetype of the function that task can run. Function has to return true, when
+// its run is considered as successfull or false when had any execution error.
+// What exactly is 'execution error' depends only on user - it can be used to mark that
+// some computation had failed an there is no sense of using it. In particiular,
+// execution error can make no sense for some TaskFunction.
+// This value is used when anyone queries ITaskHandle::HasExecutionError().
+typedef bool( *TTaskFunctionPtr ) ( const ITaskContext* task_context );
 
 // This class represent handle to real task that will be run by the system.
 // User can setup the task only via this interface.
@@ -20,6 +25,9 @@ public:
 
 	// Returns true if task is executed.
 	virtual bool IsFinished() const = 0;
+
+	// Returns if given task had an execution error. Execution error occures when user-delivered task function returns true.
+	virtual bool HasExecutionError() const = 0;
 
 	// Returns size of task storage - user can put whatever he wants to that storage.
 	// Example: user wants to calcualte some big number via the task, and wants to later get it 

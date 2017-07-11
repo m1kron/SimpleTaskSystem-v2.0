@@ -32,8 +32,8 @@ struct MergeSortRange
 	size_t m_range;
 	union
 	{
-		size_t m_maxRange;	//< When going down ( splitting ) last field contains maxRange.
-		size_t m_levels;	//< When going up ( merging ) last field contains levels.
+		size_t m_maxRange;		//< When going down ( splitting ) last field contains maxRange.
+		size_t m_levels;		//< When going up ( merging ) last field contains levels.
 	};
 
 	typename TContainer::iterator GetBeginIt() const
@@ -60,7 +60,7 @@ struct MergeSortRange
 
 /////////////////////////////////////////////////////////////////////////////
 template< typename TContainer >
-void MergeSortTaskFunction( const sts::ITaskContext* context )
+bool MergeSortTaskFunction( const sts::ITaskContext* context )
 {
 	typedef MergeSortRange< TContainer > TSortRange;
 
@@ -73,13 +73,15 @@ void MergeSortTaskFunction( const sts::ITaskContext* context )
 		std::sort( range.GetBeginIt(), range.GetEndIt() );
 		range.m_levels++;
 		TaskStorageWriter( context ).WriteSafe( range );
-		return;
+		return true;
 	}
 
 	// 3. Otherwise we have to recursively split into two ranges:
 	TaskBatch< 2 > batch( context->GetTaskSystem() ); //< for auto releasing task if return;
-	batch.Add( context->GetTaskSystem()->CreateNewTask( MergeSortTaskFunction< TContainer >, nullptr ) );
-	batch.Add( context->GetTaskSystem()->CreateNewTask( MergeSortTaskFunction< TContainer >, nullptr ) );
+	if( !batch.Add( context->GetTaskSystem()->CreateNewTask( MergeSortTaskFunction< TContainer >, nullptr ) ) )
+		return false;
+	if( !batch.Add( context->GetTaskSystem()->CreateNewTask( MergeSortTaskFunction< TContainer >, nullptr ) ) )
+		return false;
 
 	// 4. Calculate half range
 	const auto HALF_RANGE = range.m_range / 2;
@@ -96,10 +98,14 @@ void MergeSortTaskFunction( const sts::ITaskContext* context )
 	}
 
 	// 6. Submit the tasks.
-	batch.SubmitAll();
+	if( !batch.SubmitAll() )
+		 false;
 
 	// 7. Wait for tasks to finish.
 	context->SuspendUntil( [ &batch ](){ return batch.AreAllTaskFinished(); } );
+
+	if( batch.HasExecutionError() )
+		return false;
 
 	// 8. Get results from tasks - range.m_container contains sorted subrange.
 	auto left_range = TaskStorageReader( batch[ 0 ] ).Read< TSortRange >();
@@ -114,6 +120,7 @@ void MergeSortTaskFunction( const sts::ITaskContext* context )
 	range.m_levels = left_range.m_levels + 1;
 
 	TaskStorageWriter( context ).WriteSafe( range );
+	return true;
 }
 }
 
@@ -144,9 +151,13 @@ bool ParallelMergeSort( TContainer& container, ITaskSystem* system_interface )
 	if( !system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } ) )
 		return false;
 
+	// 5. Check if everything went fine.
+	if( batch.HasExecutionError() )
+		return false;
+
 	auto final_range = TaskStorageReader( batch[ 0 ] ).Read< TSortRange >();
 
-	// 5. If working_container contains result, copy it to container.
+	// 6. If working_container contains result, copy it to container.
 	if( ( final_range.m_levels & 1 ) == 0 )
 		std::copy( working_container.begin(), working_container.end(), container.begin() );
 

@@ -34,6 +34,9 @@ public:
 	// Returns true if task can be executed right now.
 	bool IsReadyToBeExecuted() const;
 
+	// Returns true if task had an execution error.
+	bool HasExecutionError() const;
+
 	// Adds dependant tasks, all will be executed after this task is done.
 	void AddDependantTasks( Task* dependant1, Task* dependant2, Task* dependant3 );
 
@@ -66,7 +69,7 @@ private:
 	TTaskFunctionPtr m_functionPtr;
 	TDependantTasksArray m_dependants;
 	TASK_ID m_id;
-	btl::Atomic< uint32_t > m_numberOfChildTasks; //< When 0, task is considered as finished.
+	btl::Atomic< int32_t > m_numberOfChildTasks; //< When <= 0, task is considered as finished. When < 0, task had an execution error.
 
 	char m_storage[ STORAGE_SIZE ];
 };
@@ -80,13 +83,19 @@ private:
 ////////////////////////////////////////////////////////
 inline bool Task::IsFinished() const
 {
-	return m_numberOfChildTasks.Load( btl::MemoryOrder::Acquire ) == 0;
+	return m_numberOfChildTasks.Load( btl::MemoryOrder::Acquire ) <= 0;
 }
 
 ////////////////////////////////////////////////////////
 inline bool Task::IsReadyToBeExecuted() const
 {
 	return m_numberOfChildTasks.Load( btl::MemoryOrder::Acquire ) == 1;
+}
+
+////////////////////////////////////////////////////////
+inline bool Task::HasExecutionError() const
+{
+	return m_numberOfChildTasks.Load( btl::MemoryOrder::Acquire ) < 0;
 }
 
 ////////////////////////////////////////////////////////
@@ -115,7 +124,7 @@ inline void* Task::GetStoragePtr()
 ////////////////////////////////////////////////////////
 inline void Task::Clear()
 {
-	ASSERT( m_numberOfChildTasks.Load( btl::MemoryOrder::Relaxed ) == 0 );
+	ASSERT( m_numberOfChildTasks.Load( btl::MemoryOrder::Relaxed ) <= 0 );
 
 	m_functionPtr = nullptr;
 	m_dependants[ 0 ] = INVALID_TASK_ID;

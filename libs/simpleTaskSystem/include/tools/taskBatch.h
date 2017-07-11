@@ -28,6 +28,9 @@ public:
 	// Returns true if all tasks in batch are finished.
 	bool AreAllTaskFinished() const;
 
+	// Returns true if any of tasks in batch has exectution error.
+	bool HasExecutionError() const;
+
 	// Submits all tasks in batch to be executed.
 	bool SubmitAll();
 
@@ -129,6 +132,16 @@ inline bool TaskBatchRaw::AreAllTaskFinished() const
 			return false;
 
 	return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+inline bool TaskBatchRaw::HasExecutionError() const
+{
+	for( auto handle : *this )
+		if( handle->HasExecutionError() )
+			return true;
+
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////

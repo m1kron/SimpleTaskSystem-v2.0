@@ -32,6 +32,12 @@ bool TaskHandle::IsFinished() const
 }
 
 ///////////////////////////////////////////////////////////////////
+bool TaskHandle::HasExecutionError() const
+{
+	return m_task->HasExecutionError();
+}
+
+///////////////////////////////////////////////////////////////////
 uint32_t TaskHandle::GetTaskStorageSize() const
 {
 	return m_task->GetStorageSize();

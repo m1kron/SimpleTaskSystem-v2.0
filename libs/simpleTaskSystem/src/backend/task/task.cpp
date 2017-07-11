@@ -30,13 +30,13 @@ void Task::Run( ITaskContext* context )
 	TASK_LOG( "Started execution." );
 
 	// Execute task function:
-	m_functionPtr( context );
+	bool success = m_functionPtr( context );
 
 	TASK_LOG( "Execution finished." );
 
 	// We are finished, so we can't have any dependant tasks now.
-	uint32_t dependent_num = m_numberOfChildTasks.Decrement();
-	ASSERT( dependent_num == 0 );
+	int32_t finalVal = success ? 0 : -1;
+	m_numberOfChildTasks.Exchange( finalVal, btl::MemoryOrder::Release );
 }
 
 ///////////////////////////////////////////////////////

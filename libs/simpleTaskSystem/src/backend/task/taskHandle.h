@@ -29,6 +29,7 @@ public:
 	void SetTaskFunction( TTaskFunctionPtr function ) const override;
 	void AddDependants( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 ) const override;
 	bool IsFinished() const override;
+	bool HasExecutionError() const override;
 	uint32_t GetTaskStorageSize() const override;
 	void* GetTaskStorage() const override;
 	// ---

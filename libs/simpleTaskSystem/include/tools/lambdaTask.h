@@ -26,7 +26,7 @@ const ITaskHandle* LambdaTaskMaker( const TLambda& functor, ITaskSystem* system_
 ////////////////////////////////////////////////////////
 // This function will extract functor and call it.
 template< typename TLambda >
-void LambdaTaskFunction( const ITaskContext* context ) 
+bool LambdaTaskFunction( const ITaskContext* context ) 
 {
 	// This helper class is used to retrive functor from task data, cuz
 	// in general TFunctor might not have ctor that we can use here ( without paramters ).
@@ -40,7 +40,7 @@ void LambdaTaskFunction( const ITaskContext* context )
 	// Cast to functor type.
 	const TLambda& lambda = reinterpret_cast<const TLambda&> ( temp );
 
-	lambda( context );
+	return lambda( context );
 }
 
 ///////////////////////////////////////////////////////////

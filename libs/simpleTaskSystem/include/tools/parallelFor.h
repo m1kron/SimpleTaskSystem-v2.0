@@ -74,6 +74,7 @@ bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 		{
 			for( Iterator it = dbg_start_it; it != dbg_end_it; ++it )
 				functor( it );
+			return true;
 		};
 #else
 		// Release version:
@@ -81,6 +82,7 @@ bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 		{
 			for( auto it = start_it; it != end_it; ++it )
 				functor( it );
+			return true;
 		};
 #endif
 
