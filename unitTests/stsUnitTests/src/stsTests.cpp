@@ -57,28 +57,30 @@ namespace helpers
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	void TaskFunction( const sts::ITaskContext* context )
+	bool TaskFunction( const sts::ITaskContext* context )
 	{
 		int sum = 0;
 		for( int i = 0; i < 10000000; ++i )
 			sum += ( i % 5 ) / 2;
 
 		sts::tools::TaskStorageWriter( context ).WriteSafe( sum );
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	void TaskFunctionFast( const sts::ITaskContext* context )
+	bool TaskFunctionFast( const sts::ITaskContext* context )
 	{
 		int sum = 0;
 		for( int i = 0; i < 100000; ++i )
 			sum += ( i % 5 ) / 2;
 
 		sts::tools::TaskStorageWriter( context ).WriteSafe( sum );
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	template< int CHILDS_SIZE >
-	void TaskFunctionDynamicTree( const sts::ITaskContext* context )
+	bool TaskFunctionDynamicTree( const sts::ITaskContext* context )
 	{
 		sts::tools::TaskBatch< CHILDS_SIZE > batch( context->GetTaskSystem() );
 
@@ -105,6 +107,8 @@ namespace helpers
 
 		if( ok )
 			sts::tools::TaskStorageWriter( context ).WriteSafe( SOME_CONST );
+
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -154,6 +158,7 @@ TEST( STSTest, SimpleSingleLambdaTask )
 		int sum = 0;
 		for( int i = 0; i < 10000; ++i )
 			sum += i;
+		return true;
 	}, system, nullptr );
 
 	ASSERT_TRUE( system->SubmitTask( task_handle ) );
@@ -268,7 +273,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 
 				// Store item in data task data storage.
 				sts::tools::TaskStorageWriter( context ).WriteSafe( calculated_item );
-
+				return true;
 			}; ///< end of child_lambda_functor
 
 			// Create new task using item_functor:
@@ -297,7 +302,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 		// Write final sum:
 		// NOTE: I am aware that I am overriding lambda here, but i am not going to touch any ot its stuff anymore..
 		sts::tools::TaskStorageWriter( context ).WriteSafe( final_sum );
-
+		return true;
 	}; ///< end of root_lambda
 
 	// Create main task using array_functor:
@@ -353,7 +358,7 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 			}	
 	
 			sts::tools::TaskStorageWriter( context ).WriteSafe( final_sum );
-
+			return true;
 		}; //< end of functor
 		////////////////////////////////////////////////////////////////////
 	
@@ -442,6 +447,7 @@ TEST( STSTest, FlushingSuspendedTasks )
 			auto lambda = [&fence ]( const sts::ITaskContext* context )
 			{
 				context->SuspendUntil( [ &fence ]() { return fence.Load( btl::MemoryOrder::Acquire ) == 1; } );
+				return true;
 			};
 
 			auto handle = sts::tools::LambdaTaskMaker( lambda, system_interface, nullptr );
