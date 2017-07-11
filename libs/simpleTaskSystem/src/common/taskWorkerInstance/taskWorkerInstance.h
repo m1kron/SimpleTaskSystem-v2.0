@@ -9,10 +9,11 @@ NAMESPACE_STS_BEGIN
 class Task;
 class TaskFiber;
 
-// Class represents TaskWorkerInstance, which is responsible for logic related to running task.
-// Implements every thing that is connected to that ( including stealing, fiber managment etc ).
-// Note that this class is used by task worker thread, as well as task system to allow running 
-// tasks from main thread.
+// Class is responsible for task execution and managment. In particular, it
+// has a queue of pending tasks, as well as list of suspended ones. It also
+// implements fiber managment.
+// Note that this class is used by task worker thread, as well as fronted task system 
+// in order to allow fronted to act as a worker instance.
 class TaskWorkerInstance
 {
 public:
