@@ -5,6 +5,7 @@ NAMESPACE_STS_BEGIN
 
 ///////////////////////////////////////////////////
 TaskAllocator::TaskAllocator()
+	: m_registry( this )
 {
 	// Setup and add to free list.
 	for( uint32_t i = 0; i < TASK_POOL_SIZE; ++i )
@@ -14,12 +15,6 @@ TaskAllocator::TaskAllocator()
 		m_taskHandlePool[ i ].AssociateTask( &task );
 		VERIFY_SUCCESS( m_freelist.PushBack( &m_taskHandlePool[ i ] ) );
 	}
-}
-
-///////////////////////////////////////////////////
-TaskAllocator::~TaskAllocator()
-{
-	ASSERT( AreAllTasksReleased() );
 }
 
 ///////////////////////////////////////////////////
@@ -45,19 +40,6 @@ void TaskAllocator::ReleaseTask( const ITaskHandle* task_handle )
 bool TaskAllocator::AreAllTasksReleased() const
 {
 	return m_freelist.GetCurrentSize() == m_freelist.GetMaxSize();;
-}
-
-////////////////////////////////////////////////////
-Task* TaskAllocator::TaskIDToTask( TASK_ID id )
-{
-	ASSERT( id != INVALID_TASK_ID );
-	return &m_taskPool[ id ];
-}
-
-////////////////////////////////////////////////////
-uint32_t TaskAllocator::GetTaskPoolSize()
-{
-	return TASK_POOL_SIZE;
 }
 
 NAMESPACE_STS_END

@@ -5,7 +5,7 @@
 NAMESPACE_STS_BEGIN
 
 class ITaskContext;
-class TaskAllocator;
+class TaskRegistry;
 
 typedef uint16_t TASK_ID;
 #define INVALID_TASK_ID 0xFFFF
@@ -45,7 +45,7 @@ public:
 
 	// Updates dependencies( parent_task ). Returns parent task if it is ready to
 	// be executed, nullptr otherwise.
-	bool UpdateDependecies( TaskAllocator* allocator, TReadyToBeExecutedArray& out_ready_to_be_executed );
+	bool UpdateDependecies( const TaskRegistry* registry, TReadyToBeExecutedArray& out_ready_to_be_executed );
 
 	// Clears task.
 	void Clear();

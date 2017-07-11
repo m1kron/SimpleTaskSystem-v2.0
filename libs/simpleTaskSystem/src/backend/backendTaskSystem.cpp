@@ -19,7 +19,7 @@ bool BackendTaskSystem::Initialize( TaskWorkerInstance& helper_instance, ITaskSy
 
 	// Init main worker instance.
 	auto idx = m_dispatcher.Register( &helper_instance, false );
-	VERIFY_SUCCESS( helper_instance.Initalize( { &m_taskAllocator, system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
+	VERIFY_SUCCESS( helper_instance.Initalize( { m_taskAllocator.GetTaskRegistryInstance(), system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
 
 	// Heuristic: create num_cores - 1 working threads:
 	m_workerThreadsPool.InitializePool( num_cores );
@@ -30,7 +30,7 @@ bool BackendTaskSystem::Initialize( TaskWorkerInstance& helper_instance, ITaskSy
 		TaskWorkerThread* workerThread = m_workerThreadsPool.GetWorkerAt( i );
 		
 		auto idx = m_dispatcher.Register( workerThread->GetWorkerInstance(), true );
-		VERIFY_SUCCESS( workerThread->Start( { &m_taskAllocator, system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
+		VERIFY_SUCCESS( workerThread->Start( { m_taskAllocator.GetTaskRegistryInstance(), system_interface, &m_dispatcher, &m_taskFiberAllocator, idx } ) );
 	}
 	
 	return true;

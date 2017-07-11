@@ -5,12 +5,12 @@ NAMESPACE_STS_BEGIN
 class Dispatcher;
 class ITaskSystem;
 class TaskFiberAllocator;
-class TaskAllocator;
+class TaskRegistry;
 
 // Contains necessary context for task worker instance.
 struct TaskWorkerInstanceContext
 {
-	TaskAllocator* m_alloator; //< TEMPORARY!
+	const TaskRegistry* m_registry;
 	ITaskSystem* m_taskSystem;
 	Dispatcher* m_dispatcher;
 	TaskFiberAllocator* m_fiberAllocator;

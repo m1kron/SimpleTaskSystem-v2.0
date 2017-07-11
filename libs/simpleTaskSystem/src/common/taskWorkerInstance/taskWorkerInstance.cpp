@@ -121,7 +121,7 @@ void TaskWorkerInstance::OnFinishedTaskFiber( TaskFiber* fiber )
 
 	// Check if task has any dependency - if has and it is ready, then submit it now.
 	TReadyToBeExecutedArray array { nullptr };
-	if( finished_task->UpdateDependecies( m_context.m_alloator, array ) )
+	if( finished_task->UpdateDependecies( m_context.m_registry, array ) )
 	{
 		for( Task* ready_to_be_executed : array )
 		{

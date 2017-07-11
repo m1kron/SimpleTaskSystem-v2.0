@@ -40,7 +40,7 @@ void Task::Run( ITaskContext* context )
 }
 
 ///////////////////////////////////////////////////////
-bool Task::UpdateDependecies( TaskAllocator* allocator, TReadyToBeExecutedArray& out_ready_to_be_executed )
+bool Task::UpdateDependecies( const TaskRegistry* registry, TReadyToBeExecutedArray& out_ready_to_be_executed )
 {
 	bool return_val = false;
 // ----------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ bool Task::UpdateDependecies( TaskAllocator* allocator, TReadyToBeExecutedArray&
 #define CHECK_DEPS( idx, dep_list, allocator, out_ret_val, out_ready_to_be_executed )			\
 	if( dep_list[ idx ] != INVALID_TASK_ID )													\
 	{																							\
-		Task* dependant = allocator->TaskIDToTask( dep_list[ idx ] );							\
+		Task* dependant = registry->TaskIDToTask( dep_list[ idx ] );							\
 		TASK_LOG( "Updating dependencies of dependant task< %i >.", , dependant->GetTaskID() );	\
 		uint32_t parent_dependencies = dependant->m_numberOfChildTasks.Decrement();				\
 		if( parent_dependencies == 1 )															\
