@@ -12,10 +12,10 @@ namespace tools
 // Returns valid handle if success. Note, that lambda has to fit task storage ( sizeof (TLambda) <= task storage )
 //
 // Example:
-// FunctorTaskMaker( []() { for( int i = 0; i < 1000000; ++i ) { int k = 0; } }, task_system_interface, nullptr );
+// LambdaTaskMaker( []() { for( int i = 0; i < 1000000; ++i ) { int k = 0; } }, task_system_interface );
 // task_system_interface->SubmitTask( task_handle );
 template< typename TLambda >
-const ITaskHandle* LambdaTaskMaker( const TLambda& functor, ITaskSystem* system_interface, const ITaskHandle* parent_task_handle );
+const ITaskHandle* LambdaTaskMaker( const TLambda& functor, ITaskSystem* system_interface );
 
 ////////////////////////////////////////////////////////
 //
@@ -45,10 +45,10 @@ bool LambdaTaskFunction( const ITaskContext* context )
 
 ///////////////////////////////////////////////////////////
 template< typename TLambda >
-const ITaskHandle* LambdaTaskMaker( const TLambda& functor, ITaskSystem* system_interface, const ITaskHandle* parent_task_handle )
+const ITaskHandle* LambdaTaskMaker( const TLambda& functor, ITaskSystem* system_interface )
 {
 	//Function ptr is nullptr, cuz I will set it manually.
-	if( auto task_handle = system_interface->CreateNewTask( parent_task_handle ) )
+	if( auto task_handle = system_interface->CreateNewTask() )
 	{
 		if( sizeof( TLambda ) <= task_handle->GetTaskStorageSize() )
 		{

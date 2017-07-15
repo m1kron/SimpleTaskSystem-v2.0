@@ -13,7 +13,7 @@ public:
 	virtual uint32_t GetWorkersCount() const = 0;
 
 	// Creates raw task, which has to be later submitted. 
-	virtual const ITaskHandle* CreateNewTask( const ITaskHandle* dependant1, const ITaskHandle* dependant2 = nullptr, const ITaskHandle* dependant3 = nullptr ) = 0;
+	virtual const ITaskHandle* CreateNewTask() = 0;
 
 	// Submits and dispatches task to workers. Returns false in case of fail. Since now task is considered
 	// to be executed, so any changes until ITaskHandle::IsFinished() returns true are not permitted.
@@ -26,7 +26,7 @@ public:
 	template< typename TCondition > bool WaitUntil( const TCondition& condition );
 
 	// Creates a tasks and set task_function at the same time.
-	const ITaskHandle* CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* dependant1, const ITaskHandle* dependant2 = nullptr, const ITaskHandle* dependant3 = nullptr );
+	const ITaskHandle* CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* dependant1 = nullptr, const ITaskHandle* dependant2 = nullptr, const ITaskHandle* dependant3 = nullptr );
 
 protected:
 	// Bunch of functions needed for WaitUntill implementation:
@@ -49,8 +49,9 @@ protected:
 ////////////////////////////////////////////////////////////////////////////
 inline const ITaskHandle* ITaskSystem::CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 )
 {
-	if( auto task_handle = CreateNewTask( dependant1, dependant2, dependant3 ) )
+	if( auto task_handle = CreateNewTask() )
 	{
+		task_handle->AddDependants( dependant1, dependant2, dependant3 );
 		task_handle->SetTaskFunction( task_function );
 		return task_handle;
 	}

@@ -159,7 +159,7 @@ TEST( STSTest, SimpleSingleLambdaTask )
 		for( int i = 0; i < 10000; ++i )
 			sum += i;
 		return true;
-	}, system, nullptr );
+	}, system );
 
 	ASSERT_TRUE( system->SubmitTask( task_handle ) );
 	ASSERT_TRUE( system->WaitUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
@@ -197,7 +197,7 @@ TEST( STSTest, SimpleFlatTree )
 			auto task_handle = system_interface->CreateNewTask( helpers::TaskFunctionFast, nullptr );
 			ASSERT_TRUE( task_handle != nullptr );
 			helpers::WriteToTask( task_handle, 0 );
-			batch.Add( task_handle );
+			ASSERT_TRUE( batch.Add( task_handle ) );
 		}
 
 		ASSERT_TRUE( batch.SubmitAll() );
@@ -277,7 +277,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 			}; ///< end of child_lambda_functor
 
 			// Create new task using item_functor:
-			const sts::ITaskHandle* handle = sts::tools::LambdaTaskMaker( child_lambda_functor, context->GetTaskSystem(), nullptr );
+			const sts::ITaskHandle* handle = sts::tools::LambdaTaskMaker( child_lambda_functor, context->GetTaskSystem() );
 			batch.Add( handle );
 		}
 
@@ -306,7 +306,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 	}; ///< end of root_lambda
 
 	// Create main task using array_functor:
-	auto root_task_handle = sts::tools::LambdaTaskMaker( root_lambda, system_interface, nullptr );
+	auto root_task_handle = sts::tools::LambdaTaskMaker( root_lambda, system_interface );
 
 	// Submit main task..
 	bool submitted = system_interface->SubmitTask( root_task_handle );
@@ -367,7 +367,7 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 	
 			for( unsigned i = 0; i < 20; ++i )
 			{
-				auto handle = sts::tools::LambdaTaskMaker( functor, system_interface, nullptr );
+				auto handle = sts::tools::LambdaTaskMaker( functor, system_interface );
 				ASSERT_TRUE( handle != nullptr );
 				batch.Add( handle );
 			}
@@ -450,7 +450,7 @@ TEST( STSTest, FlushingSuspendedTasks )
 				return true;
 			};
 
-			auto handle = sts::tools::LambdaTaskMaker( lambda, system_interface, nullptr );
+			auto handle = sts::tools::LambdaTaskMaker( lambda, system_interface );
 			batch.Add( handle );
 		}
 

@@ -78,14 +78,12 @@ void BackendTaskSystem::WakeUpAllWorkerThreads() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-const ITaskHandle* BackendTaskSystem::CreateNewTask( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 )
+const ITaskHandle* BackendTaskSystem::CreateNewTask()
 {
 	const ITaskHandle* new_task_handle = m_taskAllocator.AllocateNewTask();
 
 	if( new_task_handle == nullptr )
 		return nullptr;
-
-	new_task_handle->AddDependants( dependant1, dependant2, dependant3 );
 
 	return new_task_handle;
 }

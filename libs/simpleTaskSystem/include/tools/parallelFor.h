@@ -58,7 +58,7 @@ bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor&
 		return ParallelForEach( second_half_begin, second_half_end, functor, context->GetTaskSystem(), cut_off );
 	};
 
-	if( !batch.Add( LambdaTaskMaker( second_half_lambda, task_system_interface, nullptr ) ) )
+	if( !batch.Add( LambdaTaskMaker( second_half_lambda, task_system_interface ) ) )
 		return false;
 
 	if( !batch.SubmitAll() )
