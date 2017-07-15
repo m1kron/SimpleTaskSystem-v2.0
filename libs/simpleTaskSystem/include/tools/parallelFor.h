@@ -18,7 +18,8 @@ template< class Iterator, typename Functor >
 bool ParallelForEach(	const Iterator& begin,				//< Begin iterator
 						const Iterator& end,				//< End iterator
 						const Functor& functor,				//< functor will called on every iterator between begin and end.
-						ITaskSystem* system_interface );	//< task system interface instance that will be used to deliver task functionality.
+						ITaskSystem* system_interface,		//< task system interface instance that will be used to deliver task functionality
+						size_t cut_off );					//< when to cut off recursion and process given batch sequentailly
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -28,79 +29,49 @@ bool ParallelForEach(	const Iterator& begin,				//< Begin iterator
 
 /////////////////////////////////////////////////////////////////////////////////////
 template< class Iterator, typename Functor >
-bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor& functor, ITaskSystem* task_system_interface )
+bool ParallelForEach( const Iterator& begin, const Iterator& end, const Functor& functor, ITaskSystem* task_system_interface, size_t cut_off )
 {
-	uint32_t max_num_of_threads = task_system_interface->GetWorkersCount() + 1;
 	auto con_size = std::distance( begin, end );
-	auto batch_size = ( con_size / max_num_of_threads );
-	Iterator last_it = end;
+	auto half_size = ( con_size / 2 );
 
-	static const unsigned MAX_WORKERS = 64;
-
-	if( MAX_WORKERS < max_num_of_threads )
-		return false; // or use some dynamic memory implementation.
-
-	TaskBatch< MAX_WORKERS > batch( task_system_interface );
-	
-	// WARNING!
-	// This is needed only in debug mode, cuz in debug stl iterators are so big,
-	// that task's internal storage cannot hold them..
-#ifdef _DEBUG
-	std::vector< Iterator > iterators;
-	iterators.reserve( 2 * ( max_num_of_threads - 1 ) );
-#endif
-
-	// Setup tasks.
-	for( uint32_t i = 0; i < max_num_of_threads - 1; ++i )
+	if( (size_t)con_size < cut_off )
 	{
-		Iterator start_it = begin;
-		std::advance( start_it, i * batch_size );
+		// Just do it sequentually:
+		for( auto it = begin; it != end; ++it )
+			functor( it );
 
-		Iterator end_it = start_it;
-		std::advance( end_it, batch_size );
-
-		last_it = end_it;
-
-#ifdef _DEBUG
-		iterators.push_back( start_it ); 
-		iterators.push_back( end_it );
-		Iterator& dbg_start_it = iterators[ iterators.size() - 2 ];
-		Iterator& dbg_end_it = iterators[ iterators.size() - 1 ];
-#endif
-
-#ifdef _DEBUG
-		// Debug version:
-		auto func = [ &functor, &dbg_start_it, &dbg_end_it ]( const ITaskContext* )
-		{
-			for( Iterator it = dbg_start_it; it != dbg_end_it; ++it )
-				functor( it );
-			return true;
-		};
-#else
-		// Release version:
-		auto func = [ &functor, start_it, end_it ]( const ITaskContext* )
-		{
-			for( auto it = start_it; it != end_it; ++it )
-				functor( it );
-			return true;
-		};
-#endif
-
-		if( auto handle = LambdaTaskMaker( func, task_system_interface, nullptr ) )
-			batch.Add( handle );
-		else
-			return false;
+		return true;
 	}
+
+	// Batch is to big to calculate it sequentially, so spread it across threads.
+	Iterator first_half_begin = begin;
+	Iterator first_half_end = first_half_begin;
+	std::advance( first_half_end, half_size + 1 );
+
+	Iterator second_half_begin = first_half_end;
+	Iterator second_half_end = end;
+
+	// Crete a task to execute second half:
+	TaskBatch< 1 > batch( task_system_interface );
+	auto second_half_lambda = [ &functor, &second_half_begin, &second_half_end, cut_off ]( const ITaskContext* context )
+	{
+		return ParallelForEach( second_half_begin, second_half_end, functor, context->GetTaskSystem(), cut_off );
+	};
+
+	if( !batch.Add( LambdaTaskMaker( second_half_lambda, task_system_interface, nullptr ) ) )
+		return false;
 
 	if( !batch.SubmitAll() )
 		return false;
 
-	// Do the rest of job using this thread:
-	for( auto it = last_it; it != end; ++it )
-		functor( it );
+	// Execute ParallelFor for first half.
+	ParallelForEach( first_half_begin, first_half_end, functor, task_system_interface, cut_off );
 
-	// wait for rest to finish.
-	return task_system_interface->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+	// Wait for rest to finish.
+	if( !task_system_interface->WaitUntil( [ &batch ] { return batch.AreAllTaskFinished(); } ) )
+		return false;
+
+	return !batch.HasExecutionError();
 }
 
 }
