@@ -7,8 +7,8 @@
 #include "..\..\libs\basicThreadingLib\include\tools\tools.h"
 #include "..\..\libs\basicThreadingLib\include\thread\functorThread.h"
 
-typedef std::array<int, 16 > TArray16;
-typedef std::array<int, 8 > TArray8;
+typedef std::array<int, 1600 > TArray16;
+typedef std::array<int, 800 > TArray8;
 
 namespace helpers
 {
@@ -75,7 +75,7 @@ namespace helpers
 	static void CalculateBigSum( TIter& it ) 
 	{
 		static const int IterationNumberBig = 1000000000;
-		static const int IterationNumberSmall = 100000000;
+		static const int IterationNumberSmall = 1000000;
 
 		int sum = 0;
 		for( int i = 0; i < IterationNumberSmall; ++i )
@@ -119,12 +119,13 @@ namespace helpers
 		TArray testArray;
 		auto manager = CreateTaskSystem();
 
-		sts::tools::ParallelForEach( testArray.begin(), testArray.end(),
+		bool success = sts::tools::ParallelForEach( testArray.begin(), testArray.end(),
 			[]( TArray::iterator& it )
 		{
 			helpers::CalculateBigSum( it );
-		}, manager );
+		}, manager, 40 );
 
+		ASSERT_TRUE( success );
 		ASSERT_TRUE( helpers::ChcekIfEqual( testArray.begin(), testArray.end() ) );
 
 		DestroyTaskSystem( manager );
