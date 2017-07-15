@@ -93,7 +93,7 @@ namespace helpers
 
 		batch.SubmitAll();
 
-		context->SuspendUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+		context->GetTaskSystem()->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 
 		bool ok = true;
 		for( auto task_handle : batch )
@@ -143,7 +143,7 @@ TEST( STSTest, SimpleSingleTask )
 	const sts::ITaskHandle* task_handle = system->CreateNewTask( &helpers::TaskFunction, nullptr );
 
 	ASSERT_TRUE( system->SubmitTask( task_handle ) );
-	ASSERT_TRUE( system->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
+	ASSERT_TRUE( system->WaitUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
 	ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
 
 	system->ReleaseTask( task_handle );
@@ -162,7 +162,7 @@ TEST( STSTest, SimpleSingleLambdaTask )
 	}, system, nullptr );
 
 	ASSERT_TRUE( system->SubmitTask( task_handle ) );
-	ASSERT_TRUE( system->RunTasksUsingThisThreadUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
+	ASSERT_TRUE( system->WaitUntil( [ &task_handle ]() { return task_handle->IsFinished(); } ) );
 
 	system->ReleaseTask( task_handle );
 }
@@ -176,7 +176,7 @@ TEST( STSTest, SimpleChainTask )
 
 	ASSERT_TRUE( system->SubmitTask( root_task_handle ) );
 	ASSERT_TRUE( system->SubmitTask( child_task_handle ) );
-	ASSERT_TRUE( system->RunTasksUsingThisThreadUntil( [ &root_task_handle ]() { return root_task_handle->IsFinished(); }  ) );
+	ASSERT_TRUE( system->WaitUntil( [ &root_task_handle ]() { return root_task_handle->IsFinished(); }  ) );
 
 	ASSERT_TRUE( helpers::ReadFromTask<int>( root_task_handle ) > 0 );
 	ASSERT_TRUE( helpers::ReadFromTask<int>( child_task_handle ) > 0 );
@@ -202,7 +202,7 @@ TEST( STSTest, SimpleFlatTree )
 
 		ASSERT_TRUE( batch.SubmitAll() );
 
-		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+		system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 
 		for( auto task_handle : batch )
 			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) > 0 );
@@ -221,7 +221,7 @@ TEST( STSTest, SimpleDynamicTree )
 		helpers::WriteToTask( task_handle, 0 );
 
 		ASSERT_TRUE( batch.SubmitAll() );
-		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+		system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 
 		for( auto task_handle : batch )
 			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) == helpers::SOME_CONST );
@@ -243,7 +243,7 @@ TEST( STSTest, 2lvlDynamicTree )
 		}
 
 		ASSERT_TRUE( batch.SubmitAll() );
-		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+		system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
 
 		for( auto task_handle : batch )
 			ASSERT_TRUE( helpers::ReadFromTask<int>( task_handle ) == helpers::SOME_CONST );
@@ -285,7 +285,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 		bool submitted = batch.SubmitAll();
 
 		// Wait until whole batch is done.
-		context->SuspendUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+		context->GetTaskSystem()->WaitUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 
 		// Get results from child tasks and calculate final sum:
 		int final_sum = 0;
@@ -313,7 +313,7 @@ TEST( STSTest, DynamicTaskTreeTestWithLambdas )
 	ASSERT_TRUE( submitted );
 
 	// and help processing until main task is done:
-	system_interface->RunTasksUsingThisThreadUntil( [ &root_task_handle ] { return root_task_handle->IsFinished(); } );
+	system_interface->WaitUntil( [ &root_task_handle ] { return root_task_handle->IsFinished(); } );
 
 	// Read the result:
 	ASSERT_TRUE( helpers::ReadFromTask<int>( root_task_handle ) == 10000000 );
@@ -348,7 +348,7 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 	
 			bool submitted = batch.SubmitAll();
 	
-			context->SuspendUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+			context->GetTaskSystem()->WaitUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 	
 			int final_sum = 0;
 			for( auto handle : batch )
@@ -375,7 +375,7 @@ TEST(STSTest, DynamicTaskTreeTestWithLambdas2 )
 			bool submitted = batch.SubmitAll();
 			ASSERT_TRUE( submitted );
 	
-			system_interface->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+			system_interface->WaitUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 	
 			for( auto handle : batch )
 			{
@@ -420,7 +420,7 @@ TEST(STSTest, StaticTaskTreeTest)
 		bool submitted = batch.SubmitAll();
 		ASSERT_TRUE( submitted );
 	
-		system_interface->RunTasksUsingThisThreadUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
+		system_interface->WaitUntil( [ &batch ] { return batch.AreAllTaskFinished(); } );
 	
 		for( auto handle : batch )
 		{
@@ -446,7 +446,7 @@ TEST( STSTest, FlushingSuspendedTasks )
 		{
 			auto lambda = [&fence ]( const sts::ITaskContext* context )
 			{
-				context->SuspendUntil( [ &fence ]() { return fence.Load( btl::MemoryOrder::Acquire ) == 1; } );
+				context->GetTaskSystem()->WaitUntil( [ &fence ]() { return fence.Load( btl::MemoryOrder::Acquire ) == 1; } );
 				return true;
 			};
 
@@ -458,10 +458,10 @@ TEST( STSTest, FlushingSuspendedTasks )
 		timer.Start();
 
 		ASSERT_TRUE( batch.SubmitAll() );
-		system_interface->RunTasksUsingThisThreadUntil( [ &timer ]() { return timer.ElapsedTimeInSeconds() > 1.0; } );
+		system_interface->WaitUntil( [ &timer ]() { return timer.ElapsedTimeInSeconds() > 1.0; } );
 
 		fence.Store( 1, btl::MemoryOrder::Release );
 		btl::this_thread::SleepFor( 1000 );
-		system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished();  } );
+		system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished();  } );
 	}
 }
