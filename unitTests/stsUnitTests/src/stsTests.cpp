@@ -465,3 +465,86 @@ TEST( STSTest, FlushingSuspendedTasks )
 		system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished();  } );
 	}
 }
+
+///////////////////////////////////////////////////////////////////
+TEST( STSTest, MaxDependenciesTest )
+{
+	btl::Atomic< int > flag;
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	{
+		sts::tools::TaskBatch< 6 > batch( system_interface );
+		for( int i = 0; i < 3; ++i )
+		{
+			auto task_handle = sts::tools::LambdaTaskMaker( [ &flag ]( const sts::ITaskContext* ) { return flag == 3; }, system_interface );
+			ASSERT_TRUE( batch.Add( task_handle ) );
+		}
+
+		for( int i = 0; i < 3; ++i )
+		{
+			auto task_handle = sts::tools::LambdaTaskMaker( [ &flag ]( const sts::ITaskContext* ) { flag.Increment(); return true; }, system_interface );
+			task_handle->AddDependants( batch[ 0 ], batch[ 1 ], batch[ 2 ] );
+			ASSERT_TRUE( batch.Add( task_handle ) );
+		}
+
+		ASSERT_TRUE( batch.SubmitAll() );
+		system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+
+		ASSERT_TRUE( !batch.HasExecutionError() );
+	}
+}
+
+///////////////////////////////////////////////////////////////////
+TEST( STSTest, MaxTasksFlat )
+{
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	{
+		sts::tools::TaskBatch< 2048 > batch( system_interface );
+		for( int i = 0; i < 2048; ++i )
+		{
+			auto task_handle = system_interface->CreateNewTask( helpers::TaskFunctionFast );
+			ASSERT_TRUE( batch.Add( task_handle ) );
+		}
+
+		ASSERT_TRUE( system_interface->CreateNewTask( helpers::TaskFunctionFast ) == nullptr );
+
+		ASSERT_TRUE( batch.SubmitAll() );
+		system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+
+		ASSERT_TRUE( !batch.HasExecutionError() );
+	}
+}
+
+///////////////////////////////////////////////////////////////////
+TEST( STSTest, MaxTasksDynamic )
+{
+	sts::ITaskSystem* system_interface = helpers::StaticTaskSystem::GetStaticTaskSystem();
+	for ( int i = 0; i < 100; ++i )
+	{
+		sts::tools::TaskBatch< 128 > batch( system_interface );
+		for( int i = 0; i < 128; ++i )
+		{
+			auto task_handle = sts::tools::LambdaTaskMaker( 
+				[]( const sts::ITaskContext* context ) 
+				{ 
+					sts::tools::TaskBatch< 3 > batch( context->GetTaskSystem() );
+					for( int i = 0; i < 3; ++i )
+					{
+						auto task_handle = sts::tools::LambdaTaskMaker( []( const sts::ITaskContext* ) { return true; }, context->GetTaskSystem() );
+						if( !batch.Add( task_handle ) ) return false;
+					}
+
+					if( !batch.SubmitAll() ) return false;
+					if( !context->GetTaskSystem()->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } ) ) return false;
+
+					return !batch.HasExecutionError();
+
+				}, system_interface );
+			ASSERT_TRUE( batch.Add( task_handle ) );
+		}
+
+		ASSERT_TRUE( batch.SubmitAll() );
+		system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } );
+
+		ASSERT_TRUE( !batch.HasExecutionError() );
+	}
+}
