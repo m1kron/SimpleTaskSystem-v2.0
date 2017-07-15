@@ -19,27 +19,8 @@ public:
 	// Returns pointer to the storage - see information on TaskHandle::GetTaskStorage().
 	virtual void* GetThisTaskStorage() const = 0;
 
-	// Suspends a task represented by this context until given condition is satisfied.
-	template< class TCondtion > void SuspendUntil( const TCondtion& condition ) const;
-
 protected:
-	// Called when condition is not yet satisfied.
-	virtual void SuspendExecution() const = 0;
-
 	virtual ~ITaskContext() = 0;
 };
-
-///////////////////////////////////////////////////////////////////////////
-//
-// INLINES:
-//
-///////////////////////////////////////////////////////////////////////////
-
-template<class TCondtion>
-inline void ITaskContext::SuspendUntil( const TCondtion& condition ) const
-{
-	while( !condition() )
-		SuspendExecution();
-}
 
 }

@@ -1,5 +1,6 @@
 #include "precompiledHeader.h"
 #include "taskWorkerInstance.h"
+#include "taskWorkerInstanceHelper.h"
 #include "..\..\backend\dispatcher\dispatcher.h"
 #include "..\..\backend\taskFiber\taskFiberAllocator.h"
 #include "..\..\backend\task\task.h"
@@ -91,12 +92,15 @@ bool TaskWorkerInstance::PerformOneExecutionStep()
 void TaskWorkerInstance::SwitchToTaskFiber( TaskFiber* fiber )
 {
 	ASSERT( fiber );
+	TaskWorkerInstanceHelper::SetCurrentlyExecutedTask( fiber );
 	btl::this_fiber::SwitchToFiber( fiber->GetFiberID() );
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 void TaskWorkerInstance::HandleCurrentTaskFiberSwitch()
 {
+	TaskWorkerInstanceHelper::SetCurrentlyExecutedTask( nullptr );
+
 	WORKER_LOG( "Switching back from current fiber." );
 
 	switch( m_currentFiber->GetCurrentState() )
@@ -189,6 +193,8 @@ bool TaskWorkerInstance::CheckAndExecuteSuspenedTaskFibers()
 //////////////////////////////////////////////////////////////////////////////////
 bool TaskWorkerInstance::HandleSuspendedTaskFiberSwitch( TaskFiber* fiber )
 {
+	TaskWorkerInstanceHelper::SetCurrentlyExecutedTask( nullptr );
+
 	WORKER_LOG( "Switching back from so-far-suspended fiber with task< %i >.",, fiber->GetTask()->GetTaskID() );
 
 	switch( fiber->GetCurrentState() )
@@ -268,7 +274,7 @@ bool TaskWorkerInstance::AddTask( Task* task )
 //////////////////////////////////////////////////////////////////////////////////
 void TaskWorkerInstance::FlushAllPendingAndSuspendedTasks()
 {
-	WORKER_LOG( "Flushing %i suspended task fibers and %i pending tasks to other worker instances.",, m_suspendedTaskFibers.GetCurrentSize(), m_pendingTaskQueue.GetCurrentSize() );
+	WORKER_LOG( "Flushing %i suspended task fibers and %i pending tasks to other worker instances.", , m_suspendedTaskFibers.GetCurrentSize(), m_pendingTaskQueue.GetCurrentSize() );
 	// 2. Flush pending tasks:
 	while( TaskFiber* suspended_task_fiber = m_suspendedTaskFibers.PopBack() )
 		VERIFY_SUCCESS( m_context.m_dispatcher->RedispatchSuspendedTaskFiber( suspended_task_fiber ) );

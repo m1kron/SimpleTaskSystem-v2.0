@@ -51,6 +51,7 @@
     <ClInclude Include="src\common\structures\lockfree\lockfreePtrQueue.h" />
     <ClInclude Include="src\common\taskWorkerInstance\taskWorkerInstance.h" />
     <ClInclude Include="src\common\taskWorkerInstance\taskWorkerInstanceContext.h" />
+    <ClInclude Include="src\common\taskWorkerInstance\taskWorkerInstanceHelper.h" />
     <ClInclude Include="src\common\tools\positiveNumberHasher.h" />
     <ClInclude Include="src\frontend\frontendTaskSystem.h" />
     <ClInclude Include="src\precompiledHeader\precompiledHeader.h" />
@@ -67,6 +68,7 @@
     <ClCompile Include="src\backend\task\taskContext.cpp" />
     <ClCompile Include="src\backend\task\taskHandle.cpp" />
     <ClCompile Include="src\common\taskWorkerInstance\taskWorkerInstance.cpp" />
+    <ClCompile Include="src\common\taskWorkerInstance\taskWorkerInstanceHelper.cpp" />
     <ClCompile Include="src\frontend\frontendTaskSystem.cpp" />
     <ClCompile Include="src\frontend\globalApiImpl.cpp" />
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">

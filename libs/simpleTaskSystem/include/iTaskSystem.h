@@ -22,23 +22,20 @@ public:
 	// Release task back to the pool. Means that user has finished copying data from task.
 	virtual void ReleaseTask( const ITaskHandle* task_handle ) = 0;
 
-	// Tasks will be processed by workers and this thread until condition is satified. 
-	// Function blocks until all needed tasks to satisfy condition are excecuted.
-	// Returns true if condition is satisfied. Returns false when some critical error occured.
-	template< typename TCondition > bool RunTasksUsingThisThreadUntil( const TCondition& condition );
+	// Function blocks until condition is satisfied. Returns false when some critical error occured.
+	template< typename TCondition > bool WaitUntil( const TCondition& condition );
 
 	// Creates a tasks and set task_function at the same time.
 	const ITaskHandle* CreateNewTask( sts::TTaskFunctionPtr task_function, const ITaskHandle* dependant1, const ITaskHandle* dependant2 = nullptr, const ITaskHandle* dependant3 = nullptr );
 
 protected:
-	// Tries to steal and process one task. Blocking function.
-	virtual void TryToRunOneTask() = 0;
-
-	// Temporary converts main thread to workers. Needed for running tasks on main thread.
-	virtual bool ConvertMainThreadToWorker() = 0;
-
-	// Converts from 'worker' back to 'main thread'.
-	virtual void ConvertWorkerToMainThread() = 0;
+	// Bunch of functions needed for WaitUntill implementation:
+	virtual void WaitOnConvertedMainThread() = 0;
+	virtual bool ConvertMainThreadToWorkerInstance() = 0;
+	virtual void ConvertWorkerInstanceToMainThread() = 0;
+	virtual bool IsOnWorkerInstance() const = 0;
+	virtual void WaitOnWorkerInstance() const = 0;
+	// ---
 
 	virtual ~ITaskSystem() = 0;
 };
@@ -63,15 +60,24 @@ inline const ITaskHandle* ITaskSystem::CreateNewTask( sts::TTaskFunctionPtr task
 
 ////////////////////////////////////////////////////////////////////////////
 template<typename TCondition>
-inline bool ITaskSystem::RunTasksUsingThisThreadUntil( const TCondition & condition )
+inline bool ITaskSystem::WaitUntil( const TCondition& condition )
 {
-	if( !ConvertMainThreadToWorker() )
-		return false;
+	if( IsOnWorkerInstance() )
+	{
+		while( !condition() )
+			WaitOnWorkerInstance();
+	}
+	else
+	{
+		if( !ConvertMainThreadToWorkerInstance() )
+			return false;
 
-	while( !condition() )
-		TryToRunOneTask();
+		while( !condition() )
+			WaitOnConvertedMainThread();
 
-	ConvertWorkerToMainThread();
+		ConvertWorkerInstanceToMainThread();
+	}
+
 	return true;
 }
 

@@ -102,7 +102,7 @@ bool MergeSortTaskFunction( const sts::ITaskContext* context )
 		 false;
 
 	// 7. Wait for tasks to finish.
-	context->SuspendUntil( [ &batch ](){ return batch.AreAllTaskFinished(); } );
+	context->GetTaskSystem()->WaitUntil( [ &batch ](){ return batch.AreAllTaskFinished(); } );
 
 	if( batch.HasExecutionError() )
 		return false;
@@ -148,7 +148,7 @@ bool ParallelMergeSort( TContainer& container, ITaskSystem* system_interface )
 	// 4. Submit and wait until done.
 	if( !batch.SubmitAll() )
 		return false;
-	if( !system_interface->RunTasksUsingThisThreadUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } ) )
+	if( !system_interface->WaitUntil( [ &batch ]() { return batch.AreAllTaskFinished(); } ) )
 		return false;
 
 	// 5. Check if everything went fine.

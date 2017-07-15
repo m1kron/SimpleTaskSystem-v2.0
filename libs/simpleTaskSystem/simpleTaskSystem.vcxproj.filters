@@ -141,6 +141,9 @@
     <ClInclude Include="src\backend\taskWorkerThread\taskWorkerThreadPool.h">
       <Filter>src\backend\taskWorkerThread</Filter>
     </ClInclude>
+    <ClInclude Include="src\common\taskWorkerInstance\taskWorkerInstanceHelper.h">
+      <Filter>src\common\taskWorkerInstance</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\precompiledHeader\precompiledHeader.cpp">
@@ -184,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="src\backend\taskWorkerThread\taskWorkerThreadPool.cpp">
       <Filter>src\backend\taskWorkerThread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\taskWorkerInstance\taskWorkerInstanceHelper.cpp">
+      <Filter>src\common\taskWorkerInstance</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

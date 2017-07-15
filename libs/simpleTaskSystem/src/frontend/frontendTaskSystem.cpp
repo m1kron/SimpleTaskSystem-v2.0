@@ -1,6 +1,7 @@
 #include "precompiledHeader.h"
 #include "frontendTaskSystem.h"
 #include "..\backend\backendTaskSystem.h"
+#include "..\common\taskWorkerInstance\taskWorkerInstanceHelper.h"
 
 NAMESPACE_STS_BEGIN
 
@@ -46,7 +47,7 @@ void FrontendTaskSystem::ReleaseTask( const ITaskHandle* task_handle )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-void FrontendTaskSystem::TryToRunOneTask()
+void FrontendTaskSystem::WaitOnConvertedMainThread()
 {
 	bool hasMoreWorkToDo = m_helperInstanceWorker.PerformOneExecutionStep();
 	if( !hasMoreWorkToDo )
@@ -54,7 +55,7 @@ void FrontendTaskSystem::TryToRunOneTask()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-bool FrontendTaskSystem::ConvertMainThreadToWorker()
+bool FrontendTaskSystem::ConvertMainThreadToWorkerInstance()
 {
 	if( m_helperInstanceWorker.ConvertToWorkerInstance() )
 	{
@@ -68,11 +69,23 @@ bool FrontendTaskSystem::ConvertMainThreadToWorker()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-void FrontendTaskSystem::ConvertWorkerToMainThread()
+void FrontendTaskSystem::ConvertWorkerInstanceToMainThread()
 {
 	VERIFY_SUCCESS( m_helperInstanceWorker.ConvertToNormalThread() );
 	m_helperInstanceWorker.FlushAllPendingAndSuspendedTasks();
 	SYSTEM_LOG( "Converted from helper worker instance back to normal thread again." );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+bool FrontendTaskSystem::IsOnWorkerInstance() const
+{
+	return TaskWorkerInstanceHelper::IsOnActiveTaskWorkerInstance();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+void FrontendTaskSystem::WaitOnWorkerInstance() const
+{
+	TaskWorkerInstanceHelper::SuspendExecutionOfCurrentTask();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

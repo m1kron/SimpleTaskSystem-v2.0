@@ -19,9 +19,11 @@ public:
 	const ITaskHandle* CreateNewTask( const ITaskHandle* dependant1, const ITaskHandle* dependant2, const ITaskHandle* dependant3 ) override;
 	bool SubmitTask( const ITaskHandle* task_handle ) override;
 	void ReleaseTask( const ITaskHandle* task_handle ) override;
-	void TryToRunOneTask() override;
-	bool ConvertMainThreadToWorker() override;
-	void ConvertWorkerToMainThread() override;
+	void WaitOnConvertedMainThread() override;
+	bool ConvertMainThreadToWorkerInstance() override;
+	void ConvertWorkerInstanceToMainThread() override;
+	bool IsOnWorkerInstance() const override;
+	void WaitOnWorkerInstance() const override;
 	// ---
 
 	// Initilalizes backend system and this frontend. Returns true if success.

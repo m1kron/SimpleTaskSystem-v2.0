@@ -4,24 +4,23 @@
 NAMESPACE_STS_BEGIN
 
 class ITaskSystem;
-class TaskFiber;
+class Task;
 
 // Implementation of ITaskContext.
 class TaskContext : public ITaskContext
 {
 public:
-	TaskContext( ITaskSystem* system_interface, TaskFiber* task_fiber );
+	TaskContext( ITaskSystem* system_interface, Task* task );
 
 	// ITaskContext interface:
 	ITaskSystem* GetTaskSystem() const override;
 	uint32_t GetThisTaskStorageSize() const override;
 	void* GetThisTaskStorage() const override;
-	void SuspendExecution() const override;
 	// ---
 
 private:
 	ITaskSystem* m_taskSystem;
-	TaskFiber* m_taskFiber;
+	Task* m_task;
 };
 
 ///////////////////////////////////////////////////////////
@@ -31,9 +30,9 @@ private:
 ///////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////
-inline TaskContext::TaskContext( ITaskSystem* system_interface, TaskFiber* task_fiber )
+inline TaskContext::TaskContext( ITaskSystem* system_interface, Task* task )
 	: m_taskSystem( system_interface )
-	, m_taskFiber( task_fiber )
+	, m_task( task )
 {
 }
 
