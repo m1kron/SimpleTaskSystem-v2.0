@@ -4,6 +4,8 @@ NAMESPACE_STS_BEGIN
 
 class TaskFiber;
 
+NAMESPACE_COMMON_BEGIN
+
 class TaskWorkerInstanceHelper
 {
 public:
@@ -20,4 +22,5 @@ private:
 	static void SetCurrentlyExecutedTask( TaskFiber* fiber );
 };
 
+NAMESPACE_COMMON_END
 NAMESPACE_STS_END

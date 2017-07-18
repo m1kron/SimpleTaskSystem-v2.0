@@ -18,7 +18,7 @@ public:
 	TaskWorkerThread& operator=( const TaskWorkerThread& ) = delete;
 
 	// Starts thread ( and initializes worker instance ). Returns true if success.
-	bool Start( const TaskWorkerInstanceContext& context );
+	bool Start( const common::TaskWorkerInstanceContext& context );
 
 	// Signals to stop work.
 	void FinishWork();
@@ -30,14 +30,14 @@ public:
 	void WakeUp();
 
 	// Returns worker instance.
-	TaskWorkerInstance* GetWorkerInstance();
+	common::TaskWorkerInstance* GetWorkerInstance();
 
 private:
 	// Main thread function.
 	void ThreadFunction() override;
 	void MainWorkerThreadLoop();
 
-	TaskWorkerInstance m_workerInstance;
+	common::TaskWorkerInstance m_workerInstance;
 	btl::ManualResetEvent m_hasWorkToDoEvent;
 	bool m_shouldFinishWork;
 	bool m_hasFinishWork;
@@ -57,7 +57,7 @@ inline TaskWorkerThread::TaskWorkerThread()
 }
 
 ////////////////////////////////////////////////////////
-inline bool TaskWorkerThread::Start( const TaskWorkerInstanceContext& context )
+inline bool TaskWorkerThread::Start( const common::TaskWorkerInstanceContext& context )
 {
 	if( m_workerInstance.Initalize( context ) )
 	{
@@ -87,7 +87,7 @@ inline void TaskWorkerThread::WakeUp()
 }
 
 ////////////////////////////////////////////////////////
-inline TaskWorkerInstance* TaskWorkerThread::GetWorkerInstance()
+inline common::TaskWorkerInstance* TaskWorkerThread::GetWorkerInstance()
 {
 	return &m_workerInstance;
 }

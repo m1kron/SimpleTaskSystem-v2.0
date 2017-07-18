@@ -7,7 +7,7 @@ NAMESPACE_STS_BEGIN
 
 ///////////////////////////////////////////////////////////
 TaskFiber::TaskFiber()
-	: __base::FiberBase( TASK_FIBER_STACK_SIZE )
+	: __base::FiberBase( common::TASK_FIBER_STACK_SIZE )
 {
 	Reset();
 	STATIC_ASSERT( sizeof( TaskFiber ) == BTL_CACHE_LINE_SIZE, "[TaskFiber]: class does not have size of cacheLine!" );

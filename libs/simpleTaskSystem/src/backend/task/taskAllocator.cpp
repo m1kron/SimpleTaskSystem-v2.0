@@ -8,7 +8,7 @@ TaskAllocator::TaskAllocator()
 	: m_registry( this )
 {
 	// Setup and add to free list.
-	for( uint32_t i = 0; i < TASK_POOL_SIZE; ++i )
+	for( uint32_t i = 0; i < common::TASK_POOL_SIZE; ++i )
 	{
 		Task& task = m_taskPool[ i ];
 		task.Setup( (TASK_ID)i );

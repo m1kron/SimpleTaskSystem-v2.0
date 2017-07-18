@@ -79,13 +79,13 @@ void FrontendTaskSystem::ConvertWorkerInstanceToMainThread()
 ////////////////////////////////////////////////////////////////////////////////////////////////
 bool FrontendTaskSystem::IsOnWorkerInstance() const
 {
-	return TaskWorkerInstanceHelper::IsOnActiveTaskWorkerInstance();
+	return common::TaskWorkerInstanceHelper::IsOnActiveTaskWorkerInstance();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void FrontendTaskSystem::WaitOnWorkerInstance() const
 {
-	TaskWorkerInstanceHelper::SuspendExecutionOfCurrentTask();
+	common::TaskWorkerInstanceHelper::SuspendExecutionOfCurrentTask();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

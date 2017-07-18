@@ -20,8 +20,8 @@ public:
 	void ReleaseTaskFiber( TaskFiber* fiber );
 
 private:
-	TaskFiber m_fiberPool[ TASK_FIBER_POOL_SIZE ];		//< Main pool of fibers of static size ( for now ).
-	LockFreePtrQueue< TaskFiber, TASK_FIBER_POOL_SIZE > m_freeList;
+	TaskFiber m_fiberPool[ common::TASK_FIBER_POOL_SIZE ];		//< Main pool of fibers of static size ( for now ).
+	common::LockFreePtrQueue< TaskFiber, common::TASK_FIBER_POOL_SIZE > m_freeList;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ private:
 /////////////////////////////////////////////////////////
 inline TaskFiberAllocator::~TaskFiberAllocator()
 {
-	ASSERT( m_freeList.GetCurrentSize() == TASK_FIBER_POOL_SIZE );
+	ASSERT( m_freeList.GetCurrentSize() == common::TASK_FIBER_POOL_SIZE );
 }
 
 /////////////////////////////////////////////////////////

@@ -9,6 +9,8 @@ NAMESPACE_STS_BEGIN
 class Task;
 class TaskFiber;
 
+NAMESPACE_COMMON_BEGIN
+
 // Class is responsible for task execution and managment. In particular, it
 // has a queue of pending tasks, as well as list of suspended ones. It also
 // implements fiber managment.
@@ -168,4 +170,5 @@ inline bool TaskWorkerInstance::HasWorkToDo() const
 	return m_suspendedTaskFibers.GetCurrentSize() > 0 || m_pendingTaskQueue.GetCurrentSize() > 0;
 }
 
+NAMESPACE_COMMON_END
 NAMESPACE_STS_END

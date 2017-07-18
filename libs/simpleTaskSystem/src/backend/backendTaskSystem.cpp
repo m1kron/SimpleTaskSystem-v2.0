@@ -8,7 +8,7 @@ NAMESPACE_STS_BEGIN
 #define SYSTEM_LOG( ... ) LOG( "[BACKEND_SYSTEM]: " __VA_ARGS__ );
 
 ///////////////////////////////////////////////////////////////////////////////////
-bool BackendTaskSystem::Initialize( TaskWorkerInstance& helper_instance, ITaskSystem* system_interface )
+bool BackendTaskSystem::Initialize( common::TaskWorkerInstance& helper_instance, ITaskSystem* system_interface )
 {
 	ASSERT( system_interface );
 	const uint32_t num_cores = btl::GetLogicalCoresSize() - 1;
@@ -37,7 +37,7 @@ bool BackendTaskSystem::Initialize( TaskWorkerInstance& helper_instance, ITaskSy
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-void BackendTaskSystem::Deinitialize( TaskWorkerInstance& helper_instance )
+void BackendTaskSystem::Deinitialize( common::TaskWorkerInstance& helper_instance )
 {
 	// Signal all worker that they should finish right now.
 	for( uint32_t i = 0; i < m_workerThreadsPool.GetPoolSize(); ++i )

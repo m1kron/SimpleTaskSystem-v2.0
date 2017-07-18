@@ -3,6 +3,7 @@
 #include "..\..\..\..\..\basicThreadingLib\include\synchro\lockGuards.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_COMMON_BEGIN
 
 ///////////////////////////////////////////////////
 // Implementation of lock based multiple-producer
@@ -128,4 +129,5 @@ inline uint32_t LockBasedPtrQueue<T, SIZE, TLockPrimitive>::GetCurrentSize_NotTh
 	return m_writeCounter - m_readCounter;
 }
 
+NAMESPACE_COMMON_END
 NAMESPACE_STS_END

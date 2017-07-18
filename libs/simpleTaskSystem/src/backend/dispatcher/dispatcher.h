@@ -4,7 +4,8 @@
 
 NAMESPACE_STS_BEGIN
 
-class TaskWorkerInstance;
+namespace common { class TaskWorkerInstance; }
+
 class Task;
 class TaskFiber;
 
@@ -24,7 +25,7 @@ public:
 	// Helper instance is an instance that is not always available and has to be 
 	// threated in special way in some scenarios.
 	// Primary instance is alway available and dispatcher can count on that.
-	uint32_t Register( TaskWorkerInstance* instance, bool primary_instance );
+	uint32_t Register( common::TaskWorkerInstance* instance, bool primary_instance );
 
 	// Sets function to weak up primary worker threads. OK, this is kind of hack:
 	// my idea was that there is sth like worker instance and this dispatcher only bothers about that.
@@ -48,7 +49,7 @@ public:
 	uint32_t GetRegisteredInstancesCount() const;
 
 private:
-	friend class TaskWorkerInstance;
+	friend common::TaskWorkerInstance;
 
 	// Wakes up all primary worker instances.
 	void WakeUpAllPrimaryWorkerInstances();
@@ -61,11 +62,11 @@ private:
 	Task* TryToStealTaskFromOtherWorkerInstances( uint32_t requesting_worker_instance_id );
 
 	// Finds registered worker instance that works on given thread id.
-	TaskWorkerInstance* FindWorkerInstanceWithThreadID( btl::THREAD_ID id );
+	common::TaskWorkerInstance* FindWorkerInstanceWithThreadID( btl::THREAD_ID id );
 
-	std::vector< TaskWorkerInstance* > m_helpersInstances;
-	std::vector< TaskWorkerInstance* > m_primaryInstances;
-	std::vector< TaskWorkerInstance* > m_allRegisteredInstances;
+	std::vector< common::TaskWorkerInstance* > m_helpersInstances;
+	std::vector< common::TaskWorkerInstance* > m_primaryInstances;
+	std::vector< common::TaskWorkerInstance* > m_allRegisteredInstances;
 	std::function< void() > m_wakeUpAllPrimaryWorkerInstancesFunc;
 };
 

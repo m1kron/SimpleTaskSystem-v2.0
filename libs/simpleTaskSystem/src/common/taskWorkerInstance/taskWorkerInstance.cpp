@@ -6,6 +6,7 @@
 #include "..\..\backend\task\task.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_COMMON_BEGIN
 
 #define WORKER_LOG( txt, ... )																						\
 	if ( m_context.m_id == 0 )	{ LOG( "[HELPER_WORKER_INSTANCE< %i >]: " txt, m_context.m_id __VA_ARGS__ );	}	\
@@ -297,4 +298,5 @@ bool TaskWorkerInstance::TakeOwnershipOfSuspendedTaskFiber( TaskFiber* suspended
 	return false;
 }
 
+NAMESPACE_COMMON_END
 NAMESPACE_STS_END

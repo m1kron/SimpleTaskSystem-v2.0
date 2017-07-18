@@ -33,7 +33,7 @@ public:
 	BackendTaskSystem* Deinitialize();
 
 private:
-	TaskWorkerInstance m_helperInstanceWorker;
+	common::TaskWorkerInstance m_helperInstanceWorker;
 	BackendTaskSystem* m_backend;
 };
 

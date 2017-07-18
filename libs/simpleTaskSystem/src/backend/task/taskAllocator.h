@@ -54,9 +54,9 @@ private:
 
 	// ---------------------------------------------------
 
-	Task m_taskPool[ TASK_POOL_SIZE ];
-	TaskHandle m_taskHandlePool[ TASK_POOL_SIZE ];
-	LockFreePtrQueue< const ITaskHandle, TASK_POOL_SIZE > m_freelist;
+	Task m_taskPool[ common::TASK_POOL_SIZE ];
+	TaskHandle m_taskHandlePool[ common::TASK_POOL_SIZE ];
+	common::LockFreePtrQueue< const ITaskHandle, common::TASK_POOL_SIZE > m_freelist;
 	TaskRegistry m_registry;
 };
 
@@ -102,7 +102,7 @@ inline Task* TaskAllocator::TaskIDToTask( TASK_ID id )
 ////////////////////////////////////////////////////////////////////////////
 inline uint32_t TaskAllocator::GetTaskPoolSize()
 {
-	return TASK_POOL_SIZE;
+	return common::TASK_POOL_SIZE;
 }
 
 ////////////////////////////////////////////////////////////////////////////

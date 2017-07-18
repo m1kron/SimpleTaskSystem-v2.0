@@ -7,10 +7,10 @@
 
 NAMESPACE_STS_BEGIN
 
-#define DISPATCHER_LOG( ... ) //LOG( "[DISPATCHER]: " __VA_ARGS__ );
+#define DISPATCHER_LOG( ... ) LOG( "[DISPATCHER]: " __VA_ARGS__ );
 
 /////////////////////////////////////////////////////////////////////////////
-uint32_t Dispatcher::Register( TaskWorkerInstance* instance, bool primary_instance )
+uint32_t Dispatcher::Register( common::TaskWorkerInstance* instance, bool primary_instance )
 {
 	m_allRegisteredInstances.push_back( instance );
 
@@ -39,7 +39,7 @@ bool Dispatcher::DispatchTask( Task* task )
 	ASSERT( task->IsReadyToBeExecuted() );
 
 	// 1) If task is submited from one of the available worker instances, add task to that instance:
-	if( TaskWorkerInstance* instance = FindWorkerInstanceWithThreadID( this_thread_id ) )
+	if( common::TaskWorkerInstance* instance = FindWorkerInstanceWithThreadID( this_thread_id ) )
 	{
 		if( instance->AddTask( task ) )
 		{
@@ -73,12 +73,12 @@ bool Dispatcher::RedispatchSuspendedTaskFiber( TaskFiber* suspended_task_fiber )
 
 	// Try to dispach task equally among all primary worker threads. In order to do that use a hash of task id:
 	const uint32_t primarySize = ( uint32_t )m_primaryInstances.size();
-	uint32_t starting_id = CalcHashedNumberClamped( taskID, primarySize );
+	uint32_t starting_id = common::CalcHashedNumberClamped( taskID, primarySize );
 
 	for( uint32_t i = 0; i < primarySize; ++i )
 	{
 		uint32_t worker_instance_idx = ( starting_id + i ) % primarySize;
-		TaskWorkerInstance* instance = m_primaryInstances[ worker_instance_idx ];
+		common::TaskWorkerInstance* instance = m_primaryInstances[ worker_instance_idx ];
 		if( instance->TakeOwnershipOfSuspendedTaskFiber( suspended_task_fiber ) )
 		{
 			DISPATCHER_LOG( "Suspended task fiber with task< %i > was added to worker instance %i.", taskID, instance->GetInstanceID() );
@@ -96,12 +96,12 @@ bool Dispatcher::DispatchTaskToPrimaryInstances( Task* task )
 {
 	// Try to dispach task equally among all primary worker threads. In order to do that use a hash of task id:
 	const uint32_t primarySize = ( uint32_t )m_primaryInstances.size();
-	uint32_t starting_id = CalcHashedNumberClamped( task->GetTaskID(), primarySize );
+	uint32_t starting_id = common::CalcHashedNumberClamped( task->GetTaskID(), primarySize );
 
 	for( uint32_t i = 0; i < primarySize; ++i )
 	{
 		uint32_t worker_instance_idx = ( starting_id + i ) % primarySize;
-		TaskWorkerInstance* instance = m_primaryInstances[ worker_instance_idx ];
+		common::TaskWorkerInstance* instance = m_primaryInstances[ worker_instance_idx ];
 
 		if( instance->AddTask( task ) )
 		{
@@ -125,7 +125,7 @@ Task* Dispatcher::TryToStealTaskFromOtherWorkerInstances( uint32_t requesting_wo
 	{
 		// Start from thread that is next to this worker in the pool.
 		uint32_t index = ( i + requesting_worker_instance_id ) % instances_count;
-		TaskWorkerInstance* instance = m_allRegisteredInstances[ index ];
+		common::TaskWorkerInstance* instance = m_allRegisteredInstances[ index ];
 		if( stealed_task = instance->TryToStealTaskFromThisInstance() )
 		{
 			DISPATCHER_LOG( "Stealed task from worker instance( id: %i ), for worker instance( id: %i ).", instance->GetInstanceID(), requesting_worker_instance_id );
@@ -137,7 +137,7 @@ Task* Dispatcher::TryToStealTaskFromOtherWorkerInstances( uint32_t requesting_wo
 }
 
 /////////////////////////////////////////////////////////////////////////////
-TaskWorkerInstance* Dispatcher::FindWorkerInstanceWithThreadID( btl::THREAD_ID thread_id )
+common::TaskWorkerInstance* Dispatcher::FindWorkerInstanceWithThreadID( btl::THREAD_ID thread_id )
 {
 	// 1. Check always converted instances:
 	for( auto instance : m_primaryInstances )

@@ -3,6 +3,7 @@
 #include "..\backend\taskFiber\taskFiber.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_COMMON_BEGIN
 
 //////////////////////////////////////////////////////////////////////////////////
 thread_local TaskFiber* s_executingFiberThreadLocal = nullptr;
@@ -29,4 +30,5 @@ void TaskWorkerInstanceHelper::SetCurrentlyExecutedTask( TaskFiber* fiber )
 	s_executingFiberThreadLocal = fiber;
 }
 
+NAMESPACE_COMMON_END
 NAMESPACE_STS_END

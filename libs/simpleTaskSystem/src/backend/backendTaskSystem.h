@@ -16,10 +16,10 @@ public:
 	~BackendTaskSystem();
 
 	// Starts sts machinary.
-	bool Initialize( TaskWorkerInstance& helper_instance, ITaskSystem* system_interface );
+	bool Initialize( common::TaskWorkerInstance& helper_instance, ITaskSystem* system_interface );
 
 	// Stops sts machinery. 
-	void Deinitialize( TaskWorkerInstance& helper_instance );
+	void Deinitialize( common::TaskWorkerInstance& helper_instance );
 
 	// Creates new tasks.
 	const ITaskHandle* CreateNewTask();

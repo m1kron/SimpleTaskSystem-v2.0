@@ -3,6 +3,7 @@
 #include "..\..\..\..\..\basicThreadingLib\include\atomic\atomic.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_COMMON_BEGIN
 
 ///////////////////////////////////////////////////
 // Implementation of lockfree multiple-producer
@@ -155,4 +156,5 @@ inline uint32_t LockFreePtrQueue<T, SIZE>::CounterToIndex( uint32_t counter ) co
 	return counter & ( SIZE - 1 ); 
 }
 
+NAMESPACE_COMMON_END
 NAMESPACE_STS_END
