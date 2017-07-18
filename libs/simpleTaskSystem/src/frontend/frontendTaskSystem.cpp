@@ -5,10 +5,12 @@
 
 NAMESPACE_STS_BEGIN
 
-#define SYSTEM_LOG( ... ) LOG( "[FRONTEND_SYSTEM]: " __VA_ARGS__ );
-
 // Implementation of dtor of ITaskSystem.
 ITaskSystem::~ITaskSystem() {}
+
+NAMESPACE_FRONTEND_BEGIN
+
+#define SYSTEM_LOG( ... ) LOG( "[FRONTEND_SYSTEM]: " __VA_ARGS__ );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 FrontendTaskSystem::FrontendTaskSystem()
@@ -105,4 +107,5 @@ BackendTaskSystem* FrontendTaskSystem::Deinitialize()
 	return backend_ptr;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

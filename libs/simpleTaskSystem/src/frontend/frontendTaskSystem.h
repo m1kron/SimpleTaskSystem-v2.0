@@ -6,6 +6,8 @@ NAMESPACE_STS_BEGIN
 
 class BackendTaskSystem;
 
+NAMESPACE_FRONTEND_BEGIN
+
 // This is the frontend part of the task system: mainly implements ITaskSystem
 // and servs as a worker instance when needed.
 class FrontendTaskSystem : public ITaskSystem
@@ -37,4 +39,5 @@ private:
 	BackendTaskSystem* m_backend;
 };
 
+NAMESPACE_FRONTEND_END
 NAMESPACE_STS_END
