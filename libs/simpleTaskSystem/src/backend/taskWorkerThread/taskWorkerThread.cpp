@@ -2,6 +2,7 @@
 #include "taskWorkerThread.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 #define THREAD_LOG( ... ) LOG( "[WORKER_THREAD]: " __VA_ARGS__ );
 
@@ -49,4 +50,5 @@ void TaskWorkerThread::MainWorkerThreadLoop()
 	}
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

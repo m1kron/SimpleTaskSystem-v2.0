@@ -4,6 +4,8 @@
 NAMESPACE_STS_BEGIN
 
 class ITaskSystem;
+
+NAMESPACE_BACKEND_BEGIN
 class Task;
 
 // Implementation of ITaskContext.
@@ -42,4 +44,5 @@ inline ITaskSystem* TaskContext::GetTaskSystem() const
 	return m_taskSystem;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

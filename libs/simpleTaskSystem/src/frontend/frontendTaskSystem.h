@@ -4,7 +4,10 @@
 
 NAMESPACE_STS_BEGIN
 
-class BackendTaskSystem;
+namespace backend
+{
+	class BackendTaskSystem;
+}
 
 NAMESPACE_FRONTEND_BEGIN
 
@@ -29,14 +32,14 @@ public:
 	// ---
 
 	// Initilalizes backend system and this frontend. Returns true if success.
-	bool Initialize( BackendTaskSystem* backend_system );
+	bool Initialize( backend::BackendTaskSystem* backend_system );
 
 	// Deinitializes backend system and this frontend. Returns backend system.
-	BackendTaskSystem* Deinitialize();
+	backend::BackendTaskSystem* Deinitialize();
 
 private:
 	common::TaskWorkerInstance m_helperInstanceWorker;
-	BackendTaskSystem* m_backend;
+	backend::BackendTaskSystem* m_backend;
 };
 
 NAMESPACE_FRONTEND_END

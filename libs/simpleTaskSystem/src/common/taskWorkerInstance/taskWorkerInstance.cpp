@@ -75,7 +75,7 @@ bool TaskWorkerInstance::PerformOneExecutionStep()
 
 	isThereMoreWorkToDo |= CheckAndExecuteSuspenedTaskFibers();
 
-	if( Task* task = TrytoGetTaskToExecute() )
+	if( backend::Task* task = TrytoGetTaskToExecute() )
 	{
 		// We have the task, so run it now.
 		ExecuteSingleTask( task );
@@ -90,7 +90,7 @@ bool TaskWorkerInstance::PerformOneExecutionStep()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TaskWorkerInstance::SwitchToTaskFiber( TaskFiber* fiber )
+void TaskWorkerInstance::SwitchToTaskFiber( backend::TaskFiber* fiber )
 {
 	ASSERT( fiber );
 	TaskWorkerInstanceHelper::SetCurrentlyExecutedTask( fiber );
@@ -106,10 +106,10 @@ void TaskWorkerInstance::HandleCurrentTaskFiberSwitch()
 
 	switch( m_currentFiber->GetCurrentState() )
 	{
-	case TaskFiberState::Idle:
+	case backend::TaskFiberState::Idle:
 		OnFinishedTaskFiber( m_currentFiber );
 		break;
-	case TaskFiberState::Suspended:
+	case backend::TaskFiberState::Suspended:
 		OnSuspendedCurrrentTaskFiber();
 		break;
 
@@ -119,16 +119,16 @@ void TaskWorkerInstance::HandleCurrentTaskFiberSwitch()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TaskWorkerInstance::OnFinishedTaskFiber( TaskFiber* fiber )
+void TaskWorkerInstance::OnFinishedTaskFiber( backend::TaskFiber* fiber )
 {
-	Task* finished_task = fiber->GetTask();
+	backend::Task* finished_task = fiber->GetTask();
 	WORKER_LOG( "Task< %i > is done.",, finished_task->GetTaskID() );
 
 	// Check if task has any dependency - if has and it is ready, then submit it now.
-	TReadyToBeExecutedArray array { nullptr };
+	backend::TReadyToBeExecutedArray array { nullptr };
 	if( finished_task->UpdateDependecies( m_context.m_registry, array ) )
 	{
-		for( Task* ready_to_be_executed : array )
+		for( backend::Task* ready_to_be_executed : array )
 		{
 			if( ready_to_be_executed )
 			{
@@ -146,7 +146,7 @@ void TaskWorkerInstance::OnFinishedTaskFiber( TaskFiber* fiber )
 void TaskWorkerInstance::OnSuspendedCurrrentTaskFiber()
 {
 	WORKER_LOG( "Current task fiber with task< %i > is suspended. Add it to suspended fiber queue and get a new one.",, m_currentFiber->GetTask()->GetTaskID() );
-	if( TaskFiber* new_task_fiber = m_context.m_fiberAllocator->AllocateNewTaskFiber() )
+	if( backend::TaskFiber* new_task_fiber = m_context.m_fiberAllocator->AllocateNewTaskFiber() )
 	{
 		SetupFiber( new_task_fiber );
 		VERIFY_SUCCESS( m_suspendedTaskFibers.PushBack( m_currentFiber ) );
@@ -174,7 +174,7 @@ bool TaskWorkerInstance::CheckAndExecuteSuspenedTaskFibers()
 	const uint32_t suspendedSize = m_suspendedTaskFibers.GetCurrentSize();
 	for ( uint32_t i = 0; i < suspendedSize; ++i )
 	{
-		TaskFiber* current_suspended_task_fiber = m_suspendedTaskFibers.PopFront();
+		backend::TaskFiber* current_suspended_task_fiber = m_suspendedTaskFibers.PopFront();
 
 		if( current_suspended_task_fiber == nullptr )
 		{
@@ -192,7 +192,7 @@ bool TaskWorkerInstance::CheckAndExecuteSuspenedTaskFibers()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-bool TaskWorkerInstance::HandleSuspendedTaskFiberSwitch( TaskFiber* fiber )
+bool TaskWorkerInstance::HandleSuspendedTaskFiberSwitch( backend::TaskFiber* fiber )
 {
 	TaskWorkerInstanceHelper::SetCurrentlyExecutedTask( nullptr );
 
@@ -200,12 +200,12 @@ bool TaskWorkerInstance::HandleSuspendedTaskFiberSwitch( TaskFiber* fiber )
 
 	switch( fiber->GetCurrentState() )
 	{
-	case TaskFiberState::Idle:
+	case backend::TaskFiberState::Idle:
 		WORKER_LOG( "Suspended fiber with task< %i > is done now.", , fiber->GetTask()->GetTaskID() );
 		OnFinishedTaskFiber( fiber );
 		m_context.m_fiberAllocator->ReleaseTaskFiber( fiber ); //< Release task fiber.
 		return true;
-	case TaskFiberState::Suspended:
+	case backend::TaskFiberState::Suspended:
 		WORKER_LOG( "Suspended fiber with task< %i > is still suspended.", , fiber->GetTask()->GetTaskID() );
 		m_suspendedTaskFibers.PushBack( fiber ); //< Add this task fiber back to suspended queue.
 		return false;
@@ -218,11 +218,11 @@ bool TaskWorkerInstance::HandleSuspendedTaskFiberSwitch( TaskFiber* fiber )
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TaskWorkerInstance::ExecuteSingleTask( Task* task )
+void TaskWorkerInstance::ExecuteSingleTask( backend::Task* task )
 {
 	WORKER_LOG( "Executing the task< %i >.",, task->GetTaskID() );
 	ASSERT( m_currentFiber );
-	ASSERT( m_currentFiber->GetCurrentState() == TaskFiberState::Idle );
+	ASSERT( m_currentFiber->GetCurrentState() == backend::TaskFiberState::Idle );
 	m_currentFiber->SetTaskToExecute( task );
 	WORKER_LOG( "Switching to current fiber to execute task< %i >.", , task->GetTaskID() );
 	SwitchToTaskFiber( m_currentFiber );
@@ -230,12 +230,12 @@ void TaskWorkerInstance::ExecuteSingleTask( Task* task )
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-Task* TaskWorkerInstance::TrytoGetTaskToExecute()
+backend::Task* TaskWorkerInstance::TrytoGetTaskToExecute()
 {
 	WORKER_LOG( "Trying to get new task to execute." );
 	// Check if there is any task in the queue - take the newest one, it works better for 
 	// dynamic build trees( assumption is done, that newst tasks are related to each other and cache - friendly ).
-	Task* task = m_pendingTaskQueue.PopBack();
+	backend::Task* task = m_pendingTaskQueue.PopBack();
 
 	// Local queue is empty, so try to steal task from other threads.
 	if( task == nullptr )
@@ -248,25 +248,25 @@ Task* TaskWorkerInstance::TrytoGetTaskToExecute()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-Task* TaskWorkerInstance::TryToStealTaskFromOtherInstances()
+backend::Task* TaskWorkerInstance::TryToStealTaskFromOtherInstances()
 {
 	return m_context.m_dispatcher->TryToStealTaskFromOtherWorkerInstances( GetInstanceID() );
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TaskWorkerInstance::ReleaseFiber( TaskFiber* fiber )
+void TaskWorkerInstance::ReleaseFiber( backend::TaskFiber* fiber )
 {
 	m_context.m_fiberAllocator->ReleaseTaskFiber( fiber );
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TaskWorkerInstance::SetupFiber( TaskFiber* fiber )
+void TaskWorkerInstance::SetupFiber( backend::TaskFiber* fiber )
 {
 	fiber->Setup( m_thisFiberID, m_context.m_taskSystem );
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-bool TaskWorkerInstance::AddTask( Task* task )
+bool TaskWorkerInstance::AddTask( backend::Task* task )
 {
 	WORKER_LOG( "Added new task< %i > to local pending queue.", , task->GetTaskID() );
 	return m_pendingTaskQueue.PushBack( task );
@@ -277,18 +277,18 @@ void TaskWorkerInstance::FlushAllPendingAndSuspendedTasks()
 {
 	WORKER_LOG( "Flushing %i suspended task fibers and %i pending tasks to other worker instances.", , m_suspendedTaskFibers.GetCurrentSize(), m_pendingTaskQueue.GetCurrentSize() );
 	// 2. Flush pending tasks:
-	while( TaskFiber* suspended_task_fiber = m_suspendedTaskFibers.PopBack() )
+	while( backend::TaskFiber* suspended_task_fiber = m_suspendedTaskFibers.PopBack() )
 		VERIFY_SUCCESS( m_context.m_dispatcher->RedispatchSuspendedTaskFiber( suspended_task_fiber ) );
 
 	// 2. Flush pending tasks:
-	while( Task* pending_task = m_pendingTaskQueue.PopBack() )
+	while( backend::Task* pending_task = m_pendingTaskQueue.PopBack() )
 		VERIFY_SUCCESS( m_context.m_dispatcher->RedispatchTaskFromHelperWorkerInstance( pending_task ) );
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-bool TaskWorkerInstance::TakeOwnershipOfSuspendedTaskFiber( TaskFiber* suspended_task_fiber )
+bool TaskWorkerInstance::TakeOwnershipOfSuspendedTaskFiber( backend::TaskFiber* suspended_task_fiber )
 {
-	ASSERT( suspended_task_fiber->GetCurrentState() == TaskFiberState::Suspended );
+	ASSERT( suspended_task_fiber->GetCurrentState() == backend::TaskFiberState::Suspended );
 	if( m_suspendedTaskFibers.PushBack( suspended_task_fiber ) )
 	{
 		WORKER_LOG( "Taken ownership of suspended task fiber with task< %i >", , suspended_task_fiber->GetTask()->GetTaskID() );

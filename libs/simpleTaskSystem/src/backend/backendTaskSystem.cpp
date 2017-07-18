@@ -4,6 +4,7 @@
 #include "..\..\..\basicThreadingLib\include\tools\tools.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 #define SYSTEM_LOG( ... ) LOG( "[BACKEND_SYSTEM]: " __VA_ARGS__ );
 
@@ -88,4 +89,5 @@ const ITaskHandle* BackendTaskSystem::CreateNewTask()
 	return new_task_handle;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

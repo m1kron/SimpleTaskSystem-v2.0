@@ -2,6 +2,7 @@
 #include "taskAllocator.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 ///////////////////////////////////////////////////
 TaskAllocator::TaskAllocator()
@@ -42,4 +43,5 @@ bool TaskAllocator::AreAllTasksReleased() const
 	return m_freelist.GetCurrentSize() == m_freelist.GetMaxSize();;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

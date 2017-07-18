@@ -91,15 +91,15 @@ void FrontendTaskSystem::WaitOnWorkerInstance() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-bool FrontendTaskSystem::Initialize( BackendTaskSystem* backend_system )
+bool FrontendTaskSystem::Initialize( backend::BackendTaskSystem* backend_system )
 {
 	ASSERT( backend_system );
 	m_backend = backend_system;
-	return m_backend->Initialize( m_helperInstanceWorker, this );;
+	return m_backend->Initialize( m_helperInstanceWorker, this );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-BackendTaskSystem* FrontendTaskSystem::Deinitialize()
+backend::BackendTaskSystem* FrontendTaskSystem::Deinitialize()
 {
 	m_backend->Deinitialize( m_helperInstanceWorker );
 	auto backend_ptr = m_backend;

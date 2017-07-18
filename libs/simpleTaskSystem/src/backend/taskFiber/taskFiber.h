@@ -3,8 +3,10 @@
 
 NAMESPACE_STS_BEGIN
 
-class Task;
 class ITaskSystem;
+
+NAMESPACE_BACKEND_BEGIN
+class Task;
 
 // Describes TaskWorkerFiver
 enum class TaskFiberState
@@ -89,4 +91,5 @@ inline void TaskFiber::SwitchToParentFiber()
 	btl::this_fiber::SwitchToFiber( m_parentFiberID );
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

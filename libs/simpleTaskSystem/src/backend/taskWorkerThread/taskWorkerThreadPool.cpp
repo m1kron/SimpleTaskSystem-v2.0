@@ -2,6 +2,7 @@
 #include "taskWorkerThreadPool.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 ////////////////////////////////////////////////////////////////////
 void TaskWorkersPool::InitializePool( uint32_t num_of_workers )
@@ -21,4 +22,5 @@ TaskWorkerThread* TaskWorkersPool::FindWorkerWithThreadID( btl::THREAD_ID thread
 	return nullptr;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

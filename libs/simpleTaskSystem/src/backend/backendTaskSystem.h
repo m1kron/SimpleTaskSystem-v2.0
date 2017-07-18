@@ -8,6 +8,8 @@ NAMESPACE_STS_BEGIN
 
 class ITaskSystem;
 
+NAMESPACE_BACKEND_BEGIN
+
 // Heart of sts system.
 class BackendTaskSystem
 {
@@ -82,4 +84,5 @@ inline uint32_t BackendTaskSystem::GetWorkersCount() const
 	return m_workerThreadsPool.GetPoolSize();
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

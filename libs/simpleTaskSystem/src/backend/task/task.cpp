@@ -4,6 +4,7 @@
 #include "..\..\..\..\commonLib\include\tools\tools.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 #define TASK_LOG( txt, ... ) LOG("[TASK< %i >]: " txt, GetTaskID() __VA_ARGS__ );
 
@@ -90,4 +91,5 @@ void Task::AddDependantTasks( Task* dependant1, Task* dependant2, Task* dependan
 #undef SETUP_DEPS
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

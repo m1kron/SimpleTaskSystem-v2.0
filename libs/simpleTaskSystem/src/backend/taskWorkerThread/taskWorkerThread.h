@@ -4,6 +4,7 @@
 #include "..\..\..\..\basicThreadingLib\include\thread\Thread.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 //////////////////////////////////////////////////////////
 // Task worker thread. This is a nest for single task worker instance.
@@ -92,4 +93,5 @@ inline common::TaskWorkerInstance* TaskWorkerThread::GetWorkerInstance()
 	return &m_workerInstance;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

@@ -6,7 +6,7 @@ NAMESPACE_STS_BEGIN
 NAMESPACE_COMMON_BEGIN
 
 //////////////////////////////////////////////////////////////////////////////////
-thread_local TaskFiber* s_executingFiberThreadLocal = nullptr;
+thread_local backend::TaskFiber* s_executingFiberThreadLocal = nullptr;
 
 //////////////////////////////////////////////////////////////////////////////////
 bool TaskWorkerInstanceHelper::IsOnActiveTaskWorkerInstance()
@@ -19,13 +19,13 @@ void TaskWorkerInstanceHelper::SuspendExecutionOfCurrentTask()
 {
 	if( s_executingFiberThreadLocal != nullptr )
 	{
-		ASSERT( s_executingFiberThreadLocal->GetCurrentState() != TaskFiberState::Idle );
+		ASSERT( s_executingFiberThreadLocal->GetCurrentState() != backend::TaskFiberState::Idle );
 		s_executingFiberThreadLocal->SuspendExecution();
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TaskWorkerInstanceHelper::SetCurrentlyExecutedTask( TaskFiber* fiber )
+void TaskWorkerInstanceHelper::SetCurrentlyExecutedTask( backend::TaskFiber* fiber )
 {
 	s_executingFiberThreadLocal = fiber;
 }

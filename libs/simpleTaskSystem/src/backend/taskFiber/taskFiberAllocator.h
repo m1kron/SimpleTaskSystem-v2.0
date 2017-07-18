@@ -3,6 +3,7 @@
 #include "..\..\common\structures\lockfree\lockfreePtrQueue.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 // Allocator for task fibers. TaskFibers are preallocated and added to the freelist.
 // 'Allocating' a task fiber means taking next free one from the freelist.
@@ -49,4 +50,5 @@ inline void TaskFiberAllocator::ReleaseTaskFiber( TaskFiber* fiber )
 	VERIFY_SUCCESS( m_freeList.PushBack( fiber ) );
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

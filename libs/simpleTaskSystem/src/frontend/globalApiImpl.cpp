@@ -7,8 +7,8 @@
 STS_API sts::ITaskSystem* CreateTaskSystem()
 {
 	// TODO: prepare that all of this operations can fail!
-	void* backend_mem = _aligned_malloc( sizeof( sts::BackendTaskSystem ), BTL_CACHE_LINE_SIZE );
-	sts::BackendTaskSystem* backend = new ( backend_mem ) sts::BackendTaskSystem();
+	void* backend_mem = _aligned_malloc( sizeof( sts::backend::BackendTaskSystem ), BTL_CACHE_LINE_SIZE );
+	sts::backend::BackendTaskSystem* backend = new ( backend_mem ) sts::backend::BackendTaskSystem();
 
 	void* frontend_mem = _aligned_malloc( sizeof( sts::frontend::FrontendTaskSystem ), BTL_CACHE_LINE_SIZE );
 	sts::frontend::FrontendTaskSystem* frontend = new ( frontend_mem ) sts::frontend::FrontendTaskSystem();
@@ -24,7 +24,7 @@ STS_API void DestroyTaskSystem( sts::ITaskSystem* system )
 	ASSERT( system );
 
 	sts::frontend::FrontendTaskSystem* frontend = static_cast< sts::frontend::FrontendTaskSystem* >( system );
-	sts::BackendTaskSystem* backend = frontend->Deinitialize();
+	sts::backend::BackendTaskSystem* backend = frontend->Deinitialize();
 
 	ASSERT( backend );
 

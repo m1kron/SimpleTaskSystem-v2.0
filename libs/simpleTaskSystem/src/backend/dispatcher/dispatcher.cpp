@@ -6,6 +6,7 @@
 #include "..\..\common\tools\positiveNumberHasher.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 #define DISPATCHER_LOG( ... ) LOG( "[DISPATCHER]: " __VA_ARGS__ );
 
@@ -152,4 +153,5 @@ common::TaskWorkerInstance* Dispatcher::FindWorkerInstanceWithThreadID( btl::THR
 	return nullptr;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

@@ -4,6 +4,7 @@
 #include "..\..\common\structures\lockfree\lockfreePtrQueue.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 class TaskAllocator;
 
@@ -111,4 +112,5 @@ inline const TaskRegistry* TaskAllocator::GetTaskRegistryInstance() const
 	return &m_registry;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

@@ -2,6 +2,7 @@
 #include "..\..\..\include\iTaskHandle.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 class Task;
 
@@ -70,4 +71,5 @@ inline Task* TaskHandle::GetTask() const
 	return m_task;
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

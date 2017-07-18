@@ -1,8 +1,8 @@
 #pragma once
 #include "taskWorkerThread.h"
 
-
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 ////////////////////////////////////////////////////////////
 // Manages pool of worker threads.
@@ -54,5 +54,5 @@ inline void TaskWorkersPool::ReleasePool()
 	m_workerThreads.clear();
 }
 
-
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

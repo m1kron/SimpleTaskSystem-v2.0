@@ -7,6 +7,8 @@ NAMESPACE_STS_BEGIN
 // Implementation of dtor of ITaskHandle.
 ITaskHandle::~ITaskHandle() {}
 
+NAMESPACE_BACKEND_BEGIN
+
 ///////////////////////////////////////////////////////////////////
 void TaskHandle::SetTaskFunction( TTaskFunctionPtr function ) const
 {
@@ -49,4 +51,5 @@ void * TaskHandle::GetTaskStorage() const
 	return m_task->GetStoragePtr();
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

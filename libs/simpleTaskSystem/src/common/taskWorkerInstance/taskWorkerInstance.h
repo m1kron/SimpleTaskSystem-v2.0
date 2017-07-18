@@ -6,8 +6,11 @@
 
 NAMESPACE_STS_BEGIN
 
-class Task;
-class TaskFiber;
+namespace backend
+{
+	class Task;
+	class TaskFiber;
+}
 
 NAMESPACE_COMMON_BEGIN
 
@@ -38,7 +41,7 @@ public:
 	bool ConvertToNormalThread();
 
 	// Adds task to pending execution queue. Returns true if success.
-	bool AddTask( Task* task );
+	bool AddTask( backend::Task* task );
 
 	// Performs one execution step - first checks suspended tasks. Second, tries to execute task from pending queue. If queue is empty, then tries to steal task
 	// from other worker instances. Returns true if there is more work to do, false it there is no work on this worker instance.
@@ -57,28 +60,28 @@ public:
 	void FlushAllPendingAndSuspendedTasks();
 
 private:
-	friend class Dispatcher;
+	friend class backend::Dispatcher;
 
 	// Takes ownership of suspended task fiber. Returns true if success.
-	bool TakeOwnershipOfSuspendedTaskFiber( TaskFiber* suspended_task_fiber );
+	bool TakeOwnershipOfSuspendedTaskFiber( backend::TaskFiber* suspended_task_fiber );
 
 	// Tries to steal a task from this worker instance.
-	Task* TryToStealTaskFromThisInstance();
+	backend::Task* TryToStealTaskFromThisInstance();
 
 	// Setups given fiber.
-	void SetupFiber( TaskFiber* fiber );
+	void SetupFiber( backend::TaskFiber* fiber );
 
 	// Releases fiber.
-	void ReleaseFiber( TaskFiber* fiber );
+	void ReleaseFiber( backend::TaskFiber* fiber );
 
 	// Switches to given fiber.
-	void SwitchToTaskFiber( TaskFiber* fiber );
+	void SwitchToTaskFiber( backend::TaskFiber* fiber );
 
 	// Handles situation when current task fiber switches back to this worker.
 	void HandleCurrentTaskFiberSwitch();
 
 	// Handles task fiber which has finished it's task.
-	void OnFinishedTaskFiber( TaskFiber* fiber );
+	void OnFinishedTaskFiber( backend::TaskFiber* fiber );
 
 	// Handles current task fiber which has suspended it's execution.
 	void OnSuspendedCurrrentTaskFiber();
@@ -89,23 +92,23 @@ private:
 
 	// Handles switch from suspended fiber task. Returns false if given fiber is still suspended,
 	// true when it is done.
-	bool HandleSuspendedTaskFiberSwitch( TaskFiber* fiber );
+	bool HandleSuspendedTaskFiberSwitch( backend::TaskFiber* fiber );
 
 	// Executes single task.
-	void ExecuteSingleTask( Task* task );
+	void ExecuteSingleTask( backend::Task* task );
 
 	// Returns task to execute. Can return nullptr, which means that there is nothing to do.
-	Task* TrytoGetTaskToExecute();
+	backend::Task* TrytoGetTaskToExecute();
 
 	// Tries to steal a task from other worker instances.
-	Task* TryToStealTaskFromOtherInstances();
+	backend::Task* TryToStealTaskFromOtherInstances();
 
 	//---------------------------------------------------------------------
 
-	LockBasedPtrQueue< TaskFiber, TASK_FIBER_POOL_SIZE > m_suspendedTaskFibers;
-	LockBasedPtrQueue< Task, TASK_POOL_SIZE > m_pendingTaskQueue;
+	LockBasedPtrQueue< backend::TaskFiber, TASK_FIBER_POOL_SIZE > m_suspendedTaskFibers;
+	LockBasedPtrQueue< backend::Task, TASK_POOL_SIZE > m_pendingTaskQueue;
 	TaskWorkerInstanceContext m_context;
-	TaskFiber* m_currentFiber;
+	backend::TaskFiber* m_currentFiber;
 	bool m_convertedToFiberByThisWorkerInstance;
 	btl::Atomic< uint32_t > m_convertedFlag;
 	btl::FIBER_ID m_thisFiberID;
@@ -147,7 +150,7 @@ inline bool TaskWorkerInstance::IsConvertedToWorkerInstance() const
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-inline Task* TaskWorkerInstance::TryToStealTaskFromThisInstance()
+inline backend::Task* TaskWorkerInstance::TryToStealTaskFromThisInstance()
 {
 	return m_pendingTaskQueue.PopFront();
 }

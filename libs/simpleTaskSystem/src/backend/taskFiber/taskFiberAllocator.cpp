@@ -2,6 +2,7 @@
 #include "taskFiberAllocator.h"
 
 NAMESPACE_STS_BEGIN
+NAMESPACE_BACKEND_BEGIN
 
 /////////////////////////////////////////////////////////
 TaskFiberAllocator::TaskFiberAllocator()
@@ -13,4 +14,5 @@ TaskFiberAllocator::TaskFiberAllocator()
 	}
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

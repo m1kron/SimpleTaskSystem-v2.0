@@ -5,6 +5,8 @@
 NAMESPACE_STS_BEGIN
 
 class ITaskContext;
+
+NAMESPACE_BACKEND_BEGIN
 class TaskRegistry;
 
 typedef uint16_t TASK_ID;
@@ -139,4 +141,5 @@ inline TASK_ID Task::GetTaskID() const
 	return m_id; 
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END

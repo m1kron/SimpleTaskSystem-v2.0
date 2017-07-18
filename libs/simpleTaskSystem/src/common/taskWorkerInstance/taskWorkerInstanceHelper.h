@@ -2,7 +2,10 @@
 
 NAMESPACE_STS_BEGIN
 
-class TaskFiber;
+namespace backend
+{
+	class TaskFiber;
+}
 
 NAMESPACE_COMMON_BEGIN
 
@@ -19,7 +22,7 @@ private:
 	friend class TaskWorkerInstance;
 
 	// Sets currently executed task fiber
-	static void SetCurrentlyExecutedTask( TaskFiber* fiber );
+	static void SetCurrentlyExecutedTask( backend::TaskFiber* fiber );
 };
 
 NAMESPACE_COMMON_END

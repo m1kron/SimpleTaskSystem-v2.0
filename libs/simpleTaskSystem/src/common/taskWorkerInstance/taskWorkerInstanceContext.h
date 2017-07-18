@@ -2,20 +2,24 @@
 
 NAMESPACE_STS_BEGIN
 
-class Dispatcher;
 class ITaskSystem;
-class TaskFiberAllocator;
-class TaskRegistry;
+
+namespace backend
+{
+	class Dispatcher;
+	class TaskFiberAllocator;
+	class TaskRegistry;
+}
 
 NAMESPACE_COMMON_BEGIN
 
 // Contains necessary context for task worker instance.
 struct TaskWorkerInstanceContext
 {
-	const TaskRegistry* m_registry;
+	const backend::TaskRegistry* m_registry;
 	ITaskSystem* m_taskSystem;
-	Dispatcher* m_dispatcher;
-	TaskFiberAllocator* m_fiberAllocator;
+	backend::Dispatcher* m_dispatcher;
+	backend::TaskFiberAllocator* m_fiberAllocator;
 	uint32_t m_id;
 };
 

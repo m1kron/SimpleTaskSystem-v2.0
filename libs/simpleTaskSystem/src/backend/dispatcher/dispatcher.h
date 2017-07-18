@@ -1,10 +1,11 @@
 #pragma once
 #include "..\..\..\..\libs\basicThreadingLib\include\thread\thisThreadHelpers.h"
 
-
 NAMESPACE_STS_BEGIN
 
 namespace common { class TaskWorkerInstance; }
+
+NAMESPACE_BACKEND_BEGIN
 
 class Task;
 class TaskFiber;
@@ -104,4 +105,5 @@ inline void Dispatcher::WakeUpAllPrimaryWorkerInstances()
 	m_wakeUpAllPrimaryWorkerInstancesFunc();
 }
 
+NAMESPACE_BACKEND_END
 NAMESPACE_STS_END
