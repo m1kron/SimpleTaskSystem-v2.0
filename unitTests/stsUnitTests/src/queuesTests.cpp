@@ -228,95 +228,95 @@ namespace helpers
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_PopBack_Lockbased_SpinLock )
 {
-	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
+	helpers::TestSingleThreadedPopBack< sts::common::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_PopBack_Lockbased_Mutex )
 {
-	helpers::TestSingleThreadedPopBack< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
+	helpers::TestSingleThreadedPopBack< sts::common::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_Lockfree )
 {
-	helpers::TestSingleThreaded< sts::LockFreePtrQueue< float, helpers::QUEUE_SIZE >  >();
+	helpers::TestSingleThreaded< sts::common::LockFreePtrQueue< float, helpers::QUEUE_SIZE >  >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_Lockbased_SpinLock )
 {
-	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
+	helpers::TestSingleThreaded< sts::common::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleThreaded_Lockbased_Mutex )
 {
-	helpers::TestSingleThreaded< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
+	helpers::TestSingleThreaded< sts::common::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_Lockfree )
 {
-	helpers::TestSingleProducerAndConsumer< sts::LockFreePtrQueue< float, helpers::BIG_QUEUE_SIZE >  >();
+	helpers::TestSingleProducerAndConsumer< sts::common::LockFreePtrQueue< float, helpers::BIG_QUEUE_SIZE >  >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_Lockbased_SpinLock )
 {
-	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::SpinLock > >();
+	helpers::TestSingleProducerAndConsumer< sts::common::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_Lockbased_Mutex )
 {
-	helpers::TestSingleProducerAndConsumer< sts::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::Mutex > >();
+	helpers::TestSingleProducerAndConsumer< sts::common::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_PopBack_Lockbased_SpinLock )
 {
-	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::SpinLock > >();
+	helpers::TestSingleProducerAndConsumer_PopBack< sts::common::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, SingleProducerAndConsumer_PopBack_Lockbased_Mutex )
 {
-	helpers::TestSingleProducerAndConsumer_PopBack< sts::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::Mutex > >();
+	helpers::TestSingleProducerAndConsumer_PopBack< sts::common::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::Mutex > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, 2Producers2Consumers_Lockfree )
 {
-	helpers::Test2Producers2Consumers< sts::LockFreePtrQueue< float, helpers::QUEUE_SIZE >, 10000000 >();
+	helpers::Test2Producers2Consumers< sts::common::LockFreePtrQueue< float, helpers::QUEUE_SIZE >, 10000000 >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, 2Producers2Consumers_LockBased_SpinLock )
 {
-	helpers::Test2Producers2Consumers< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock >, 10000000 >();
+	helpers::Test2Producers2Consumers< sts::common::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::SpinLock >, 10000000 >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, 2Producers2Consumers_LockBased_Mutex )
 {
-	helpers::Test2Producers2Consumers< sts::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex >, 10000000 >();
+	helpers::Test2Producers2Consumers< sts::common::LockBasedPtrQueue< float, helpers::QUEUE_SIZE, btl::Mutex >, 10000000 >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, MultipleProducersAndConsumers_Lockfree )
 {
-	helpers::TestMultipleProducersAndConsumers< sts::LockFreePtrQueue< float, helpers::BIG_QUEUE_SIZE > >();
+	helpers::TestMultipleProducersAndConsumers< sts::common::LockFreePtrQueue< float, helpers::BIG_QUEUE_SIZE > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, MultipleProducersAndConsumers_LockBased_SpinLock )
 {
-	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::SpinLock > >();
+	helpers::TestMultipleProducersAndConsumers< sts::common::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::SpinLock > >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST( QueueTests, MultipleProducersAndConsumers_LockBased_Mutex )
 {
-	helpers::TestMultipleProducersAndConsumers< sts::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::Mutex > >();
+	helpers::TestMultipleProducersAndConsumers< sts::common::LockBasedPtrQueue< float, helpers::BIG_QUEUE_SIZE, btl::Mutex > >();
 }
