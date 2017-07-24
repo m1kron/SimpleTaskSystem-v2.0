@@ -12,7 +12,7 @@ Main features of the library includes:
 - dynamic parallelism - ability to create and schedule new tasks from already-being-executed ones
 - base support for building dependency graphs
 - ability to suspend and later resume task execution at arbitrary points
-- implementation of base parallel algorithms - parallel for and parallel sort
+- implementation of basic parallel algorithms - parallel for and parallel sort
 
 
 For more information, please visit: https://pkowalczyk.wordpress.com/2017/07/16/simple-task-system-2-0.
