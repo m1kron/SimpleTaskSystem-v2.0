@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////////
 
 
-Simple Task System - a C++ library for parallel programming on multi-core processors.
+Simple Task System - a C++ library for task-based, parallel programming on multi-core processors.
 
 Main features of the library includes:
 - auto-balancing based of amount of work and number of available cores
